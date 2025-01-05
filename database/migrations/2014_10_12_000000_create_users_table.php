@@ -32,6 +32,7 @@ return new class extends Migration {
             $table->string('password');
             $table->json('settings')->nullable();
             $table->rememberToken();
+            $table->bigInteger('coins')->default(0);
             $table->timestamps();
         });
 

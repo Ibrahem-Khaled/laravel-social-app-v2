@@ -10,14 +10,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('user_gifts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('gift_id');
+            $table->integer('quantity')->default(1);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->text('content')->nullable();
-            $table->text('media')->nullable();
-            $table->boolean('pinned')->default(false);
-            $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
+            $table->foreign('gift_id')->references('id')->on('gifts')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('user_gifts');
     }
 };
