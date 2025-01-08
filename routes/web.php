@@ -1,5 +1,12 @@
 <?php
 
+use App\Http\Controllers\dashboard\GiftController;
+use App\Http\Controllers\dashboard\homeController;
+use App\Http\Controllers\dashboard\MessageController;
+use App\Http\Controllers\dashboard\NotificationController;
+use App\Http\Controllers\dashboard\PostController;
+use App\Http\Controllers\dashboard\UserController;
+use App\Http\Controllers\dashboard\VerificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +21,44 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('profile');
+})->name('home');
+
+
+
+
+Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], function () {
+    //this is dashboard route
+    Route::get('/', [homeController::class, 'dashboard'])->name('home.dashboard');
+
+    Route::resource('users', UserController::class);
+    Route::patch('/users/{user}/toggle-ban', [UserController::class, 'toggleBan'])->name('users.toggleBan');
+    Route::get('/users/search', [UserController::class, 'search'])->name('users.search');
+    Route::post('/users/{user}/manage-coins', [UserController::class, 'manageCoins'])->name('users.manageCoins');
+
+    Route::resource('posts', PostController::class);
+    Route::get('/reports', [PostController::class, 'reports'])->name('reports.index');
+    Route::patch('/reports/{report}/toggle-visibility', [PostController::class, 'toggleVisibility'])->name('reports.toggleVisibility');
+
+    Route::resource('gifts', GiftController::class);
+
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::post('/messages/send-anonymous', [MessageController::class, 'sendAnonymous'])->name('messages.sendAnonymous');
+    Route::delete('/messages/delete-multiple', [MessageController::class, 'deleteMultiple'])->name('messages.deleteMultiple');
+
+
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'delete'])->name('notifications.delete');
+    Route::post('/notifications', [NotificationController::class, 'store'])->name('notifications.store');
+    Route::patch('/notifications/{notification}', [NotificationController::class, 'update'])->name('notifications.update');
+
+    Route::post('/verification', [VerificationController::class, 'store'])->name('verification.store');
+    Route::get('/verifications', [VerificationController::class, 'index'])->name('verification.index');
+    Route::patch('/verification/{verificationRequest}/approve', [VerificationController::class, 'approve'])->name('verification.approve');
+    Route::patch('/verification/{verificationRequest}/reject', [VerificationController::class, 'reject'])->name('verification.reject');
+
 });
+
+
+require __DIR__ . '/web/auth.php';

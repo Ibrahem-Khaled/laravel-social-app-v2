@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
     protected static function booted()
@@ -17,11 +18,7 @@ class User extends Authenticatable
             $user->uuid = random_int(1000000000, 9999999999);
         });
     }
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $guarded = ['id'];
     protected $hidden = [
         'password',
         'remember_token',
@@ -31,6 +28,28 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function addCoins($amount)
+    {
+        $this->increment('coins', $amount);
+    }
+
+    public function subtractCoins($amount)
+    {
+        $this->decrement('coins', $amount);
+    }
+
+    public function scopeGender($query, $gender)
+    {
+        return $query->where('gender', $gender);
+    }
+
+    public function scopeCountry($query, $country)
+    {
+        return $query->where('country', $country);
+    }
+
+
+    // relations //
     public function posts()
     {
         return $this->hasMany(Post::class);
@@ -76,6 +95,30 @@ class User extends Authenticatable
 
     public function gifts()
     {
-        return $this->belongsToMany(Gift::class, 'user_gifts', 'user_id', 'gift_id');
+        return $this->belongsToMany(Gift::class, 'user_gifts')
+            ->withPivot('sender_id', 'quantity')
+            ->withTimestamps();
+    }
+
+
+    //this method is used to get the identifier that will be stored in the subject claim of the JWT
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }

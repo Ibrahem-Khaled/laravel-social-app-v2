@@ -17,15 +17,16 @@ return new class extends Migration {
             $table->string('name');
             $table->string('email')->unique();
             $table->string('phone')->nullable()->unique();
-            $table->string('profile_image')->nullable();
+            $table->string('avatar')->nullable();
             $table->text('bio')->nullable();
             $table->string('address')->nullable();
+            $table->string('country')->nullable();
             $table->string('website')->nullable();
             $table->json('social_links')->nullable();
             $table->boolean('is_verified')->default(false);
             $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
             $table->enum('gender', ['male', 'female'])->default('female');
-            $table->enum('role', ['admin', 'moderator', 'user'])->default('user');
+            $table->enum('role', ['admin', 'moderator', 'user', 'vip'])->default('user');
             $table->string('language')->default('ar');
             $table->timestamp('email_verified_at')->nullable();
             $table->date('birth_date')->nullable();
@@ -36,6 +37,16 @@ return new class extends Migration {
             $table->timestamps();
         });
 
+        DB::table('users')->insert([
+            'uuid' => 1,
+            'username' => 'admin',
+            'name' => 'Admin',
+            'email' => 'admin@gmail.com',
+            'password' => bcrypt('12345678'),
+            'role' => 'admin',
+            'is_verified' => true,
+            'status' => 'active',
+        ]);
     }
 
     /**

@@ -9,9 +9,14 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $guarded = ['id'];
-
-    public function users()
+    protected $fillable = [
+        'user_id',
+        'content',
+        'media',
+        'pinned',
+        'status',
+    ];
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
@@ -24,5 +29,10 @@ class Post extends Model
     public function likes()
     {
         return $this->belongsToMany(User::class, 'post_likes', 'post_id', 'user_id');
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(ReportPost::class);
     }
 }

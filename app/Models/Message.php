@@ -9,7 +9,14 @@ class Message extends Model
 {
     use HasFactory;
 
-    protected $guarded = ['id'];
+    protected $fillable = [
+        'sender_id',
+        'receiver_id',
+        'message',
+        'media',
+        'is_read',
+        'is_anonymous',
+    ];
 
     public function sender()
     {

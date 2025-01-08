@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->text('media')->nullable();
             $table->boolean('is_read')->default(false);
             $table->boolean('is_anonymous')->default(false);
+            $table->integer('points')->default(0)->nullable();
             $table->timestamps();
 
             $table->foreign('sender_id')->references('id')->on('users')->onDelete('set null');
