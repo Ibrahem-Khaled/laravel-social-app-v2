@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\dashboard\FamilyController;
 use App\Http\Controllers\dashboard\GiftController;
 use App\Http\Controllers\dashboard\homeController;
+use App\Http\Controllers\dashboard\LiveStreamingController;
 use App\Http\Controllers\dashboard\MessageController;
 use App\Http\Controllers\dashboard\NotificationController;
 use App\Http\Controllers\dashboard\PostController;
 use App\Http\Controllers\dashboard\UserController;
+use App\Http\Controllers\dashboard\UserFamilyController;
 use App\Http\Controllers\dashboard\VerificationController;
 use Illuminate\Support\Facades\Route;
 
@@ -57,6 +60,11 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::get('/verifications', [VerificationController::class, 'index'])->name('verification.index');
     Route::patch('/verification/{verificationRequest}/approve', [VerificationController::class, 'approve'])->name('verification.approve');
     Route::patch('/verification/{verificationRequest}/reject', [VerificationController::class, 'reject'])->name('verification.reject');
+
+    Route::resource('families', FamilyController::class);
+    Route::resource('user-families', UserFamilyController::class)->only(['store', 'update', 'destroy']);
+
+    Route::resource('live_streamings', LiveStreamingController::class);
 
 });
 

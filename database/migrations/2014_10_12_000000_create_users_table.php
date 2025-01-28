@@ -46,6 +46,8 @@ return new class extends Migration {
             'role' => 'admin',
             'is_verified' => true,
             'status' => 'active',
+            'gender' => 'male',
+            'language' => 'en',
         ]);
     }
 
