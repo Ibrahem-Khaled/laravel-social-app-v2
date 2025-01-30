@@ -88,6 +88,10 @@
                     <i class="fas fa-fw fa-tv"></i>
                     <span>اللايفات الحية</span>
                 </a>
+                <a class="collapse-item" href="{{ route('agencies.index') }}">
+                    <i class="fas fa-fw fa-building"></i>
+                    <span>الوكالات</span>
+                </a>
                 {{-- <div class="collapse-divider"></div>
                 <h6 class="collapse-header">Other Pages:</h6>
                 <a class="collapse-item" href="404.html">404 Page</a>
