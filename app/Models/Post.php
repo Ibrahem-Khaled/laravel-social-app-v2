@@ -9,10 +9,15 @@ class Post extends Model
 {
     use HasFactory;
 
+    protected $appends = ['comment_count', 'like_count'];
+    protected $casts = [
+        'images' => 'array',
+    ];
+
     protected $fillable = [
         'user_id',
         'content',
-        'media',
+        'images',
         'pinned',
         'status',
     ];
@@ -34,5 +39,17 @@ class Post extends Model
     public function reports()
     {
         return $this->hasMany(ReportPost::class);
+    }
+
+
+    //this accessor functions
+    public function getCommentCountAttribute()
+    {
+        return $this->comments()->count();
+    }
+
+    public function getLikeCountAttribute()
+    {
+        return $this->likes()->count();
     }
 }

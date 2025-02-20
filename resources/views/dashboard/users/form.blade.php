@@ -20,6 +20,10 @@
             <label for="email" class="form-label">البريد الإلكتروني</label>
             <input type="email" name="email" class="form-control" value="{{ $user->email ?? '' }}" required>
         </div>
+        <div class="mb-3">
+            <label for="phone" class="form-label">رقم الهاتف</label>
+            <input type="text" name="phone" class="form-control" value="{{ $user->phone ?? '' }}" required>
+        </div>
         @if (!$user)
             <div class="mb-3">
                 <label for="password" class="form-label">كلمة المرور</label>

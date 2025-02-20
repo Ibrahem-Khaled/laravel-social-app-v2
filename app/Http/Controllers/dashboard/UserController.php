@@ -71,6 +71,7 @@ class UserController extends Controller
             'username' => 'required|unique:users',
             'name' => 'required',
             'email' => 'required|email|unique:users',
+            'phone' => 'required|unique:users',
             'password' => 'required|min:6',
         ]);
 
@@ -78,6 +79,7 @@ class UserController extends Controller
             'username' => $request->username,
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => $request->phone,
             'password' => bcrypt($request->password),
         ]);
 
@@ -90,12 +92,14 @@ class UserController extends Controller
             'username' => 'required|unique:users,username,' . $user->id,
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'required|unique:users,phone,' . $user->id,
         ]);
 
         $user->update([
             'username' => $request->username,
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => $request->phone,
         ]);
 
         return redirect()->route('users.index')->with('success', 'تم تحديث المستخدم بنجاح');

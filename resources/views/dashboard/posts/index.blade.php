@@ -82,6 +82,7 @@
                     <th>المعرف</th>
                     <th>المستخدم</th>
                     <th>المحتوى</th>
+                    <th>الصور</th>
                     <th>الحالة</th>
                     <th>مثبت</th>
                     <th>التاريخ</th>
@@ -97,6 +98,13 @@
                         <td>{{ $post->id }}</td>
                         <td>{{ $post->user->name }}</td>
                         <td>{{ Str::limit($post->content, 50) }}</td>
+                        <td>
+                            @if ($post->images)
+                                @foreach (json_decode($post->images) as $image)
+                                    <img src="{{ asset('storage/' . $image) }}" width="100" alt="Post Image" class="img-thumbnail" >
+                                    @endforeach
+                                @endif
+                        </td>
                         <td>{{ $post->status }}</td>
                         <td>{{ $post->pinned ? 'نعم' : 'لا' }}</td>
                         <td>
