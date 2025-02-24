@@ -28,7 +28,7 @@
         <div class="mb-3">
             <label for="images" class="form-label">الصور (يمكن اختيار أكثر من صورة)</label>
             <input type="file" name="images[]" class="form-control" multiple accept="image/*"
-                {{ !$post ? 'required' : '' }}>
+                {{ !$post ? '' : '' }}>
             <small class="text-muted">الحد الأقصى لحجم الصورة: 2MB</small>
         </div>
 
