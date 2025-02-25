@@ -46,4 +46,25 @@ class postsController extends Controller
         $post = Post::create($data);
         return response()->json($post);
     }
+
+    public function getComments(Post $post)
+    {
+        return response()->json($post->comments()->with('user')->get());
+    }
+
+    public function addComment(Request $request, Post $post)
+    {
+        $validator = Validator::make($request->all(), [
+            'content' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+        $post->comments()->create([
+            'user_id' => auth()->guard('api')->user()->id,
+            'content' => $request->content,
+        ]);
+        return response()->json($post);
+    }
 }

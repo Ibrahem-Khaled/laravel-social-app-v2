@@ -19,6 +19,10 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [authController::class, 'login']);
 
 Route::group([], function () {
+
+    //this posts routes
     Route::get('/posts', [postsController::class, 'index']);
-    Route::post('/posts', [postsController::class, 'create']);  
+    Route::post('/posts', [postsController::class, 'create']);
+    Route::get('/posts/{post}/comments', [postsController::class, 'getComments']);
+    Route::post('/posts/{post}/comments', [postsController::class, 'addComment']);
 });
