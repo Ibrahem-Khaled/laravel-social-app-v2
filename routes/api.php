@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\authController;
+use App\Http\Controllers\api\homeController;
 use App\Http\Controllers\api\postsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -27,4 +28,6 @@ Route::group([], function () {
     Route::get('/posts/{post}/comments', [postsController::class, 'getComments']);
     Route::post('/posts/{post}/comments', [postsController::class, 'addComment']);
     Route::post('/posts/{post}/like', [postsController::class, 'like']);
+
+    Route::get('/deep/search', [homeController::class, 'deepSearch']);
 });
