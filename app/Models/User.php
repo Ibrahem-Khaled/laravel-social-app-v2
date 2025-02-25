@@ -90,7 +90,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function commentedPosts()
     {
-        return $this->belongsToMany(Post::class, 'post_comments', 'user_id', 'post_id');
+        return $this->hasMany(PostComment::class);
     }
 
     public function gifts()
