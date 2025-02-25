@@ -9,7 +9,7 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $appends = ['comment_count', 'like_count'];
+    protected $appends = ['comment_count', 'like_count', 'is_liked'];
     protected $casts = [
         'images' => 'array',
     ];
@@ -33,7 +33,7 @@ class Post extends Model
 
     public function likes()
     {
-        return $this->belongsToMany(User::class, 'post_likes', 'post_id', 'user_id');
+        return $this->hasMany(PostLike::class);
     }
 
     public function reports()
@@ -51,5 +51,14 @@ class Post extends Model
     public function getLikeCountAttribute()
     {
         return $this->likes()->count();
+    }
+
+    public function getIsLikedAttribute()
+    {
+        $user = auth()->guard('api')->user();
+        if ($user) {
+            return $this->likes()->where('user_id', $user->id)->exists();
+        }
+        return false;
     }
 }

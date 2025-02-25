@@ -67,7 +67,7 @@ class postsController extends Controller
             'user_id' => auth()->guard('api')->user()->id,
             'content' => $request->content
         ]);
-        
+
         return response()->json($post);
     }
 }
