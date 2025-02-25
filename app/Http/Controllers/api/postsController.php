@@ -70,4 +70,12 @@ class postsController extends Controller
 
         return response()->json($post);
     }
+
+    public function like(Post $post)
+    {
+        $post->likes()->create([
+            'user_id' => auth()->guard('api')->user()->id
+        ]);
+        return response()->json($post);
+    }
 }
