@@ -26,4 +26,5 @@ Route::group([], function () {
     Route::post('/posts', [postsController::class, 'create']);
     Route::get('/posts/{post}/comments', [postsController::class, 'getComments']);
     Route::post('/posts/{post}/comments', [postsController::class, 'addComment']);
+    Route::post('/posts/{post}/like', [postsController::class, 'like']);
 });
