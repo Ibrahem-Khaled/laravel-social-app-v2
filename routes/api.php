@@ -20,4 +20,5 @@ Route::post('/login', [authController::class, 'login']);
 
 Route::group([], function () {
     Route::get('/posts', [postsController::class, 'index']);
+    Route::post('/posts', [postsController::class, 'create']);  
 });

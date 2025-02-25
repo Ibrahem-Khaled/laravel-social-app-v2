@@ -24,17 +24,16 @@ class postsController extends Controller
         $user = auth()->guard('api')->user();
 
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
             'content' => 'nullable|string',
-            'status' => 'required|in:active,inactive,banned',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        $data = $request->except('images');
 
+        $data['user_id'] = $user->id;
+        $data = $request->except('images');
         // معالجة الصور
         if ($request->hasFile('images')) {
             $images = [];
