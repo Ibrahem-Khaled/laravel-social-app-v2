@@ -73,9 +73,14 @@ class postsController extends Controller
 
     public function like(Post $post)
     {
-        $post->likes()->create([
-            'user_id' => auth()->guard('api')->user()->id
-        ]);
+        if ($post->likes()->where('user_id', auth()->guard('api')->user()->id)->exists()) {
+            $post->likes()->where('user_id', auth()->guard('api')->user()->id)->delete();
+
+        } else {
+            $post->likes()->create([
+                'user_id' => auth()->guard('api')->user()->id
+            ]);
+        }
         return response()->json($post);
     }
 }
