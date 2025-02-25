@@ -48,12 +48,16 @@ class User extends Authenticatable implements JWTSubject
         return $query->where('country', $country);
     }
 
-
     // relations //
     public function posts()
     {
         return $this->hasMany(Post::class);
     }
+    public function latestPost()
+    {
+        return $this->hasOne(Post::class)->latestOfMany();
+    }
+
 
     public function sentMessages()
     {
