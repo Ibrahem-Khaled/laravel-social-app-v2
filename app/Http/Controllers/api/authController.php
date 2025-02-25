@@ -34,4 +34,15 @@ class authController extends Controller
         ]);
     }
 
+
+    public function user(Request $request)
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+            return response()->json(['user' => $user]);
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'غير مصرح به'], 401);
+        }
+    }
+
 }
