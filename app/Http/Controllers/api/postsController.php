@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use App\Models\PostComment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -61,10 +62,12 @@ class postsController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        $post->comments()->create([
+        $post = PostComment::create([
+            'post_id' => $post->id,
             'user_id' => auth()->guard('api')->user()->id,
-            'content' => $request->content,
+            'content' => $request->content
         ]);
+        
         return response()->json($post);
     }
 }
