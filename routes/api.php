@@ -3,6 +3,7 @@
 use App\Http\Controllers\api\authController;
 use App\Http\Controllers\api\homeController;
 use App\Http\Controllers\api\postsController;
+use App\Http\Controllers\api\questionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,4 +31,8 @@ Route::group([], function () {
     Route::post('/posts/{post}/like', [postsController::class, 'like']);
 
     Route::get('/deep/search', [homeController::class, 'deepSearch']);
+
+    //this questions routes
+    Route::get('/questions', [questionController::class, 'index']);
+    
 });
