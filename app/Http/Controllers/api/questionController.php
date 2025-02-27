@@ -10,9 +10,14 @@ class questionController extends Controller
     public function index()
     {
         $user = auth()->guard('api')->user();
-        $questions = $user->receivedMessages()->where('is_anonymous', true)->get();
+        if (!$user) {
+            return response()->json(['message' => 'unauthorized'], 401);
+        }
+
+        $questions = $user->receivedMessages()->where('is_anonymous', 1)->get();
+
         return response()->json($questions);
     }
 
-    
+
 }

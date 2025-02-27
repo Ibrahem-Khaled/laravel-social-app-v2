@@ -34,5 +34,5 @@ Route::group([], function () {
 
     //this questions routes
     Route::get('/questions', [questionController::class, 'index']);
-    
+
 });
