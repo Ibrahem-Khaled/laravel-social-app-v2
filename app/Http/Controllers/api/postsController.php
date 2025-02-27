@@ -27,13 +27,13 @@ class postsController extends Controller
         $validator = Validator::make($request->all(), [
             'content' => 'nullable|string',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $data['user_id'] = $user->id;
         $data = $request->except('images');
         // معالجة الصور
         if ($request->hasFile('images')) {
@@ -44,7 +44,9 @@ class postsController extends Controller
             }
             $data['images'] = json_encode($images);
         }
-        $post = Post::create($data);
+
+        $post = $user->posts()->create($data);
+
         return response()->json($post);
     }
 
