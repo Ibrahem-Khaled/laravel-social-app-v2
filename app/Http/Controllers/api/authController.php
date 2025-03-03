@@ -17,6 +17,8 @@ class authController extends Controller
         // الحصول على رقم الهاتف من الطلب
         $phone = $request->input('phone');
 
+        return response()->json(['phone' => $phone], 401);
+
         $validator = Validator::make($request->all(), [
             'phone' => 'required|numeric',
         ]);
