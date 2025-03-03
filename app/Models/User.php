@@ -18,6 +18,7 @@ class User extends Authenticatable implements JWTSubject
             $user->uuid = random_int(1000000000, 9999999999);
         });
     }
+    protected $appends = ['user_followers_count', 'user_following_count', 'user_posts_count', 'user_gifts_count', 'is_current_user'];
     protected $guarded = ['id'];
     protected $hidden = [
         'password',
@@ -104,6 +105,31 @@ class User extends Authenticatable implements JWTSubject
             ->withTimestamps();
     }
 
+    //this accessors methods
+    public function getUserFollowersCountAttribute()
+    {
+        return $this->followers()->count();
+    }
+
+    public function getUserFollowingCountAttribute()
+    {
+        return $this->followings()->count();
+    }
+
+    public function getUserPostsCountAttribute()
+    {
+        return $this->posts()->count();
+    }
+
+    public function getUserGiftsCountAttribute()
+    {
+        return $this->gifts()->count();
+    }
+
+    public function getIsCurrentUserAttribute()
+    {
+        return $this->id == auth()->guard('api')->id();
+    }
 
     //this method is used to get the identifier that will be stored in the subject claim of the JWT
     /**
