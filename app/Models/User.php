@@ -126,6 +126,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->gifts()->count();
     }
 
+    public function getQuestionsCountAttribute()
+    {
+        return $this->receivedMessages()->where('is_anonymous', 1)->count();
+    }
+
     public function getIsCurrentUserAttribute()
     {
         return $this->id == auth()->guard('api')->id();
