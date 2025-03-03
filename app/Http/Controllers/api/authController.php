@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -16,14 +17,20 @@ class authController extends Controller
         // الحصول على رقم الهاتف من الطلب
         $phone = $request->input('phone');
 
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => 'بيانات الاعتماد غير صحيحة'], 401);
+        }
+
         // البحث عن المستخدم باستخدام رقم الهاتف
         $user = User::where('phone', $phone)->first();
 
         if (!$user) {
             return response()->json(['error' => 'بيانات الاعتماد غير صحيحة'], 401);
         }
-
-        // ينصح بإضافة آلية تحقق إضافية مثل إرسال OTP للتأكد من هوية المستخدم
 
         // إنشاء التوكن للمستخدم دون التحقق من كلمة المرور
         $token = JWTAuth::fromUser($user);
