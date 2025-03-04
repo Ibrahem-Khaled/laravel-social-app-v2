@@ -18,7 +18,7 @@ class User extends Authenticatable implements JWTSubject
             $user->uuid = random_int(1000000000, 9999999999);
         });
     }
-    protected $appends = ['user_followers_count', 'user_following_count', 'user_posts_count', 'user_gifts_count', 'qustions_count', 'is_current_user'];
+    protected $appends = ['user_followers_count', 'user_following_count', 'user_posts_count', 'user_gifts_count', 'questions_count', 'is_current_user'];
     protected $guarded = ['id'];
     protected $hidden = [
         'password',
