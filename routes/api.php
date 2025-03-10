@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [authController::class, 'login']);
 Route::get('me', [authController::class, 'user']);
 Route::get('user/{user}', [authController::class, 'getUser']);
+Route::post('/addExpoPushToken', [authController::class, 'addExpoPushToken']);
 
 Route::group([], function () {
 

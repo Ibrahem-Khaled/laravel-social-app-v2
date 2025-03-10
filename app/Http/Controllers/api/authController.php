@@ -57,4 +57,12 @@ class authController extends Controller
         return response()->json(['user' => $user]);
     }
 
+    public function addExpoPushToken(Request $request)
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+        $user->expo_push_token = $request->input('expo_push_token');
+        $user->save();
+        return response()->json('success added token');
+    }
+
 }

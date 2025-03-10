@@ -28,6 +28,7 @@ return new class extends Migration {
             $table->enum('gender', ['male', 'female'])->default('female');
             $table->enum('role', ['admin', 'moderator', 'user', 'vip'])->default('user');
             $table->string('language')->default('ar');
+            $table->text('expo_push_token')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->date('birth_date')->nullable();
             $table->string('password');
