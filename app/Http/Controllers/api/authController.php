@@ -54,7 +54,10 @@ class authController extends Controller
 
     public function getUser(User $user)
     {
-        return response()->json(['user' => $user]);
+        return response()->json([
+            'user' => $user,
+            'posts' => $user->posts
+        ]);
     }
 
     public function addExpoPushToken(Request $request)

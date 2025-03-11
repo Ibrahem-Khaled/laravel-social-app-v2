@@ -20,6 +20,11 @@ class postsController extends Controller
         return response()->json($posts);
     }
 
+    public function getUserPosts($id)
+    {
+        $posts = Post::where('user_id', $id)->with('user')->get();
+        return response()->json($posts);
+    }
     public function create(Request $request)
     {
         $user = auth()->guard('api')->user();
