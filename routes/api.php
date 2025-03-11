@@ -36,5 +36,7 @@ Route::group([], function () {
 
     //this questions routes
     Route::get('/questions', [questionController::class, 'index']);
+    Route::post('/questions', [questionController::class, 'create']);
+    Route::delete('/questions/{id}', [questionController::class, 'delete']);
 
 });

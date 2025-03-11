@@ -132,6 +132,7 @@
                         <td>
                             <button class="btn btn-success" data-toggle="modal"
                                 data-target="#editPostModal{{ $post->id }}">تعديل</button>
+                                
                             <form action="{{ route('posts.destroy', $post) }}" method="POST"
                                 style="display: inline-block;">
                                 @csrf
