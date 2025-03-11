@@ -4,7 +4,10 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Message;
+use App\Models\User;
+use App\Notifications\ExpoNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 
 class questionController extends Controller
 {
@@ -23,13 +26,18 @@ class questionController extends Controller
     public function create(Request $request)
     {
         $user = auth()->guard('api')->user();
-
+        $receiver = User::findOrFail($request->receiver_id);
         $question = Message::create([
             'sender_id' => $user->id,
-            'receiver_id' => $request->receiver_id,
+            'receiver_id' => $receiver->id,
             'message' => $request->message,
             'is_anonymous' => true,
         ]);
+
+        if ($receiver->expo_push_token) {
+            Notification::send($receiver, new ExpoNotification([$receiver->expo_push_token], 'رسالة جديدة', $question->message));
+
+        }
 
         return response()->json($question);
     }
