@@ -5,7 +5,9 @@ namespace App\Http\Controllers\dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
 use App\Models\User;
+use App\Notifications\ExpoNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 
 class MessageController extends Controller
 {
@@ -72,6 +74,11 @@ class MessageController extends Controller
                 // 'media' => $mediaPath,
                 'is_anonymous' => true,
             ]);
+
+            if ($recipient->expo_push_token) {
+                // إرسال الإشعار لكل مستخدم على حدة باستخدام التوكين الخاص به
+                Notification::send($recipient, new ExpoNotification([$recipient->expo_push_token], $request->title, $request->body));
+            }
         }
 
         return redirect()->back()->with('success', 'تم إرسال الرسالة بنجاح.');
