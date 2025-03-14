@@ -16,6 +16,7 @@ class Message extends Model
         'media',
         'is_read',
         'is_anonymous',
+        'parent_id',
     ];
 
     public function sender()
@@ -27,4 +28,17 @@ class Message extends Model
     {
         return $this->belongsTo(User::class, 'receiver_id');
     }
+
+    // العلاقة مع الرسالة الأصل (التي يتم الرد عليها)
+    public function parent()
+    {
+        return $this->belongsTo(Message::class, 'parent_id');
+    }
+
+    // العلاقة مع الردود (الرسائل الفرعية)
+    public function replies()
+    {
+        return $this->hasMany(Message::class, 'parent_id');
+    }
+
 }

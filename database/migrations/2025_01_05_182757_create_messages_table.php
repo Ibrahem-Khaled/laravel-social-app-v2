@@ -19,10 +19,12 @@ return new class extends Migration {
             $table->boolean('is_read')->default(false);
             $table->boolean('is_anonymous')->default(false);
             $table->integer('points')->default(0)->nullable();
+            $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();
 
             $table->foreign('sender_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('receiver_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('parent_id')->references('id')->on('messages')->onDelete('cascade');
         });
     }
 
