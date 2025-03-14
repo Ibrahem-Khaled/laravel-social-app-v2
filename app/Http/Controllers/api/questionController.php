@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Notifications\ExpoNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Validator;
 
 class questionController extends Controller
 {
@@ -41,6 +42,41 @@ class questionController extends Controller
 
         return response()->json($question);
     }
+
+    public function replyMessage(Request $request, Message $message)
+    {
+        $user = auth()->guard('api')->user();
+
+        $validatedData = Validator::make($request->all(), [
+            'message' => 'required|string',
+        ]);
+
+        if ($validatedData->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validatedData->errors(),
+            ], 422);
+        }
+
+        // إنشاء الرسالة الجديدة كرسالة رد مع تحديد الرسالة الأصل عبر parent_id
+        $reply = Message::create([
+            'parent_id' => $message->id,
+            'sender_id' => $user->id,
+            'receiver_id' => $message->sender_id,
+            'message' => $request->message,
+        ]);
+
+        if ($message->sender->expo_push_token) {
+            Notification::send($message->sender, new ExpoNotification([$message->sender->expo_push_token], 'رسالة جديدة', $reply->message));
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم إرسال الرد بنجاح',
+            'data' => $reply
+        ], 201);
+    }
+
 
     public function delete($id)
     {
