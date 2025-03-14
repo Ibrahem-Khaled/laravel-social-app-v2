@@ -136,6 +136,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->id == auth()->guard('api')->id();
     }
 
+    public function getIsAuthanticatedUserFollowingThisUserAttribute()
+    {
+        return $this->followers()->where('follower_id', auth()->guard('api')->id())->exists();
+    }
+
     //this method is used to get the identifier that will be stored in the subject claim of the JWT
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
