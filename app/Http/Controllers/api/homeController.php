@@ -26,11 +26,11 @@ class homeController extends Controller
                     ->orWhere('uuid', 'like', '%' . $search . '%')
                     ->orWhere('username', 'like', '%' . $search . '%');
 
-                // 2. البحث في المنشورات عبر whereHas
-                $q->orWhereHas('posts', function ($postQuery) use ($search) {
-                    $postQuery->where('title', 'like', '%' . $search . '%')
-                        ->orWhere('content', 'like', '%' . $search . '%');
-                });
+                // // 2. البحث في المنشورات عبر whereHas
+                // $q->orWhereHas('posts', function ($postQuery) use ($search) {
+                //     $postQuery->where('title', 'like', '%' . $search . '%')
+                //         ->orWhere('content', 'like', '%' . $search . '%');
+                // });
             });
         }
 
