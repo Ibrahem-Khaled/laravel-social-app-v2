@@ -10,8 +10,18 @@ class followerController extends Controller
 {
     public function addAndRemoveFollower(Request $request)
     {
+        // الحصول على المستخدم الحالي من خلال التوكن
         $user = JWTAuth::parseToken()->authenticate();
-        $user->followers()->toggle($request->input('user_id'));
+
+        // التحقق من صحة وجود معرف المستخدم في الطلب (يمكن إضافة عملية تحقق إضافية)
+        $otherUserId = $request->input('user_id');
+        if (!$otherUserId) {
+            return response()->json(['error' => 'user_id is required'], 400);
+        }
+
+        // تبديل حالة متابعة المستخدم الآخر (إضافة إذا لم يكن موجوداً أو إزالته إذا كان موجوداً)
+        $user->followings()->toggle($otherUserId);
+
         return response()->json('success');
     }
 }
