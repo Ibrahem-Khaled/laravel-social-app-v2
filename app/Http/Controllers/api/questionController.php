@@ -19,7 +19,9 @@ class questionController extends Controller
             return response()->json(['message' => 'unauthorized'], 401);
         }
 
-        $questions = $user->receivedMessages()->where('is_anonymous', 1)->get();
+        $questions = $user->receivedMessages()->where('is_anonymous', 1)
+        ->orderBy('created_at', 'desc')
+        ->get();
 
         return response()->json($questions);
     }
