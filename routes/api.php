@@ -40,5 +40,5 @@ Route::group([], function () {
     Route::post('/questions', [questionController::class, 'create']);
     Route::delete('/questions/{id}', [questionController::class, 'delete']);
 
-    Route::get('/add-and-remove-friend', [followerController::class, 'addAndRemoveFollower']);
+    Route::get('/follow', [followerController::class, 'addAndRemoveFollower']);
 });
