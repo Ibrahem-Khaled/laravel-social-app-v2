@@ -55,6 +55,16 @@ class postsController extends Controller
         return response()->json($post);
     }
 
+    public function delete(Post $post)
+    {
+        $user = auth()->guard('api')->user();
+        if ($post->user_id == $user->id) {
+            $post->delete();
+            return response()->json(['message' => 'تم حذف المنشور بنجاح']);
+        }
+        return response()->json(['message' => 'غير مصرح به'], 401);
+    }
+
     public function getComments(Post $post)
     {
         return response()->json($post->comments()->with('user')->get());

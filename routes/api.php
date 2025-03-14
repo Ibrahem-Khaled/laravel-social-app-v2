@@ -29,6 +29,7 @@ Route::group([], function () {
     //this posts routes
     Route::get('/posts', [postsController::class, 'index']);
     Route::post('/posts', [postsController::class, 'create']);
+    Route::delete('/posts/{post}', [postsController::class, 'delete']);
     Route::get('/posts/{post}/comments', [postsController::class, 'getComments']);
     Route::post('/posts/{post}/comments', [postsController::class, 'addComment']);
     Route::post('/posts/{post}/like', [postsController::class, 'like']);
