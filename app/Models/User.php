@@ -84,14 +84,14 @@ class User extends Authenticatable implements JWTSubject
             ->orWhere('user_two', $this->id);
     }
 
-    // المستخدمون الذين يتابعهم هذا المستخدم
-    public function followings()
+    // المستخدمون الذين يتابعون هذا المستخدم
+    public function followers()
     {
         return $this->belongsToMany(User::class, 'follows', 'follower_id', 'following_id');
     }
-
-    // المستخدمون الذين يتابعون هذا المستخدم
-    public function followers()
+    
+    // المستخدمون الذين يتابعهم هذا المستخدم
+    public function followings()
     {
         return $this->belongsToMany(User::class, 'follows', 'following_id', 'follower_id');
     }
