@@ -18,7 +18,15 @@ class User extends Authenticatable implements JWTSubject
             $user->uuid = random_int(1000000000, 9999999999);
         });
     }
-    protected $appends = ['user_followers_count', 'user_following_count', 'user_posts_count', 'user_gifts_count', 'questions_count', 'is_current_user'];
+    protected $appends = [
+        'user_followers_count',
+        'user_following_count',
+        'user_posts_count',
+        'user_gifts_count',
+        'questions_count',
+        'is_current_user',
+        'is_authanticated_user_following_this_user',
+    ];
     protected $guarded = ['id'];
     protected $hidden = [
         'password',
@@ -140,6 +148,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->followers()->where('follower_id', auth()->guard('api')->id())->exists();
     }
+
 
     //this method is used to get the identifier that will be stored in the subject claim of the JWT
     /**
