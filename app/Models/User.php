@@ -146,7 +146,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function getIsAuthanticatedUserFollowingThisUserAttribute()
     {
-        return $this->followers()->where('following_id', auth()->guard('api')->id())->exists();
+        return $this->followers()->where('follower_id', auth()->guard('api')->id())->exists();
     }
 
 
