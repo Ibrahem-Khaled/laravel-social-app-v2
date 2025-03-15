@@ -16,8 +16,8 @@ class Post extends Model
 
     protected $fillable = [
         'user_id',
+        'message_id',
         'content',
-        'caption',
         'images',
         'pinned',
         'status',
@@ -25,6 +25,11 @@ class Post extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function message()
+    {
+        return $this->belongsTo(Message::class);
     }
 
     public function comments()

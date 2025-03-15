@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Message;
+use App\Models\Post;
 use App\Models\User;
 use App\Notifications\ExpoNotification;
 use Illuminate\Http\Request;
@@ -20,8 +21,8 @@ class questionController extends Controller
         }
 
         $questions = $user->receivedMessages()->where('is_anonymous', 1)
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return response()->json($questions);
     }
@@ -66,6 +67,12 @@ class questionController extends Controller
             'sender_id' => $user->id,
             'receiver_id' => $message->sender_id,
             'message' => $request->message,
+        ]);
+
+        Post::create([
+            'user_id' => $user->id,
+            'message_id' => $reply->id,
+            'content' => $request->message,
         ]);
 
         if ($message->sender->expo_push_token) {

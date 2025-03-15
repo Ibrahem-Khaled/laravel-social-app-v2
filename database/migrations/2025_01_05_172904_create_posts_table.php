@@ -13,15 +13,18 @@ return new class extends Migration {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            ///
+            $table->unsignedBigInteger('message_id')->nullable();
+            ///
             $table->text('content')->nullable();
-            ///
-            $table->text('caption')->nullable()->comment('post caption and use this fromto replay message');////
-            ///
             $table->json('images')->nullable();
             $table->boolean('pinned')->default(false);
             $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('message_id')->references('id')->on('messages')->onDelete('cascade');
+
         });
     }
 
