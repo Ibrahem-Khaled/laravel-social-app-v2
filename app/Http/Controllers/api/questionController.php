@@ -71,7 +71,7 @@ class questionController extends Controller
 
         Post::create([
             'user_id' => $user->id,
-            'message_id' => $reply->id,
+            'message_id' => $message->id,
             'content' => $request->message,
         ]);
 

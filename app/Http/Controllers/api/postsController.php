@@ -14,7 +14,7 @@ class postsController extends Controller
     {
         $posts = Post::where('status', 'active')
             ->orderBy('created_at', 'desc')
-            ->with('user')
+            ->with('user', 'message')
             ->get();
 
         return response()->json($posts);
