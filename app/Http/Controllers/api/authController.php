@@ -54,7 +54,7 @@ class authController extends Controller
 
     public function getUser(User $user)
     {
-        $posts = $user->posts()->with('user')->get();
+        $posts = $user->posts()->with('user', 'message')->get();
         return response()->json([
             'user' => $user,
             'posts' => $posts
