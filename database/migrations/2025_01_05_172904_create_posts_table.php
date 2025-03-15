@@ -15,6 +15,9 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->text('content')->nullable();
+            ///
+            $table->text('caption')->nullable()->comment('post caption and use this fromto replay message');////
+            ///
             $table->json('images')->nullable();
             $table->boolean('pinned')->default(false);
             $table->enum('status', ['active', 'inactive', 'banned'])->default('active');

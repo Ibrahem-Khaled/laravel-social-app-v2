@@ -13,31 +13,27 @@ class homeController extends Controller
     {
         $search = $request->input('search');
 
-        // نبدأ الاستعلام بجلب المستخدمين مع آخر منشور لهم
-        $query = User::with('latestPost');
-
-        // إذا كانت هناك قيمة للبحث، نطبق الشروط
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                // 1. البحث في حقول المستخدم
-                $q->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('email', 'like', '%' . $search . '%')
-                    ->orWhere('phone', 'like', '%' . $search . '%')
-                    ->orWhere('uuid', 'like', '%' . $search . '%')
-                    ->orWhere('username', 'like', '%' . $search . '%');
-
-                // // 2. البحث في المنشورات عبر whereHas
-                // $q->orWhereHas('posts', function ($postQuery) use ($search) {
-                //     $postQuery->where('title', 'like', '%' . $search . '%')
-                //         ->orWhere('content', 'like', '%' . $search . '%');
-                // });
-            });
+        // إذا كان البحث فارغاً يمكن إرجاع مصفوفة فارغة أو رسالة مناسبة
+        if (empty($search)) {
+            return response()->json([], 200);
         }
 
-        // اجلب النتائج
+        // تهيئة الـ Query بشكل صحيح
+        $query = User::query();
+
+        // تطبيق شرط البحث
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', '%' . $search . '%')
+                ->orWhere('email', 'like', '%' . $search . '%')
+                ->orWhere('phone', 'like', '%' . $search . '%')
+                ->orWhere('uuid', 'like', '%' . $search . '%')
+                ->orWhere('username', 'like', '%' . $search . '%');
+        });
+
         $users = $query->get();
 
-        return response()->json($users);
+        return response()->json($users, 200);
     }
+
 
 }
