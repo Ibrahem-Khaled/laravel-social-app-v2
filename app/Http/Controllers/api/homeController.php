@@ -41,8 +41,8 @@ class homeController extends Controller
 
         // الترتيب داخل قاعدة البيانات باستخدام orderBy واستخدام pluck للحصول على النقاط مع مفتاح المعرف
         $followersPoints = $user->followers()
-            ->orderBy('points', 'desc')
-            ->pluck('points', 'id');
+            ->orderBy('coins', 'desc')
+            ->pluck('coins', 'id');
 
         return response()->json($followersPoints);
     }
@@ -50,7 +50,7 @@ class homeController extends Controller
     public function getHigherPointsFromUsers()
     {
         // جلب أفضل 10 مستخدمين ترتيباً حسب النقاط من قاعدة البيانات
-        $users = User::orderBy('points', 'desc')
+        $users = User::orderBy('coins', 'desc')
             ->limit(20)
             ->get();
 
