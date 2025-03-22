@@ -39,13 +39,15 @@ class homeController extends Controller
     {
         $user = auth()->guard('api')->user();
 
-        // الترتيب داخل قاعدة البيانات باستخدام orderBy واستخدام pluck للحصول على النقاط مع مفتاح المعرف
+        // تحديد الأعمدة من جدول users لتفادي الالتباس في عمود id
         $followersPoints = $user->followers()
-            ->orderBy('coins', 'desc')
-            ->pluck('coins', 'id');
+            ->select('users.id', 'users.coins')
+            ->orderBy('users.coins', 'desc')
+            ->pluck('users.coins', 'users.id');
 
         return response()->json($followersPoints);
     }
+
 
     public function getHigherPointsFromUsers()
     {
