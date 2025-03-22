@@ -35,5 +35,26 @@ class homeController extends Controller
         return response()->json($users, 200);
     }
 
+    public function getHigherPointsFromUsersFollowers(Request $request)
+    {
+        $user = auth()->guard('api')->user();
+
+        // الترتيب داخل قاعدة البيانات باستخدام orderBy واستخدام pluck للحصول على النقاط مع مفتاح المعرف
+        $followersPoints = $user->followers()
+            ->orderBy('points', 'desc')
+            ->pluck('points', 'id');
+
+        return response()->json($followersPoints);
+    }
+
+    public function getHigherPointsFromUsers()
+    {
+        // جلب أفضل 10 مستخدمين ترتيباً حسب النقاط من قاعدة البيانات
+        $users = User::orderBy('points', 'desc')
+            ->limit(20)
+            ->get();
+
+        return response()->json($users);
+    }
 
 }

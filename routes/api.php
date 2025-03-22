@@ -25,6 +25,11 @@ Route::get('user/{user}', [authController::class, 'getUser']);
 Route::post('/addExpoPushToken', [authController::class, 'addExpoPushToken']);
 
 Route::group([], function () {
+    //this main routes
+    Route::get('/deep/search', [homeController::class, 'deepSearch']);
+    Route::get('/get/higher/points/from/users', [homeController::class, 'getHigherPointsFromUsers']);
+    Route::get('/get/higher/points/from/users/followers', [homeController::class, 'getHigherPointsFromUsersFollowers']);
+
 
     //this posts routes
     Route::get('/posts', [postsController::class, 'index']);
@@ -33,8 +38,6 @@ Route::group([], function () {
     Route::get('/posts/{post}/comments', [postsController::class, 'getComments']);
     Route::post('/posts/{post}/comments', [postsController::class, 'addComment']);
     Route::post('/posts/{post}/like', [postsController::class, 'like']);
-
-    Route::get('/deep/search', [homeController::class, 'deepSearch']);
 
     //this questions routes
     Route::get('/questions', [questionController::class, 'index']);

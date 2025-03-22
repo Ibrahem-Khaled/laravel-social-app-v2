@@ -36,7 +36,7 @@
                                     <div class="text-center">
                                         <img src="{{ asset('assets/img/logo-ct.png') }}" style="width: 185px;"
                                             alt="الشعار">
-                                        <h4 class="mt-1 mb-5 pb-1">فريق منصة تيلير</h4>
+                                        <h4 class="mt-1 mb-5 pb-1">لوحة التحكم</h4>
                                     </div>
 
                                     <form action="{{ route('customLogin') }}" method="POST">
