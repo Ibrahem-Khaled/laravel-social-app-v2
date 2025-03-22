@@ -39,13 +39,12 @@ class homeController extends Controller
     {
         $user = auth()->guard('api')->user();
 
-        // تحديد الأعمدة من جدول users لتفادي الالتباس في عمود id
-        $followersPoints = $user->followers()
-            ->select('users.id', 'users.coins')
+        // استرجاع بيانات المستخدمين المتابعين وترتيبهم حسب نقاطهم بشكل تنازلي
+        $followers = $user->followers()
             ->orderBy('users.coins', 'desc')
-            ->pluck('users.coins', 'users.id');
+            ->get();
 
-        return response()->json($followersPoints);
+        return response()->json($followers);
     }
 
 
