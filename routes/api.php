@@ -50,6 +50,7 @@ Route::group([], function () {
     Route::get('/conversations', [chatController::class, 'getConversations']);
     Route::post('/conversations', [chatController::class, 'startConversation']);
     Route::get('/conversations/{conversationId}/messages', [chatController::class, 'getMessages']);
+    Route::post('/conversations/{conversationId}/messages', [chatController::class, 'sendMessage']);
 
     Route::post('/follow', [followerController::class, 'addAndRemoveFollower']);
 });
