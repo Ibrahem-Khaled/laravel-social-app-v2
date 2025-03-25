@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
+use App\Models\Message;
 use Illuminate\Http\Request;
 
 class chatController extends Controller
@@ -94,5 +95,11 @@ class chatController extends Controller
             'message' => 'Conversation started successfully',
             'conversation' => $conversation
         ], 201);
+    }
+
+    public function getMessages($conversationId)
+    {
+        $messages = Message::where('conversation_id', $conversationId)->get();
+        return response()->json($messages);
     }
 }

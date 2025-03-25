@@ -49,6 +49,7 @@ Route::group([], function () {
     //this chat and conversations routes
     Route::get('/conversations', [chatController::class, 'getConversations']);
     Route::post('/conversations', [chatController::class, 'startConversation']);
+    Route::get('/conversations/{conversationId}/messages', [chatController::class, 'getMessages']);
 
     Route::post('/follow', [followerController::class, 'addAndRemoveFollower']);
 });
