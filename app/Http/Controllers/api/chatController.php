@@ -29,7 +29,7 @@ class chatController extends Controller
             ])
             ->get();
 
-        // تحويل نتائج المحادثات لتحتوي على بيانات جهة الاتصال وآخر رسالة
+        // تحويل نتائج المحادثات لتحتوي على بيانات جهة الاتصال، آخر رسالة ووقت آخر رسالة
         $result = $conversations->map(function ($conversation) use ($user) {
             // تحديد جهة الاتصال: إذا كان المستخدم الحالي هو user_one، فإن الطرف الآخر هو userTwo والعكس صحيح
             $chat_partner = ($conversation->user_one == $user->id)
@@ -38,10 +38,12 @@ class chatController extends Controller
 
             // الحصول على آخر رسالة من المحادثة (إن وجدت)
             $last_message = $conversation->messages->first();
+            $last_message_time = $last_message ? $last_message->created_at : null;
 
             return [
                 'chat_partner' => $chat_partner,
                 'last_message' => $last_message,
+                'last_message_time' => $last_message_time,
             ];
         });
 
