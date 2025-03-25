@@ -23,9 +23,21 @@ class chatController extends Controller
                 'messages' => function ($query) {
                     // جلب أحدث رسالة لكل محادثة
                     $query->orderBy('created_at', 'desc')->limit(1);
-                }
+                },
+                // جلب بيانات الطرفين من جدول users
+                'userOne',
+                'userTwo'
             ])
             ->get();
+
+        // تحديد جهة الاتصال (الشريك في المحادثة) بناءً على المستخدم الحالي
+        $conversations->transform(function ($conversation) use ($user) {
+            // إذا كان المستخدم الحالي هو user_one، فإن الشريك هو userTwo، والعكس صحيح
+            $conversation->chat_partner = ($conversation->user_one == $user->id)
+                ? $conversation->userTwo
+                : $conversation->userOne;
+            return $conversation;
+        });
 
         // ترتيب المحادثات بناءً على أحدث رسالة (أو تاريخ إنشاء المحادثة إذا لم توجد رسالة)
         $sortedConversations = $conversations->sortByDesc(function ($conversation) {

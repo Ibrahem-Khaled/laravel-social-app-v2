@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('conversation_id')->nullable(); // إضافة عمود معرف المحادثة
             $table->unsignedBigInteger('sender_id')->nullable();
             $table->unsignedBigInteger('receiver_id');
             $table->text('message');
@@ -22,6 +23,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();
 
+            $table->foreign('conversation_id')->references('id')->on('conversations')->onDelete('cascade');
             $table->foreign('sender_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('receiver_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('parent_id')->references('id')->on('messages')->onDelete('cascade');
