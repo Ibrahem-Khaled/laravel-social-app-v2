@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class chatController extends Controller
 {
-    public function getChatPartners()
+    public function getConversations()
     {
         // استرجاع المستخدم المُسجّل
         $user = auth()->guard('api')->user();
