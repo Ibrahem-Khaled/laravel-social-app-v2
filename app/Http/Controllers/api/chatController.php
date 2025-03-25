@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class chatController extends Controller
 {
@@ -101,5 +102,38 @@ class chatController extends Controller
     {
         $messages = Message::where('conversation_id', $conversationId)->get();
         return response()->json($messages);
+    }
+
+    public function sendMessage(Request $request)
+    {
+        $user = auth()->guard('api')->user();
+        if (!$user) {
+            return response()->json(['message' => 'unauthorized'], 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'conversation_id' => 'required|exists:conversations,id',
+            'message' => 'required|string',
+            'receiver_id' => 'required|exists:users,id',
+            'media' => 'nullable|file|mimes:jpg,jpeg,png,mp4,mov|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        if ($request->receiver_id == $user->id) {
+            return response()->json(['message' => 'unauthorized'], 401);
+        }
+        if ($request->media) {
+
+        }
+        $message = Message::create([
+            'conversation_id' => $request->conversation_id,
+            'sender_id' => $user->id,
+            'message' => $request->message,
+            'receiver_id' => $request->receiver_id
+        ]);
+        return response()->json($message);
     }
 }
