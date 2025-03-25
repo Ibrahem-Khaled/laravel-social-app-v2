@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class chatController extends Controller
 {
-    public function getConversations()
+    public function getChatPartners()
     {
         // استرجاع المستخدم المُسجّل
         $user = auth()->guard('api')->user();
@@ -16,35 +16,29 @@ class chatController extends Controller
             return response()->json(['message' => 'unauthorized'], 401);
         }
 
-        // استرجاع جميع المحادثات التي يكون فيها المستخدم مشترك (سواء كـ user_one أو user_two)
+        // استرجاع المحادثات التي يكون فيها المستخدم مشترك
         $conversations = Conversation::where('user_one', $user->id)
             ->orWhere('user_two', $user->id)
             ->with([
-                'messages' => function ($query) {
-                    // جلب أحدث رسالة لكل محادثة
-                    $query->orderBy('created_at', 'desc')->limit(1);
-                },
-                // جلب بيانات الطرفين من جدول users
                 'userOne',
-                'userTwo'
+                'userTwo',
+                'messages' => function ($query) {
+                    // جلب أحدث رسالة لكل محادثة (اختياري)
+                    $query->orderBy('created_at', 'desc')->limit(1);
+                }
             ])
             ->get();
 
-        // تحديد جهة الاتصال (الشريك في المحادثة) بناءً على المستخدم الحالي
-        $conversations->transform(function ($conversation) use ($user) {
-            // إذا كان المستخدم الحالي هو user_one، فإن الشريك هو userTwo، والعكس صحيح
-            $conversation->chat_partner = ($conversation->user_one == $user->id)
+        // استخراج بيانات جهة الاتصال لكل محادثة
+        $chatPartners = $conversations->map(function ($conversation) use ($user) {
+            // إذا كان المستخدم الحالي هو user_one، فإن جهة الاتصال هي userTwo والعكس صحيح
+            return ($conversation->user_one == $user->id)
                 ? $conversation->userTwo
                 : $conversation->userOne;
-            return $conversation;
         });
 
-        // ترتيب المحادثات بناءً على أحدث رسالة (أو تاريخ إنشاء المحادثة إذا لم توجد رسالة)
-        $sortedConversations = $conversations->sortByDesc(function ($conversation) {
-            return $conversation->messages->first()->created_at ?? $conversation->created_at;
-        })->values();
-
-        return response()->json($sortedConversations);
+        // إعادة المصفوفة كاستجابة JSON
+        return response()->json($chatPartners->values());
     }
 
     public function startConversation(Request $request)
