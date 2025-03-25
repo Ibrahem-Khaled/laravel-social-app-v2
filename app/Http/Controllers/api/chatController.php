@@ -122,18 +122,25 @@ class chatController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        if ($request->receiver_id == $user->id) {
-            return response()->json(['message' => 'unauthorized'], 401);
+        // معالجة ملف الوسائط إذا وُجد
+        if ($request->hasFile('media')) {
+            $filePath = $request->file('media')->store('uploads/media', 'public');
         }
-        if ($request->media) {
 
-        }
-        $message = Message::create([
+        $messageData = [
             'conversation_id' => $request->conversation_id,
             'sender_id' => $user->id,
             'message' => $request->message,
-            'receiver_id' => $request->receiver_id
-        ]);
-        return response()->json($message);
+            'receiver_id' => $request->receiver_id,
+        ];
+
+        if (isset($filePath)) {
+            $messageData['media'] = $filePath;
+        }
+
+        $message = Message::create($messageData);
+
+        return response()->json($message, 201);
     }
+
 }
