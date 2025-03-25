@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\authController;
+use App\Http\Controllers\api\chatController;
 use App\Http\Controllers\api\followerController;
 use App\Http\Controllers\api\homeController;
 use App\Http\Controllers\api\postsController;
@@ -44,6 +45,10 @@ Route::group([], function () {
     Route::post('/questions', [questionController::class, 'create']);
     Route::post('/questions/{message}/reply', [questionController::class, 'replyMessage']);
     Route::delete('/questions/{id}', [questionController::class, 'delete']);
+
+    //this chat and conversations routes
+    Route::get('/conversations', [chatController::class, 'getConversations']);
+    Route::post('/conversations', [chatController::class, 'startConversation']);
 
     Route::post('/follow', [followerController::class, 'addAndRemoveFollower']);
 });
