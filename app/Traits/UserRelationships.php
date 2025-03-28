@@ -66,7 +66,8 @@ trait UserRelationships
     // العلاقات للمستخدم الذي قام بحظر مستخدمين آخرين
     public function blockedUsers()
     {
-        return $this->belongsToMany(User::class, 'blocked_users', 'user_id', 'blocked_user_id');
+        return $this->belongsToMany(User::class, 'blocked_users', 'user_id', 'blocked_user_id')->
+            withTimestamps();
     }
 
 }

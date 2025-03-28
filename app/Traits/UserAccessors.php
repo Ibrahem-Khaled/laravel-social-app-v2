@@ -42,6 +42,6 @@ trait UserAccessors
 
     public function getIsAuthanticatedUserBlockedThisUserAttribute()
     {
-        return $this->blockedUsers()->where('blocked_id', auth()->guard('api')->id())->exists();
+        return $this->blockedUsers()->where('blocked_user_id', auth()->guard('api')->id())->exists();
     }
 }
