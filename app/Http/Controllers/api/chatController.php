@@ -111,11 +111,13 @@ class chatController extends Controller
 
     public function sendMessage(Request $request)
     {
+        // التحقق من صحة المستخدم
         $user = auth()->guard('api')->user();
         if (!$user) {
-            return response()->json(['message' => 'unauthorized'], 401);
+            return response()->json(['message' => 'غير مصرح لك'], 401);
         }
 
+        // التحقق من صحة البيانات الواردة باستخدام Validator
         $validator = Validator::make($request->all(), [
             'conversation_id' => 'required|exists:conversations,id',
             'message' => 'required|string',
@@ -127,31 +129,57 @@ class chatController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // معالجة ملف الوسائط إذا وُجد
-        if ($request->hasFile('media')) {
-            $filePath = $request->file('media')->store('uploads/media', 'public');
+        try {
+            // بدء معاملة قاعدة البيانات لضمان التكامل في حالة حدوث خطأ
+            \DB::beginTransaction();
+
+            // معالجة ملف الوسائط إذا وُجد
+            $mediaPath = null;
+            if ($request->hasFile('media')) {
+                $mediaPath = $request->file('media')->store('uploads/media', 'public');
+            }
+
+            // تجهيز بيانات الرسالة
+            $messageData = [
+                'conversation_id' => $request->conversation_id,
+                'sender_id' => $user->id,
+                'message' => $request->message,
+                'receiver_id' => $request->receiver_id,
+            ];
+
+            if ($mediaPath) {
+                $messageData['media'] = $mediaPath;
+            }
+
+            // إنشاء سجل الرسالة في قاعدة البيانات
+            $message = Message::create($messageData);
+
+            // إرسال الإشعار للمستقبل إن وجد
+            $receiver = User::find($request->receiver_id);
+            if ($receiver && $receiver->expo_push_token) {
+                Notification::send(
+                    $receiver,
+                    new ExpoNotification(
+                        [$receiver->expo_push_token],
+                        'رسالة جديدة من ' . $user->name,
+                        $request->message
+                    )
+                );
+            }
+
+            // تأكيد المعاملة
+            \DB::commit();
+
+            return response()->json($message, 201);
+        } catch (\Exception $e) {
+            // التراجع عن المعاملة في حالة حدوث خطأ
+            \DB::rollBack();
+            return response()->json([
+                'message' => 'حدث خطأ أثناء إرسال الرسالة',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $messageData = [
-            'conversation_id' => $request->conversation_id,
-            'sender_id' => $user->id,
-            'message' => $request->message,
-            'receiver_id' => $request->receiver_id,
-        ];
-
-        $receiver = User::find($request->receiver_id);
-
-        if ($receiver->expo_push_token) {
-            Notification::send($receiver, new ExpoNotification([$receiver->expo_push_token], 'رسالة جديدة من ' . $user->name . '', $messageData->message));
-        }
-
-        if (isset($filePath)) {
-            $messageData['media'] = $filePath;
-        }
-
-        $message = Message::create($messageData);
-
-        return response()->json($message, 201);
     }
+
 
 }
