@@ -54,6 +54,13 @@ class authController extends Controller
 
     public function getUser(User $user)
     {
+        $currentUser = auth()->guard('api')->user();
+
+        // التحقق مما إذا كان المستخدم الحالي قد حظر المستخدم المطلوب
+        if ($currentUser->blockedUsers()->where('blocked_user_id', $user->id)->exists()) {
+            return response()->json(['error' => 'هذا المستخدم محظور'], 403);
+        }
+
         $posts = $user->posts()->with('user', 'message')->get();
         return response()->json([
             'user' => $user,
