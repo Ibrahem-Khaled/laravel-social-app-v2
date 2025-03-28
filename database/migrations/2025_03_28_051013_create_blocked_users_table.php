@@ -14,7 +14,6 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('user_id');          // المستخدم الذي يقوم بالحظر
             $table->unsignedBigInteger('blocked_user_id');    // المستخدم الذي تم حظره
-            $table->timestamps();
 
             // تعريف المفاتيح الخارجية
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
