@@ -40,11 +40,9 @@ class followerController extends Controller
             // تبديل حالة حظر المستخدم الآخر (إضافة إذا لم يكن موجوداً أو إزالته إذا كان موجوداً)
             $result = $user->blockedUsers()->toggle($otherUserId);
             // نتيجة toggle ترجع مصفوفة تحتوي على مفتاحي 'attached' و 'detached'
-            // إذا كان $otherUserId موجودًا في قائمة 'attached' فهذا يعني أن المستخدم تم حظره حالياً.
-            $isBlocked = in_array($otherUserId, $result['attached']);
 
             // إذا تم حظر المستخدم، قم بإزالته من قوائم المتابعة (followings) والمتابعين (followers)
-            if ($isBlocked) {
+            if ($result) {
                 if ($user->followings()->where('follower_id', $otherUserId)->exists()) {
                     $user->followings()->detach($otherUserId);
                 }
@@ -55,7 +53,7 @@ class followerController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'blocked' => $isBlocked
+                'blocked' => $result
             ]);
         } catch (\Exception $e) {
             return response()->json([
