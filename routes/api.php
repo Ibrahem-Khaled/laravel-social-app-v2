@@ -56,4 +56,5 @@ Route::group([], function () {
     //this block and follow routes
     Route::post('/follow', [followerController::class, 'addAndRemoveFollower']);
     Route::post('/block', [followerController::class, 'addAndRemoveBlock']);
+    Route::get('/blocked/users', [followerController::class, 'getBlockedUsers']);
 });

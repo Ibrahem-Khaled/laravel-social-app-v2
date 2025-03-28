@@ -38,4 +38,12 @@ class followerController extends Controller
         $user->blockedUsers()->toggle($otherUserId);
         return response()->json('success');
     }
+
+    public function getBlockedUsers()
+    {
+        // الحصول على المستخدم الحالي من خلال التوكن
+        $user = JWTAuth::parseToken()->authenticate();
+        $blockedUsers = $user->blockedUsers()->get();
+        return response()->json($blockedUsers);
+    }
 }
