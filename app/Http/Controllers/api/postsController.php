@@ -12,13 +12,22 @@ class postsController extends Controller
 {
     public function index()
     {
+        // الحصول على المستخدم الحالي
+        $currentUser = auth()->guard('api')->user();
+
+        // الحصول على قائمة معرفات المستخدمين المحظورين
+        $blockedUserIds = $currentUser->blockedUsers()->pluck('id')->toArray();
+
+        // استعلام المنشورات مع استبعاد المنشورات الخاصة بالمستخدمين المحظورين
         $posts = Post::where('status', 'active')
+            ->whereNotIn('user_id', $blockedUserIds)
             ->orderBy('created_at', 'desc')
             ->with('user', 'message')
             ->get();
 
         return response()->json($posts);
     }
+
 
     public function getUserPosts($id)
     {
