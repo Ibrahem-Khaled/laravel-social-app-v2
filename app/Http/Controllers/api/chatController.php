@@ -181,5 +181,18 @@ class chatController extends Controller
         }
     }
 
+    public function deleteConversationMessages(Conversation $conversation)
+    {
+        $conversation->messages()->delete();
+        return response()->json(['message' => 'تم حذف الرسائل بنجاح']);
+    }
+
+    public function deleteConversation($id)
+    {
+        $conversation = Conversation::findOrFail($id);
+        $conversation->delete();
+        return response()->json(['message' => 'تم حذف المحادثة بنجاح']);
+    }
+
 
 }
