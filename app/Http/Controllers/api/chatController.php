@@ -5,7 +5,10 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\ExpoNotification;
 use Illuminate\Support\Facades\Validator;
 
 class chatController extends Controller
@@ -101,8 +104,8 @@ class chatController extends Controller
     public function getMessages($conversationId)
     {
         $messages = Message::where('conversation_id', $conversationId)
-        ->where('is_anonymous',0)
-        ->get();
+            ->where('is_anonymous', 0)
+            ->get();
         return response()->json($messages);
     }
 
@@ -135,6 +138,12 @@ class chatController extends Controller
             'message' => $request->message,
             'receiver_id' => $request->receiver_id,
         ];
+
+        $receiver = User::find($request->receiver_id);
+
+        if ($receiver->expo_push_token) {
+            Notification::send($receiver, new ExpoNotification([$receiver->expo_push_token], 'رسالة جديدة من ' . $user->name . '', $messageData->message));
+        }
 
         if (isset($filePath)) {
             $messageData['media'] = $filePath;
