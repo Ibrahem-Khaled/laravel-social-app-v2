@@ -16,7 +16,7 @@ class postsController extends Controller
         $currentUser = auth()->guard('api')->user();
 
         // الحصول على قائمة معرفات المستخدمين المحظورين
-        $blockedUserIds = $currentUser->blockedUsers()->pluck('id')->toArray();
+        $blockedUserIds = $currentUser->blockedUsers()->pluck('blocked_user_id')->toArray();
 
         // استعلام المنشورات مع استبعاد المنشورات الخاصة بالمستخدمين المحظورين
         $posts = Post::where('status', 'active')
