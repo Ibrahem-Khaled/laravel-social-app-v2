@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Traits\UserAccessors;
+use App\Traits\UserRelationships;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,7 +13,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, UserRelationships, UserAccessors;
     protected static function booted()
     {
         static::creating(function ($user) {
@@ -26,6 +28,7 @@ class User extends Authenticatable implements JWTSubject
         'questions_count',
         'is_current_user',
         'is_authanticated_user_following_this_user',
+        'is_authanticated_user_blocked_this_user',
     ];
     protected $guarded = ['id'];
     protected $hidden = [
@@ -56,101 +59,6 @@ class User extends Authenticatable implements JWTSubject
     {
         return $query->where('country', $country);
     }
-
-    // relations //
-    public function posts()
-    {
-        return $this->hasMany(Post::class);
-    }
-    public function latestPost()
-    {
-        return $this->hasOne(Post::class)->latestOfMany();
-    }
-
-
-    public function sentMessages()
-    {
-        return $this->hasMany(Message::class, 'sender_id');
-    }
-
-    public function receivedMessages()
-    {
-        return $this->hasMany(Message::class, 'receiver_id');
-    }
-
-    public function conversations()
-    {
-        return $this->hasMany(Conversation::class, 'user_one')
-            ->orWhere('user_two', $this->id);
-    }
-
-    // المستخدمون الذين يتابعون هذا المستخدم
-    public function followers()
-    {
-        return $this->belongsToMany(User::class, 'follows', 'following_id', 'follower_id');
-    }
-
-
-    // المستخدمون الذين يتابعهم هذا المستخدم
-    public function followings()
-    {
-        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'following_id');
-    }
-
-
-    public function likedPosts()
-    {
-        return $this->hasMany(PostLike::class);
-    }
-
-    public function commentedPosts()
-    {
-        return $this->hasMany(PostComment::class);
-    }
-
-    public function gifts()
-    {
-        return $this->belongsToMany(Gift::class, 'user_gifts')
-            ->withPivot('sender_id', 'quantity')
-            ->withTimestamps();
-    }
-
-    //this accessors methods
-    public function getUserFollowersCountAttribute()
-    {
-        return $this->followers()->count();
-    }
-
-    public function getUserFollowingCountAttribute()
-    {
-        return $this->followings()->count();
-    }
-
-    public function getUserPostsCountAttribute()
-    {
-        return $this->posts()->count();
-    }
-
-    public function getUserGiftsCountAttribute()
-    {
-        return $this->gifts()->count();
-    }
-
-    public function getQuestionsCountAttribute()
-    {
-        return $this->receivedMessages()->where('is_anonymous', 1)->count();
-    }
-
-    public function getIsCurrentUserAttribute()
-    {
-        return $this->id == auth()->guard('api')->id();
-    }
-
-    public function getIsAuthanticatedUserFollowingThisUserAttribute()
-    {
-        return $this->followers()->where('follower_id', auth()->guard('api')->id())->exists();
-    }
-
 
     //this method is used to get the identifier that will be stored in the subject claim of the JWT
     /**

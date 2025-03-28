@@ -53,6 +53,7 @@ Route::group([], function () {
     Route::delete('/conversations/{conversation}/messages', [chatController::class, 'deleteConversationMessages']);
     Route::post('/conversations/{conversationId}/messages', [chatController::class, 'sendMessage']);
 
-
+    //this block and follow routes
     Route::post('/follow', [followerController::class, 'addAndRemoveFollower']);
+    Route::post('/block', [followerController::class, 'addAndRemoveBlock']);
 });
