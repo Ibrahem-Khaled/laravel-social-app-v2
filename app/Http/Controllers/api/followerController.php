@@ -27,17 +27,44 @@ class followerController extends Controller
 
     public function addAndRemoveBlock(Request $request)
     {
-        // الحصول على المستخدم الحالي من خلال التوكن
-        $user = JWTAuth::parseToken()->authenticate();
-        // التحقق من صحة وجود معرف المستخدم في الطلب (يمكن إضافة عملية تحقق إضافية)
-        $otherUserId = $request->input('user_id');
-        if (!$otherUserId) {
-            return response()->json(['error' => 'user_id is required'], 400);
+        try {
+            // الحصول على المستخدم الحالي من خلال التوكن
+            $user = JWTAuth::parseToken()->authenticate();
+
+            // التحقق من صحة وجود معرف المستخدم في الطلب
+            $otherUserId = $request->input('user_id');
+            if (!$otherUserId) {
+                return response()->json(['error' => 'user_id is required'], 400);
+            }
+
+            // تبديل حالة حظر المستخدم الآخر (إضافة إذا لم يكن موجوداً أو إزالته إذا كان موجوداً)
+            $result = $user->blockedUsers()->toggle($otherUserId);
+            // نتيجة toggle ترجع مصفوفة تحتوي على مفتاحي 'attached' و 'detached'
+            // إذا كان $otherUserId موجودًا في قائمة 'attached' فهذا يعني أن المستخدم تم حظره حالياً.
+            $isBlocked = in_array($otherUserId, $result['attached']);
+
+            // إذا تم حظر المستخدم، قم بإزالته من قوائم المتابعة (followings) والمتابعين (followers)
+            if ($isBlocked) {
+                if ($user->followings()->where('follower_id', $otherUserId)->exists()) {
+                    $user->followings()->detach($otherUserId);
+                }
+                if ($user->followings()->where('following_id', $otherUserId)->exists()) {
+                    $user->followings()->detach($otherUserId);
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'blocked' => $isBlocked
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'حدث خطأ أثناء تنفيذ العملية',
+                'message' => $e->getMessage()
+            ], 500);
         }
-        // تبديل حالة حظر المستخدم الآخر (إضافة إذا لم يكن موجوداً أو إزالته إذا كان موجوداً)
-        $user->blockedUsers()->toggle($otherUserId);
-        return response()->json('success');
     }
+
 
     public function getBlockedUsers()
     {
