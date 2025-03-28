@@ -41,9 +41,13 @@ class followerController extends Controller
 
     public function getBlockedUsers()
     {
-        // الحصول على المستخدم الحالي من خلال التوكن
-        $user = JWTAuth::parseToken()->authenticate();
-        $blockedUsers = $user->blockedUsers()->get();
-        return response()->json($blockedUsers);
+        try {
+            // الحصول على المستخدم الحالي من خلال التوكن
+            $user = JWTAuth::parseToken()->authenticate();
+            $blockedUsers = $user->blockedUsers()->get();
+            return response()->json($blockedUsers, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'فشل جلب المستخدمين المحظورين', 'message' => $e->getMessage()], 500);
+        }
     }
 }
