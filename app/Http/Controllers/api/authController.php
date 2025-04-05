@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Str;
 
 class authController extends Controller
 {
@@ -50,7 +51,15 @@ class authController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
+        $username = Str::slug($request->name) . '-' . Str::random(5);
+        $user = User::where('username', $username)->first();
+        while ($user) {
+            $username = Str::slug($request->name) . '-' . Str::random(5);
+            $user = User::where('username', $username)->first();
+        }
+        // إنشاء المستخدم الجديد
         $user = User::create([
+            'username' => $username,
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
