@@ -49,6 +49,12 @@ class followerController extends Controller
                 if ($user->followings()->where('following_id', $otherUserId)->exists()) {
                     $user->followings()->detach($otherUserId);
                 }
+                if ($user->conversations()->where('user_one', $otherUserId)->exists()) {
+                    $user->conversations()->detach($otherUserId);
+                }
+                if ($user->conversations()->where('user_two', $otherUserId)->exists()) {
+                    $user->conversations()->detach($otherUserId);
+                }
             }
 
             return response()->json([
