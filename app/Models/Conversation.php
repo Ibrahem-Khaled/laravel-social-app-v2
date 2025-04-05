@@ -9,6 +9,7 @@ class Conversation extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
+    protected $appends = ['chat_partner', 'last_message'];
 
     public function userOne()
     {
@@ -23,5 +24,17 @@ class Conversation extends Model
     public function messages()
     {
         return $this->hasMany(Message::class);
+    }
+
+    // this accessors functions
+    public function getChatPartnerAttribute()
+    {
+        return ($this->user_one == auth()->user()->id)
+            ? $this->userTwo
+            : $this->userOne;
+    }
+    public function getLastMessageAttribute()
+    {
+        return $this->messages()->latest()->first();
     }
 }

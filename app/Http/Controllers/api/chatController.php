@@ -24,36 +24,12 @@ class chatController extends Controller
         // استرجاع المحادثات التي يكون فيها المستخدم مشترك مع تحميل بيانات الطرفين وأحدث رسالة
         $conversations = Conversation::where('user_one', $user->id)
             ->orWhere('user_two', $user->id)
-            ->with([
-                'userOne',
-                'userTwo',
-                'messages' => function ($query) {
-                    // جلب أحدث رسالة لكل محادثة
-                    $query->orderBy('created_at', 'desc')->limit(1);
-                }
-            ])
             ->get();
 
-        // تحويل نتائج المحادثات لتحتوي على بيانات جهة الاتصال، آخر رسالة ووقت آخر رسالة
-        $result = $conversations->map(function ($conversation) use ($user) {
-            // تحديد جهة الاتصال: إذا كان المستخدم الحالي هو user_one، فإن الطرف الآخر هو userTwo والعكس صحيح
-            $chat_partner = ($conversation->user_one == $user->id)
-                ? $conversation->userTwo
-                : $conversation->userOne;
-
-            // الحصول على آخر رسالة من المحادثة (إن وجدت)
-            $last_message = $conversation->messages->first();
-            $last_message_time = $last_message ? $last_message->created_at : null;
-
-            return [
-                'chat_partner' => $chat_partner,
-                'last_message' => $last_message,
-                'last_message_time' => $last_message_time,
-            ];
-        });
-
         // إعادة النتائج كمصفوفة
-        return response()->json($result->values());
+        return response()->json([
+            'conversations' => $conversations,
+        ]);
     }
 
     public function startConversation(Request $request)
