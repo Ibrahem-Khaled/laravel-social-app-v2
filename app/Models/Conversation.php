@@ -29,7 +29,7 @@ class Conversation extends Model
     // this accessors functions
     public function getChatPartnerAttribute()
     {
-        return ($this->user_one == auth()->user()->id)
+        return ($this->user_one == auth()->guard('api')->user()->id)
             ? $this->userTwo
             : $this->userOne;
     }
