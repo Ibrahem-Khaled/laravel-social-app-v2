@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\authController;
+use App\Http\Controllers\api\CallLogController;
 use App\Http\Controllers\api\chatController;
 use App\Http\Controllers\api\followerController;
 use App\Http\Controllers\api\homeController;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/login', [authController::class, 'login']);
+Route::post('/register', [authController::class, 'register']);
 Route::get('me', [authController::class, 'user']);
 Route::get('user/{user}', [authController::class, 'getUser']);
 Route::post('/addExpoPushToken', [authController::class, 'addExpoPushToken']);
@@ -57,4 +59,10 @@ Route::group([], function () {
     Route::post('/follow', [followerController::class, 'addAndRemoveFollower']);
     Route::post('/block', [followerController::class, 'addAndRemoveBlock']);
     Route::get('/blocked/users', [followerController::class, 'getBlockedUsers']);
+
+    //this call log routes
+    Route::get('/call-logs', [CallLogController::class, 'index']);
+    Route::post('/call-logs', [CallLogController::class, 'store']);
+    Route::put('/call-logs/{callLog}', [CallLogController::class, 'update']);
+    Route::delete('/call-logs/{callLog}', [CallLogController::class, 'destroy']);
 });

@@ -14,33 +14,54 @@ class authController extends Controller
 {
     public function login(Request $request)
     {
-        // الحصول على رقم الهاتف من الطلب
-        $phone = $request->input('phone');
+        // استخراج بيانات الاعتماد من الطلب
+        $credentials = $request->only('email', 'password');
 
-        $validator = Validator::make($request->all(), [
-            'phone' => 'required|string',
+        // التحقق من صحة البيانات المدخلة
+        $validator = Validator::make($credentials, [
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|string|min:6',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error' => 'بيانات الاعتماد غير صحيحة'], 401);
         }
 
-        // البحث عن المستخدم باستخدام رقم الهاتف
-        $user = User::where('phone', $phone)->first();
-
-        if (!$user) {
+        // محاولة تسجيل الدخول والتحقق من صحة كلمة المرور
+        if (!$token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'بيانات الاعتماد غير صحيحة'], 401);
         }
 
-        // إنشاء التوكن للمستخدم دون التحقق من كلمة المرور
-        $token = JWTAuth::fromUser($user);
-
+        // إرجاع التوكن وبيانات المستخدم
         return response()->json([
             'token' => $token,
-            'user' => $user,
+            'user' => auth()->user(),
         ]);
     }
 
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'required|string|unique:users',
+            'password' => 'required|string|min:6',
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => bcrypt($request->password),
+        ]);
+        $token = JWTAuth::fromUser($user);
+        return response()->json([
+            'user' => $user,
+            'token' => $token,
+        ]);
+    }
 
     public function user(Request $request)
     {
