@@ -63,9 +63,10 @@ class postsController extends Controller
 
         return response()->json($post);
     }
-    public function update(Request $request, Post $post)
+    public function update(Request $request, $post)
     {
         $user = auth()->guard('api')->user();
+        $post = Post::findOrFail($post);
         if ($post->user_id == $user->id) {
             $validator = Validator::make($request->all(), [
                 'content' => 'nullable|string',
