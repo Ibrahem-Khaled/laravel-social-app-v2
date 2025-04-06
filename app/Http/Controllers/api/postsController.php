@@ -67,34 +67,43 @@ class postsController extends Controller
     {
         $user = auth()->guard('api')->user();
         $post = Post::findOrFail($post);
-        if ($post->user_id == $user->id) {
-            $validator = Validator::make($request->all(), [
-                'content' => 'nullable|string',
-                'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'images' => 'nullable|array',
-            ]);
 
-            if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
-            }
+        if ($post->user_id != $user->id) {
+            return response()->json(['message' => 'غير مصرح به'], 401);
+        }
 
-            $data = $request->except('images');
-            // معالجة الصور
-            if ($request->hasFile('images')) {
-                $images = [];
-                foreach ($request->file('images') as $image) {
+        $validator = Validator::make($request->all(), [
+            'content' => 'nullable|string',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $data = $request->except('images');
+
+        // معالجة الصور إذا تم رفع صور جديدة
+        if ($request->hasFile('images')) {
+            $images = [];
+            foreach ($request->file('images') as $image) {
+                try {
                     $path = $image->store('public/posts');
                     $images[] = str_replace('public/', '', $path);
+                } catch (\Exception $e) {
+                    return response()->json(['message' => 'فشل رفع الصور', 'error' => $e->getMessage()], 500);
                 }
-                $data['images'] = json_encode($images);
             }
-
-            $post->update($data);
-
-            return response()->json($request->all());
+            $data['images'] = json_encode($images);
         }
-        return response()->json(['message' => 'غير مصرح به'], 401);
+
+        $post->update($data);
+
+        // في الاختبار، يمكنك عرض بيانات الطلب للتأكد من وصولها، ولكن في النهاية يُفضل إرجاع المنشور المحدث
+        return response()->json($post);
     }
+
 
     public function delete(Post $post)
     {
