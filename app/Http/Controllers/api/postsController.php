@@ -63,6 +63,37 @@ class postsController extends Controller
 
         return response()->json($post);
     }
+    public function update(Request $request, Post $post)
+    {
+        $user = auth()->guard('api')->user();
+        if ($post->user_id == $user->id) {
+            $validator = Validator::make($request->all(), [
+                'content' => 'nullable|string',
+                'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'images' => 'nullable|array',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $data = $request->except('images');
+            // معالجة الصور
+            if ($request->hasFile('images')) {
+                $images = [];
+                foreach ($request->file('images') as $image) {
+                    $path = $image->store('public/posts');
+                    $images[] = str_replace('public/', '', $path);
+                }
+                $data['images'] = json_encode($images);
+            }
+
+            $post->update($data);
+
+            return response()->json($post);
+        }
+        return response()->json(['message' => 'غير مصرح به'], 401);
+    }
 
     public function delete(Post $post)
     {

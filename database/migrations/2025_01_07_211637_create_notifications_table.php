@@ -12,10 +12,11 @@ return new class extends Migration {
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id'); // المستخدم المستلم للإشعار
-            $table->string('type'); // نوع الإشعار
+            $table->unsignedBigInteger('user_id')->nullable(); // المستخدم المستلم للإشعار
             $table->text('message'); // نص الإشعار
             $table->boolean('is_read')->default(false); // حالة الإشعار (مقروء/غير مقروء)
+            $table->unsignedBigInteger('related_id')->nullable(); // معرف الكائن المرتبط بالإشعار (مثل معرف المنشور أو المحادثة)
+            $table->string('related_type')->nullable(); // نوع الكائن المرتبط بالإشعار (مثل "post" أو "conversation")
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
