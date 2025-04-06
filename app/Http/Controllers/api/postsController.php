@@ -91,7 +91,7 @@ class postsController extends Controller
 
             $post->update($data);
 
-            return response()->json($post);
+            return response()->json('تم تحديث المنشور بنجاح');
         }
         return response()->json(['message' => 'غير مصرح به'], 401);
     }
