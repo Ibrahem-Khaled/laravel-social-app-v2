@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [authController::class, 'login']);
 Route::post('/register', [authController::class, 'register']);
-Route::put('/update-profile', [authController::class, 'update']);
+Route::post('/update-profile', [authController::class, 'update']);
 Route::get('me', [authController::class, 'user']);
 Route::get('user/{user}', [authController::class, 'getUser']);
 Route::post('/addExpoPushToken', [authController::class, 'addExpoPushToken']);
