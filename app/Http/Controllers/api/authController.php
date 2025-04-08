@@ -82,6 +82,63 @@ class authController extends Controller
         }
     }
 
+    public function update(Request $request)
+    {
+        // الحصول على المستخدم الحالي من التوكن
+        $user = JWTAuth::parseToken()->authenticate();
+
+        // التحقق من صحة البيانات المدخلة
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'phone' => 'required|string|unique:users,phone,' . $user->id,
+            'gender' => 'required|string|in:male,female',
+            'avatar' => 'nullable|image|max:2048',
+            'bio' => 'nullable|string|max:500',
+            'address' => 'nullable|string|max:255',
+            'country' => 'nullable|string|max:255',
+            'birth_date' => 'nullable|date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // التحقق من وجود ملف صورة في الطلب
+        if ($request->hasFile('avatar')) {
+            $avatar = $request->file('avatar');
+
+            // توليد اسم فريد للصورة
+            $filename = time() . '_' . uniqid() . '.' . $avatar->getClientOriginalExtension();
+
+            // تخزين الصورة في مجلد "avatars" داخل القرص "public"
+            $path = $avatar->storeAs('avatars', $filename, 'public');
+
+            // توليد رابط الصورة العام باستخدام asset() أو Storage::url()
+            $avatarUrl = asset('storage/' . $path);
+
+            // تحديث رابط الصورة الخاصة بالمستخدم
+            $user->avatar = $avatarUrl;
+        }
+
+        // تحديث باقي بيانات المستخدم
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+        $user->phone = $request->input('phone');
+        $user->gender = $request->input('gender');
+        $user->bio = $request->input('bio');
+        $user->address = $request->input('address');
+        $user->country = $request->input('country');
+        $user->birth_date = $request->input('birth_date');
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم تحديث الملف الشخصي بنجاح',
+            'user' => $user,
+        ], 200);
+    }
+
     public function getUser(User $user)
     {
         $currentUser = auth()->guard('api')->user();
