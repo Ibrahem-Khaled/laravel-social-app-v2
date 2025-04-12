@@ -23,6 +23,7 @@ class postsController extends Controller
             ->whereNotIn('user_id', $blockedUserIds)
             ->orderBy('created_at', 'desc')
             ->with('user', 'message')
+            ->take(10)
             ->get();
 
         return response()->json($posts);
