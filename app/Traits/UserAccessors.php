@@ -5,12 +5,11 @@ namespace App\Traits;
 trait UserAccessors
 {
     //this accessors methods
-
     public function getAvatarUrlAttribute()
     {
-        return asset('storage/' . $this->avatar);
+        // إذا كانت قيمة avatar موجودة تُبنى باستخدام asset() مع مجلد storage
+        return $this->avatar ? asset($this->avatar) : 'https://cdn-icons-png.flaticon.com/128/3135/3135715.png';
     }
-
     public function getUserFollowersCountAttribute()
     {
         return $this->followers()->count();
