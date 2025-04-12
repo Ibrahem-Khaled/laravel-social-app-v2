@@ -5,6 +5,12 @@ namespace App\Traits;
 trait UserAccessors
 {
     //this accessors methods
+
+    public function getAvatarUrlAttribute()
+    {
+        return asset('storage/' . $this->avatar);
+    }
+
     public function getUserFollowersCountAttribute()
     {
         return $this->followers()->count();
