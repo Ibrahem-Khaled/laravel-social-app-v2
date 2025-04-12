@@ -8,7 +8,7 @@ trait UserAccessors
     public function getAvatarUrlAttribute()
     {
         // إذا كانت قيمة avatar موجودة تُبنى باستخدام asset() مع مجلد storage
-        return $this->avatar ? asset($this->avatar) : 'https://cdn-icons-png.flaticon.com/128/3135/3135715.png';
+        return $this->avatar ? asset(env('APP_URL') . $this->avatar) : 'https://cdn-icons-png.flaticon.com/128/3135/3135715.png';
     }
     public function getUserFollowersCountAttribute()
     {
