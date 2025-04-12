@@ -21,6 +21,7 @@ class User extends Authenticatable implements JWTSubject
         });
     }
     protected $appends = [
+        'avatar_url',
         'user_followers_count',
         'user_following_count',
         'user_posts_count',
