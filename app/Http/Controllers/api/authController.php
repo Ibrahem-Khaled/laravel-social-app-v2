@@ -104,10 +104,7 @@ class authController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        // مصفوفة لتخزين الحقول التي تغيرت فقط
-        $updatedFields = [];
-
-        // التحقق من وجود ملف صورة في الطلب وتحديث الصورة
+        // التحقق من وجود ملف صورة في الطلب
         if ($request->hasFile('avatar')) {
             $avatar = $request->file('avatar');
 
@@ -117,34 +114,30 @@ class authController extends Controller
             // تخزين الصورة في مجلد "avatars" داخل القرص "public"
             $path = $avatar->storeAs('avatars', $filename, 'public');
 
-            // توليد رابط الصورة العام
+            // توليد رابط الصورة العام باستخدام asset() أو Storage::url()
             $avatarUrl = asset('storage/' . $path);
 
             // تحديث رابط الصورة الخاصة بالمستخدم
             $user->avatar = $avatarUrl;
-            $updatedFields['avatar'] = $avatarUrl;
         }
 
-        // قائمة الحقول المطلوب تحديثها
-        $fields = ['name', 'email', 'phone', 'gender', 'bio', 'address', 'country', 'birth_date'];
-        foreach ($fields as $field) {
-            $input = $request->input($field);
-            // إذا كانت القيمة موجودة ومختلفة عن الحالية
-            if (!is_null($input) && $user->{$field} != $input) {
-                $user->{$field} = $input;
-                $updatedFields[$field] = $input;
-            }
-        }
-
+        // تحديث باقي بيانات المستخدم
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+        $user->phone = $request->input('phone');
+        $user->gender = $request->input('gender');
+        $user->bio = $request->input('bio');
+        $user->address = $request->input('address');
+        $user->country = $request->input('country');
+        $user->birth_date = $request->input('birth_date');
         $user->save();
 
         return response()->json([
             'status' => 'success',
             'message' => 'تم تحديث الملف الشخصي بنجاح',
-            'updated' => $updatedFields,
+            'user' => $user,
         ], 200);
     }
-
 
     public function getUser(User $user)
     {
