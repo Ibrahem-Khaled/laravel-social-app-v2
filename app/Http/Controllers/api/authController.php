@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -136,6 +137,33 @@ class authController extends Controller
             'status' => 'success',
             'message' => 'تم تحديث الملف الشخصي بنجاح',
             'user' => $user,
+        ], 200);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:6',
+            'confirm_password' => 'required|string|same:new_password',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $user = JWTAuth::parseToken()->authenticate();
+
+        if (!Hash::check($request->input('current_password'), $user->password)) {
+            return response()->json(['error' => 'كلمة المرور الحالية غير صحيحة'], 422);
+        }
+
+        $user->password = Hash::make($request->input('new_password'));
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم تغيير كلمة المرور بنجاح',
         ], 200);
     }
 
