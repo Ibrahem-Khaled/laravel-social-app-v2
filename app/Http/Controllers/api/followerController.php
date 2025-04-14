@@ -51,10 +51,10 @@ class followerController extends Controller
                 $user->followings()->detach($otherUserId);
 
                 // إزالة من المحادثات - في حالة كانت العلاقة من نوع belongsToMany أو يتطلب حذف سجلات معينة في حالة hasMany
-                $user->conversations()->where(function ($query) use ($otherUserId) {
-                    $query->where('user_one', $otherUserId)
-                        ->orWhere('user_two', $otherUserId);
-                })->delete();
+                // $user->conversations()->where(function ($query) use ($otherUserId) {
+                //     $query->where('user_one', $otherUserId)
+                //         ->orWhere('user_two', $otherUserId);
+                // })->delete();
             }
 
             DB::commit();
