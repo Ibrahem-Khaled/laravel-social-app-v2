@@ -57,11 +57,13 @@ Route::group([], function () {
     Route::get('/conversations', [chatController::class, 'getConversations']);
     Route::post('/conversations', [chatController::class, 'startConversation']);
     Route::get('/conversations/{conversationId}/messages', [chatController::class, 'getMessages']);
-    Route::delete('/conversations/{conversation}/messages', [chatController::class, 'deleteConversationMessages']);
     Route::post('/conversations/{conversationId}/messages', [chatController::class, 'sendMessage']);
+    Route::delete('/conversations/{conversation}/messages', [chatController::class, 'deleteConversationMessages']);
+    Route::delete('/conversations/{conversation}', [chatController::class, 'deleteConversation']);
 
     //this block and follow routes
     Route::post('/follow', [followerController::class, 'addAndRemoveFollower']);
+    Route::get('get/{type}/{user}', [followerController::class, 'getFollowersAndFollowing']);
     Route::post('/block', [followerController::class, 'addAndRemoveBlock']);
     Route::get('/blocked/users', [followerController::class, 'getBlockedUsers']);
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +25,16 @@ class followerController extends Controller
         $user->followings()->toggle($otherUserId);
 
         return response()->json('success');
+    }
+
+    public function getFollowersAndFollowing(User $user, $type)
+    {
+        if ($type === 'followers') {
+            return $user->followers()->with('user')->get();
+        } elseif ($type === 'following') {
+            return $user->followings()->with('user')->get();
+        }
+        return response()->json(['error' => 'Invalid type'], 400);
     }
 
     public function addAndRemoveBlock(Request $request)
