@@ -30,9 +30,9 @@ class followerController extends Controller
     public function getFollowersAndFollowing(User $user, $type)
     {
         if ($type === 'followers') {
-            return $user->followers()->with('user')->get();
+            return $user->followers()->get();
         } elseif ($type === 'following') {
-            return $user->followings()->with('user')->get();
+            return $user->followings()->get();
         }
         return response()->json(['error' => 'Invalid type'], 400);
     }
