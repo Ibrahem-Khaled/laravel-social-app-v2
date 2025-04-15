@@ -34,7 +34,7 @@ Route::group([], function () {
     Route::get('/deep/search', [homeController::class, 'deepSearch']);
     Route::get('/get/higher/points/from/users', [homeController::class, 'getHigherPointsFromUsers']);
     Route::get('/get/higher/points/from/users/followers', [homeController::class, 'getHigherPointsFromUsersFollowers']);
-
+    Route::post('/submit/verification', [homeController::class, 'submitVerification']);
 
     //this posts routes
     Route::get('/posts', [postsController::class, 'index']);

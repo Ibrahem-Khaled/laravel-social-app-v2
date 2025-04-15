@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\VerificationRequest;
 use Illuminate\Http\Request;
 
 class homeController extends Controller
@@ -58,4 +59,24 @@ class homeController extends Controller
         return response()->json($users);
     }
 
+    public function submitVerification(Request $request)
+    {
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+            'front_id_image' => 'required|image|max:2048',
+            'back_id_image' => 'required|image|max:2048',
+        ]);
+
+        $frontImagePath = $request->file('front_id_image')->store('verifications');
+        $backImagePath = $request->file('back_id_image')->store('verifications');
+
+        VerificationRequest::create([
+            'user_id' => auth()->guard('api')->user()->id,
+            'full_name' => $request->full_name,
+            'front_id_image' => $frontImagePath,
+            'back_id_image' => $backImagePath,
+        ]);
+
+        return redirect()->back()->with('success', 'تم تقديم طلب التوثيق بنجاح.');
+    }
 }
