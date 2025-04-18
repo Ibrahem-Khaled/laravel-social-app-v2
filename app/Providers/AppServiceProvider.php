@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\ReportPost;
 use App\Models\VerificationRequest;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +31,8 @@ class AppServiceProvider extends ServiceProvider
                 'unhiddenReportsCount' => $unhiddenReportsCount,
             ]);
         }
+        Schema::defaultStringLength(191);
+
     }
 
 }
