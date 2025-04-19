@@ -41,11 +41,12 @@ Route::group([], function () {
     Route::post('/posts', [postsController::class, 'create']);
     Route::put('/posts/{post}', [postsController::class, 'update']);
     Route::delete('/posts/{post}', [postsController::class, 'delete']);
+    Route::post('/posts/{post}/like', [postsController::class, 'like']);
 
     //this posts comments routes
     Route::get('/posts/{post}/comments', [postsController::class, 'getComments']);
     Route::post('/posts/{post}/comments', [postsController::class, 'addComment']);
-    Route::post('/posts/{post}/like', [postsController::class, 'like']);
+    Route::delete('/posts/delete/comment/{comment}', [postsController::class, 'deleteComment']);
 
     //this questions routes
     Route::get('/questions', [questionController::class, 'index']);

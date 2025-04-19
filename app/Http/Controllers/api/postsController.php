@@ -118,13 +118,14 @@ class postsController extends Controller
 
     public function getComments(Post $post)
     {
-        return response()->json($post->comments()->with('user')->get());
+        return response()->json($post->comments()->with('user', 'replies.user')->get());
     }
 
     public function addComment(Request $request, Post $post)
     {
         $validator = Validator::make($request->all(), [
             'content' => 'required|string',
+            'comment_id' => 'nullable|exists:post_comments,id',
         ]);
 
         if ($validator->fails()) {
@@ -133,10 +134,21 @@ class postsController extends Controller
         $post = PostComment::create([
             'post_id' => $post->id,
             'user_id' => auth()->guard('api')->user()->id,
+            'comment_id' => $request->comment_id,
             'content' => $request->content
         ]);
 
         return response()->json($post);
+    }
+
+    public function deleteComment(PostComment $comment)
+    {
+        $user = auth()->guard('api')->user();
+        if ($comment->user_id == $user->id) {
+            $comment->delete();
+            return response()->json(['message' => 'تم حذف التعليق بنجاح']);
+        }
+        return response()->json(['message' => 'غير مصرح به'], 401);
     }
 
     public function like(Post $post)
