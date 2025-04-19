@@ -8,6 +8,7 @@ use App\Models\Message;
 use App\Models\Post;
 use App\Models\PostComment;
 use App\Models\PostLike;
+use App\Models\SocialMediaAccounts;
 use App\Models\User;
 
 trait UserRelationships
@@ -68,6 +69,11 @@ trait UserRelationships
     {
         return $this->belongsToMany(User::class, 'blocked_users', 'user_id', 'blocked_user_id')->
             withTimestamps();
+    }
+
+    public function socialMedia()
+    {
+        return $this->hasOne(SocialMediaAccounts::class);
     }
 
 }

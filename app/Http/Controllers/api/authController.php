@@ -176,7 +176,7 @@ class authController extends Controller
             return response()->json(['error' => 'هذا المستخدم محظور'], 403);
         }
 
-        $posts = $user->posts()->with('user', 'message')->get();
+        $posts = $user->posts()->with('user', 'message', 'socialMedia')->get();
         return response()->json([
             'user' => $user,
             'posts' => $posts
