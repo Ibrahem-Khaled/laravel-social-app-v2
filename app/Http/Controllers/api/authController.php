@@ -47,6 +47,7 @@ class authController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'required|string|unique:users',
+            'gender' => 'nullable|string|in:male,female',
             'password' => 'required|string|min:6',
         ]);
         if ($validator->fails()) {
@@ -64,6 +65,7 @@ class authController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
+            'gender' => $request->gender,
             'password' => bcrypt($request->password),
         ]);
         $token = JWTAuth::fromUser($user);
