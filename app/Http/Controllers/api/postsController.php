@@ -118,7 +118,9 @@ class postsController extends Controller
 
     public function getComments(Post $post)
     {
-        return response()->json($post->comments()->with('user', 'replies.user')->get());
+        return response()->json($post->comments()->with('user', 'replies.user')
+        ->orderBy('created_at', 'desc')
+        ->get());
     }
 
     public function addComment(Request $request, Post $post)
