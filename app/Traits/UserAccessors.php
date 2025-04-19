@@ -9,7 +9,7 @@ trait UserAccessors
     {
         // إذا كانت قيمة avatar موجودة تُبنى باستخدام asset() مع مجلد storage
         return $this->avatar ? asset(env('APP_URL') . $this->avatar) :
-            ($this->gender == 'male' ? asset(env('APP_URL') . 'assets/img/avatar-male.jpeg') : asset(env('APP_URL') . 'assets/img/avatar-female.jpeg'));
+            ($this->gender == 'male' ? asset(env('APP_URL') . '/assets/img/avatar-male.jpeg') : asset(env('APP_URL') . '/assets/img/avatar-female.jpeg'));
     }
     public function getUserFollowersCountAttribute()
     {
