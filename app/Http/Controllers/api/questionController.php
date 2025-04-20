@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class questionController extends Controller
 {
+
     public function index()
     {
         $user = auth()->guard('api')->user();
@@ -21,22 +22,15 @@ class questionController extends Controller
         }
 
         $messages = $user->receivedMessages()
-            // 1) استثناء الرسائل المجهولة
-            ->where('type_message', '!=', 'anonymous')           // :contentReference[oaicite:0]{index=0}
-            // أو إذا لديك عمود is_anonymous:
-            // ->where('is_anonymous', 0)
-            // 2) جلب بيانات المرسل عبر eager loading
-            ->with([
-                'sender' => function ($q) {
-                    $q->select('id', 'name', 'avatar_url');          // :contentReference[oaicite:1]{index=1}
-                }
-            ])
+            // جلب فقط الرسائل غير المجهولة
+            ->where('type_message', '!=', 'anonymous')
+            // تحميل المرسل مع الأعمدة الفعلية فقط
+            ->with(['sender:id,name,avatar'])       // :contentReference[oaicite:0]{index=0}
             ->orderBy('created_at', 'desc')
             ->get();
 
         return response()->json($messages);
     }
-
 
     public function create(Request $request)
     {
