@@ -41,6 +41,7 @@ Route::group([], function () {
     Route::post('/posts', [postsController::class, 'create']);
     Route::put('/posts/{post}', [postsController::class, 'update']);
     Route::delete('/posts/{post}', [postsController::class, 'delete']);
+    Route::post('/posts/{post}/pinned', [postsController::class, 'pinnedPost']);
     Route::post('/posts/{post}/like', [postsController::class, 'like']);
 
     //this posts comments routes

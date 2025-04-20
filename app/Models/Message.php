@@ -17,6 +17,7 @@ class Message extends Model
         'media',
         'is_read',
         'is_anonymous',
+        'type_message',
         'parent_id',
     ];
 

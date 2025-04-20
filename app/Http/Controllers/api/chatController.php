@@ -80,7 +80,7 @@ class chatController extends Controller
     public function getMessages($conversationId)
     {
         $messages = Message::where('conversation_id', $conversationId)
-            ->where('is_anonymous', 0)
+            ->where('type_message', 'normal')
             ->get();
         return response()->json($messages);
     }

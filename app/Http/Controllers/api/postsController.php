@@ -116,11 +116,22 @@ class postsController extends Controller
         return response()->json(['message' => 'غير مصرح به'], 401);
     }
 
+    public function pinnedPost(Post $post)
+    {
+        $user = auth()->guard('api')->user();
+        if ($post->user_id == $user->id) {
+            $post->pinned = !$post->pinned;
+            $post->save();
+            return response()->json(['message' => 'تم تغيير حالة التثبيت']);
+        }
+        return response()->json(['message' => 'غير مصرح به'], 401);
+    }
+
     public function getComments(Post $post)
     {
         return response()->json($post->comments()->with('user', 'replies.user')
-        ->orderBy('created_at', 'desc')
-        ->get());
+            ->orderBy('created_at', 'desc')
+            ->get());
     }
 
     public function addComment(Request $request, Post $post)

@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->text('media')->nullable();
             $table->boolean('is_read')->default(false);
             $table->boolean('is_anonymous')->default(false);
+            $table->enum('type_message', ['normal', 'anonymous'])->default('normal');
             $table->integer('points')->default(0)->nullable();
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();

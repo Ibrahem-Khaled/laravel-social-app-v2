@@ -21,7 +21,7 @@ class questionController extends Controller
         }
 
         $questions = $user->receivedMessages()
-            ->where('is_anonymous', 1)
+            ->where('type_message', 'anonymous')
             ->doesntHave('replies')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -34,11 +34,13 @@ class questionController extends Controller
     {
         $user = auth()->guard('api')->user();
         $receiver = User::findOrFail($request->receiver_id);
+
         $question = Message::create([
             'sender_id' => $user->id,
             'receiver_id' => $receiver->id,
             'message' => $request->message,
-            'is_anonymous' => true,
+            'is_anonymous' => $request->is_anonymous,
+            'type_message' => 'anonymous',
         ]);
 
         if ($receiver->expo_push_token) {
