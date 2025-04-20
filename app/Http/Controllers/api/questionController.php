@@ -21,13 +21,21 @@ class questionController extends Controller
             return response()->json(['message' => 'unauthorized'], 401);
         }
 
+        // 1) جلب كل الرسائل (بما في ذلك المجهولة وغير المجهولة)
         $messages = $user->receivedMessages()
-            // جلب فقط الرسائل غير المجهولة
-            ->where('type_message', '!=', 'anonymous')
-            // تحميل المرسل مع الأعمدة الفعلية فقط
-            ->with(['sender:id,name,avatar'])       // :contentReference[oaicite:0]{index=0}
             ->orderBy('created_at', 'desc')
             ->get();
+
+        // 2) Eager load بيانات المرسل لجميع الرسائل دفعة واحدة للتوفير في الاستعلامات :contentReference[oaicite:0]{index=0}
+        $messages->load('sender:id,name,avatar');
+
+        // 3) استبعاد بيانات المرسل (Relation) للرسائل المجهولة
+        $messages->each(function ($msg) {
+            if ($msg->is_anonymous) {
+                // إذا كانت الرسالة مجهولة، نزيل العلاقة sender
+                $msg->setRelation('sender', null);
+            }
+        });
 
         return response()->json($messages);
     }

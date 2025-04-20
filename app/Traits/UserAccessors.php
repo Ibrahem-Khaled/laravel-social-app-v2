@@ -34,7 +34,7 @@ trait UserAccessors
 
     public function getQuestionsCountAttribute()
     {
-        return $this->receivedMessages()->where('is_anonymous', 1)->count();
+        return $this->receivedMessages()->where('type_message', 'anonymous')->count();
     }
 
     public function getIsCurrentUserAttribute()
