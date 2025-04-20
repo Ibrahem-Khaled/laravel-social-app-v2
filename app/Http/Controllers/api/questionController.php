@@ -20,13 +20,21 @@ class questionController extends Controller
             return response()->json(['message' => 'unauthorized'], 401);
         }
 
-        $questions = $user->receivedMessages()
-            ->where('type_message', 'anonymous')
-            ->doesntHave('replies')
+        $messages = $user->receivedMessages()
+            // 1) استثناء الرسائل المجهولة
+            ->where('type_message', '!=', 'anonymous')           // :contentReference[oaicite:0]{index=0}
+            // أو إذا لديك عمود is_anonymous:
+            // ->where('is_anonymous', 0)
+            // 2) جلب بيانات المرسل عبر eager loading
+            ->with([
+                'sender' => function ($q) {
+                    $q->select('id', 'name', 'avatar_url');          // :contentReference[oaicite:1]{index=1}
+                }
+            ])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return response()->json($questions);
+        return response()->json($messages);
     }
 
 
