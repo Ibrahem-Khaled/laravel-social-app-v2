@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Models\CallLog;
 use App\Models\Conversation;
 use App\Models\Gift;
 use App\Models\Message;
@@ -74,6 +75,11 @@ trait UserRelationships
     public function socialMedia()
     {
         return $this->hasOne(SocialMediaAccounts::class);
+    }
+
+    public function callLogs()
+    {
+        return $this->hasMany(CallLog::class);
     }
 
 }

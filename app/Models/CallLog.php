@@ -19,6 +19,7 @@ class CallLog extends Model
         'start_time' => 'datetime',
         'end_time' => 'datetime',
     ];
+    
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');
