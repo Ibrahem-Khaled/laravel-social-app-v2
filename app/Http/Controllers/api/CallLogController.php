@@ -10,10 +10,17 @@ class CallLogController extends Controller
 {
     public function index(Request $request)
     {
-        // استرجاع سجلات المكالمات للمستخدم الحالي
-        $user = auth()->guard('api')->user();
-        $callLogs = $user->callLogs()->with(['sender', 'recipient'])->get();
-        return response()->json($callLogs);
+        // 1. جلب المستخدم الحالي من Guard 'api'
+        $user = $request->user('api');
+
+        // 2. استدعاء accessor: يستدعي getCallLogsAttribute أوتوماتيكيًا
+        $callLogs = $user->call_logs;  // هنا يتم دمج sentCalls و receivedCalls وترتيبها
+
+        // 3. إعادة النتيجة كـ JSON
+        return response()->json([
+            'status' => 'success',
+            'call_logs' => $callLogs->values(),  // values() لإعادة ترقيم المفاتيح
+        ], 200);
     }
 
     public function store(Request $request)

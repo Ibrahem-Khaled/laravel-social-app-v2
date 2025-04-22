@@ -77,9 +77,15 @@ trait UserRelationships
         return $this->hasOne(SocialMediaAccounts::class);
     }
 
-    public function callLogs()
+    public function sentCalls()
     {
-        return $this->hasMany(CallLog::class);
+        // جميع المكالمات التي أرسلها المستخدم
+        return $this->hasMany(CallLog::class, 'sender_id');
     }
 
+    public function receivedCalls()
+    {
+        // جميع المكالمات التي استقبلها المستخدم
+        return $this->hasMany(CallLog::class, 'recipient_id');
+    }
 }

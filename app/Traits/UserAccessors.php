@@ -53,4 +53,12 @@ trait UserAccessors
             ->orWhere('user_id', auth()->guard('api')->id())
             ->exists();
     }
+
+    public function getCallLogsAttribute()
+    {
+        // نجلب الاثنين ثم ندمجهما ونرتب حسب وقت البداية تنازلياً
+        return $this->sentCalls
+            ->merge($this->receivedCalls)
+            ->sortByDesc('start_time');
+    }
 }
