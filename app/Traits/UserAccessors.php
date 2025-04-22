@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use App\Models\CallLog;
+
 trait UserAccessors
 {
     //this accessors methods
@@ -54,11 +56,11 @@ trait UserAccessors
             ->exists();
     }
 
-    public function getCallLogsAttribute()
+    public function allCallLogs()
     {
-        // نجلب الاثنين ثم ندمجهما ونرتب حسب وقت البداية تنازلياً
-        return $this->sentCalls
-            ->merge($this->receivedCalls)
-            ->sortByDesc('start_time');
+        return CallLog::with(['sender', 'recipient'])
+            ->where('sender_id', $this->id)
+            ->orWhere('recipient_id', $this->id);
     }
+
 }
