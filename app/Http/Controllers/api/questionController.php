@@ -96,6 +96,8 @@ class questionController extends Controller
             Notification::send($message->sender, new ExpoNotification([$message->sender->expo_push_token], 'رسالة جديدة', $reply->message));
         }
 
+        $message->delete();
+
         return response()->json([
             'status' => 'success',
             'message' => 'تم إرسال الرد بنجاح',
