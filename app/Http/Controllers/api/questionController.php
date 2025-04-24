@@ -23,6 +23,8 @@ class questionController extends Controller
 
         // 1) جلب كل الرسائل (بما في ذلك المجهولة وغير المجهولة)
         $messages = $user->receivedMessages()
+            ->where('type_message', 'anonymous')
+            ->where('is_anonymous', 0)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -31,7 +33,7 @@ class questionController extends Controller
 
         // 3) استبعاد بيانات المرسل (Relation) للرسائل المجهولة
         $messages->each(function ($msg) {
-            if ($msg->is_anonymous) {
+            if ($msg->is_anonymous && $msg->type_message == 'anonymous') {
                 // إذا كانت الرسالة مجهولة، نزيل العلاقة sender
                 $msg->setRelation('sender', null);
             }
