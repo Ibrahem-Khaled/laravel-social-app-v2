@@ -56,12 +56,26 @@ Route::group([], function () {
     Route::delete('/questions/{id}', [questionController::class, 'delete']);
 
     //this chat and conversations routes
-    Route::get('/conversations', [chatController::class, 'getConversations']);
-    Route::post('/conversations', [chatController::class, 'startConversation']);
-    Route::get('/conversations/{conversationId}/messages', [chatController::class, 'getMessages']);
-    Route::post('/conversations/{conversationId}/messages', [chatController::class, 'sendMessage']);
-    Route::delete('/conversations/{conversation}/messages', [chatController::class, 'deleteConversationMessages']);
-    Route::delete('/conversations/{conversation}', [chatController::class, 'deleteConversation']);
+    Route::get('conversations', [ChatController::class, 'getConversations']);
+    // جلب المحادثات الثنائية (1-1)
+    Route::get('conversations/private', [ChatController::class, 'getPrivateConversations']);
+    // جلب المحادثات الجماعية (جروبات)
+    Route::get('conversations/group', [ChatController::class, 'getGroupConversations']);
+    // إنشاء محادثة ثنائية
+    Route::post('conversations/private', [ChatController::class, 'createPrivate']);
+    // إنشاء جروب جديد
+    Route::post('conversations/group', [ChatController::class, 'createGroup']);
+    // جلب الرسائل لمحاثة معينة
+    Route::get('conversations/{id}/messages', [ChatController::class, 'getMessages']);
+    // إرسال رسالة جديدة
+    Route::post('messages', [ChatController::class, 'sendMessage']);
+    // حذف جميع رسائل محادثة
+    Route::delete('conversations/{id}/messages', [ChatController::class, 'deleteConversationMessages']);
+    // حذف محادثة كاملة
+    Route::delete('conversations/{id}', [ChatController::class, 'deleteConversation']);
+    // حذف رسالة معينة
+    Route::delete('messages/{id}', [ChatController::class, 'deleteMessage']);
+
 
     //this block and follow routes
     Route::post('/follow', [followerController::class, 'addAndRemoveFollower']);
@@ -74,4 +88,9 @@ Route::group([], function () {
     Route::post('/call-logs', [CallLogController::class, 'store']);
     Route::put('/call-logs/{callLog}', [CallLogController::class, 'update']);
     Route::delete('/call-logs/{callLog}', [CallLogController::class, 'destroy']);
+
+    //this live streaming routes
+    Route::apiResource('live-streamings', 'App\Http\Controllers\api\LiveStreamingController');
+
+
 });

@@ -11,16 +11,13 @@ class Conversation extends Model
     protected $guarded = ['id'];
     protected $appends = ['chat_partner', 'last_message'];
 
-    public function userOne()
+    // this relationship functions
+    public function users()
     {
-        return $this->belongsTo(User::class, 'user_one');
+        return $this->belongsToMany(User::class, 'conversation_users')
+            ->withPivot('role', 'is_blocked')
+            ->withTimestamps();
     }
-
-    public function userTwo()
-    {
-        return $this->belongsTo(User::class, 'user_two');
-    }
-
     public function messages()
     {
         return $this->hasMany(Message::class);
@@ -29,9 +26,10 @@ class Conversation extends Model
     // this accessors functions
     public function getChatPartnerAttribute()
     {
-        return ($this->user_one == auth()->guard('api')->user()->id)
-            ? $this->userTwo
-            : $this->userOne;
+        // نستخدم المجموعة المحمّلة users (Collection) إن وجدت،
+        // وإلا سيحمّلها ويطبق الفلتر
+        return $this->users
+            ->first(fn($user) => $user->id !== auth()->guard('api')->user()->id);
     }
     public function getLastMessageAttribute()
     {

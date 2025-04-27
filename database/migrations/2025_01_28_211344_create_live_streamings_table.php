@@ -17,8 +17,10 @@ return new class extends Migration {
             $table->string('title');
             $table->text('description')->nullable();
             $table->bigInteger('live_streaming_id')->unique()->nullable()->comment('ID of the live streaming from the streaming platform');
+            $table->string('thumbnail')->nullable()->comment('URL of the thumbnail image');
+            $table->string('password')->nullable()->comment('Password for the live stream');
 
-            $table->enum('status', ['pending', 'live', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'live', 'completed', 'cancelled'])->default('live');
             $table->timestamp('scheduled_at')->nullable();
 
             $table->timestamps();

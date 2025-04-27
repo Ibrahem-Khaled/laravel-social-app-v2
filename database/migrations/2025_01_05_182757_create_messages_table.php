@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('conversation_id')->nullable(); // إضافة عمود معرف المحادثة
             $table->unsignedBigInteger('sender_id')->nullable();
             $table->unsignedBigInteger('receiver_id');
+            
             $table->text('message');
             $table->text('media')->nullable();
             $table->boolean('is_read')->default(false);

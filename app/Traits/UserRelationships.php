@@ -31,8 +31,9 @@ trait UserRelationships
 
     public function conversations()
     {
-        return $this->hasMany(Conversation::class, 'user_one')
-            ->orWhere('user_two', $this->id);
+        return $this->belongsToMany(Conversation::class, 'conversation_users')
+            ->withPivot('role', 'is_blocked')
+            ->withTimestamps();
     }
 
     // المستخدمون الذين يتابعون هذا المستخدم

@@ -10,90 +10,161 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\ExpoNotification;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
-class chatController extends Controller
+class ChatController extends Controller
 {
     public function getConversations()
     {
-        // استرجاع المستخدم المُسجّل
         $user = auth()->guard('api')->user();
-        if (!$user) {
-            return response()->json(['message' => 'unauthorized'], 401);
-        }
 
-        // استرجاع المحادثات التي يكون فيها المستخدم مشترك مع تحميل بيانات الطرفين وأحدث رسالة
-        $conversations = Conversation::where('user_one', $user->id)
-            ->orWhere('user_two', $user->id)
+        // جلب المحادثات التي يشارك فيها المستخدم
+        // مع تحميل بيانات الأعضاء، وأحدث رسالة لكل محادثة
+        $conversations = Conversation::whereHas('users', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+            ->with([
+                'users',
+                'messages' => function ($q) {
+                    $q->latest()->limit(1);
+                }
+            ])
             ->get();
 
-        // إعادة النتائج كمصفوفة
         return response()->json([
-            'conversations' => $conversations,
-        ]);
+            'conversations' => $conversations
+        ], 200);
     }
 
-    public function startConversation(Request $request)
+    public function getPrivateConversations()
     {
-        // استرجاع المستخدم المُسجّل عبر API
         $user = auth()->guard('api')->user();
-        if (!$user) {
-            return response()->json(['message' => 'unauthorized'], 401);
-        }
 
-        // استلام معرف جهة الاتصال من الطلب
-        $otherUserId = $request->input('user_id');
-
-        // التحقق من صحة معرف جهة الاتصال وعدم مساواته لمعرف المستخدم الحالي
-        if (!$otherUserId || $otherUserId == $user->id) {
-            return response()->json(['message' => 'Invalid user id'], 400);
-        }
-
-        // التأكد من عدم وجود محادثة سابقة بين المستخدمين
-        $conversation = Conversation::where(function ($query) use ($user, $otherUserId) {
-            $query->where('user_one', $user->id)
-                ->where('user_two', $otherUserId);
-        })->orWhere(function ($query) use ($user, $otherUserId) {
-            $query->where('user_one', $otherUserId)
-                ->where('user_two', $user->id);
-        })->first();
-
-        if ($conversation) {
-            // في حال وجود محادثة سابقة يتم إرجاعها مع رسالة توضيحية
-            return response()->json([
-                'message' => 'Conversation already exists',
-                'conversation' => $conversation
-            ], 200);
-        }
-
-        // إنشاء محادثة جديدة إذا لم تكن موجودة مسبقاً
-        $conversation = Conversation::create([
-            'user_one' => $user->id,
-            'user_two' => $otherUserId,
-        ]);
+        $private = Conversation::where('is_group', false)                    // فِلترة المحادثات الثنائية
+            ->whereHas('users', fn($q) => $q->where('user_id', $user->id))    // التأكد من اشتراك المستخدم
+            ->with([
+                'users',
+                'messages' => fn($q) => $q->latest()->limit(1)
+            ])
+            ->get();                                                        // تنفيذ الاستعلام :contentReference[oaicite:0]{index=0}
 
         return response()->json([
-            'message' => 'Conversation started successfully',
-            'conversation' => $conversation
+            'private_conversations' => $private
+        ], 200);
+    }
+
+    /**
+     * جلب المحادثات الجماعية فقط (جروبات)
+     */
+    public function getGroupConversations()
+    {
+        $user = auth()->guard('api')->user();
+
+        $group = Conversation::where('is_group', true)                      // فِلترة الجروبات
+            ->whereHas('users', fn($q) => $q->where('user_id', $user->id))  // التأكد من اشتراك المستخدم
+            ->with([
+                'users',
+                'messages' => fn($q) => $q->latest()->limit(1)
+            ])
+            ->get();                                                      // تنفيذ الاستعلام :contentReference[oaicite:1]{index=1}
+
+        return response()->json([
+            'group_conversations' => $group
+        ], 200);
+    }
+
+    /**
+     * إنشاء أو جلب محادثة ثنائية (1-1)
+     */
+    public function createPrivate(Request $request)
+    {
+        $user = auth()->guard('api')->user();
+
+        // التحقق من معرف الطرف الآخر
+        $request->validate([
+            'member_id' => 'required|exists:users,id|not_in:' . $user->id,
+        ]);
+
+        $otherId = $request->member_id;
+
+        // البحث عن محادثة ثنائية قائمة بوجود العضوين
+        $conversation = Conversation::where('is_group', false)
+            ->whereHas('users', fn($q) => $q->where('user_id', $user->id))
+            ->whereHas('users', fn($q) => $q->where('user_id', $otherId))
+            ->withCount('users')
+            ->having('users_count', 2)
+            ->first();
+
+        if (!$conversation) {
+            // إن لم توجد، ننشئ محادثة جديدة
+            $conversation = Conversation::create([
+                'name' => null,
+                'is_group' => false,
+                'created_by' => $user->id,
+            ]);
+            // ربط العضوين
+            $conversation->users()->attach([$user->id, $otherId]);
+        }
+
+        return response()->json([
+            'conversation' => $conversation->load('users')
+        ], 200);
+    }
+
+    /**
+     * إنشاء جروب جديد
+     */
+    public function createGroup(Request $request)
+    {
+        $user = auth()->guard('api')->user();
+
+        // التحقق من الاسم وقائمة الأعضاء
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'members' => 'required|array|min:2',
+            'members.*' => 'exists:users,id|not_in:' . $user->id,
+        ]);
+
+        // إنشاء المحادثة كجروب
+        $conversation = Conversation::create([
+            'name' => $request->name,
+            'is_group' => true,
+            'created_by' => $user->id,
+        ]);
+
+        // ربط الأعضاء بالجروب
+        $conversation->users()->attach($request->members);
+        // جعل منشئ الجروب Admin
+        $conversation->users()
+            ->updateExistingPivot($user->id, ['role' => 'admin']);
+
+        return response()->json([
+            'conversation' => $conversation->load('users')
         ], 201);
     }
 
+    /**
+     * استرجاع جميع الرسائل من محادثة محددة
+     */
     public function getMessages($conversationId)
     {
+        // جلب الرسائل العادية فقط
         $messages = Message::where('conversation_id', $conversationId)
             ->where('type_message', 'normal')
             ->get();
-        return response()->json($messages);
+
+        return response()->json($messages, 200);
     }
 
+    /**
+     * إرسال رسالة (نصية أو وسائط)
+     */
     public function sendMessage(Request $request)
     {
-        // التحقق من صحة المستخدم
         $user = auth()->guard('api')->user();
-        if (!$user) {
-            return response()->json(['message' => 'غير مصرح لك'], 401);
-        }
 
-        // التحقق من صحة البيانات الواردة باستخدام Validator
+        // التحقق من البيانات الواردة
         $validator = Validator::make($request->all(), [
             'conversation_id' => 'required|exists:conversations,id',
             'message' => 'required|string',
@@ -105,32 +176,25 @@ class chatController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        \DB::beginTransaction();
         try {
-            // بدء معاملة قاعدة البيانات لضمان التكامل في حالة حدوث خطأ
-            \DB::beginTransaction();
-
-            // معالجة ملف الوسائط إذا وُجد
+            // معالجة ملف الوسائط إن وُجد وخزنه في القرص public
             $mediaPath = null;
             if ($request->hasFile('media')) {
-                $mediaPath = $request->file('media')->store('uploads/media', 'public');
+                $mediaPath = $request->file('media')
+                    ->store('uploads/media', 'public'); // :contentReference[oaicite:0]{index=0}
             }
 
-            // تجهيز بيانات الرسالة
-            $messageData = [
+            // إنشاء الرسالة
+            $message = Message::create([
                 'conversation_id' => $request->conversation_id,
                 'sender_id' => $user->id,
-                'message' => $request->message,
                 'receiver_id' => $request->receiver_id,
-            ];
+                'message' => $request->message,
+                'media' => $mediaPath,
+            ]);
 
-            if ($mediaPath) {
-                $messageData['media'] = $mediaPath;
-            }
-
-            // إنشاء سجل الرسالة في قاعدة البيانات
-            $message = Message::create($messageData);
-
-            // إرسال الإشعار للمستقبل إن وجد
+            // إرسال إشعار للمستقبل عبر Expo (إذا ثبت التوكين)
             $receiver = User::find($request->receiver_id);
             if ($receiver && $receiver->expo_push_token) {
                 Notification::send(
@@ -140,15 +204,13 @@ class chatController extends Controller
                         'رسالة جديدة من ' . $user->name,
                         $request->message
                     )
-                );
+                ); // :contentReference[oaicite:1]{index=1}
             }
 
-            // تأكيد المعاملة
             \DB::commit();
-
             return response()->json($message, 201);
+
         } catch (\Exception $e) {
-            // التراجع عن المعاملة في حالة حدوث خطأ
             \DB::rollBack();
             return response()->json([
                 'message' => 'حدث خطأ أثناء إرسال الرسالة',
@@ -157,18 +219,41 @@ class chatController extends Controller
         }
     }
 
-    public function deleteConversationMessages(Conversation $conversation)
+    /**
+     * حذف كافة رسائل محادثة معينة
+     */
+    public function deleteConversationMessages($conversationId)
     {
+        $conversation = Conversation::findOrFail($conversationId);
         $conversation->messages()->delete();
-        return response()->json(['message' => 'تم حذف الرسائل بنجاح']);
+
+        return response()->json(['message' => 'تم حذف الرسائل بنجاح'], 200);
     }
 
-    public function deleteConversation($id)
+    /**
+     * حذف المحادثة بكامل بياناتها (وسائط ورسائل)
+     */
+    public function deleteConversation($conversationId)
     {
-        $conversation = Conversation::findOrFail($id);
+        $conversation = Conversation::findOrFail($conversationId);
         $conversation->delete();
-        return response()->json(['message' => 'تم حذف المحادثة بنجاح']);
+
+        return response()->json(['message' => 'تم حذف المحادثة بنجاح'], 200);
     }
+    /**
+     * حذف رسالة معينة
+     */
+    public function deleteMessage($messageId)
+    {
+        $message = Message::findOrFail($messageId);
 
+        // حذف ملف الوسائط من القرص إن وُجد
+        if ($message->media) {
+            Storage::disk('public')->delete($message->media);
+        }
 
+        $message->delete();
+
+        return response()->json(['message' => 'تم حذف الرسالة بنجاح'], 200);
+    }
 }

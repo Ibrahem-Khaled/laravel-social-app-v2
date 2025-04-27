@@ -12,12 +12,12 @@ return new class extends Migration {
     {
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_one');
-            $table->unsignedBigInteger('user_two');
+            $table->string('name')->nullable();              // اسم الجروب (اختياري للمحادثات الثنائية)
+            $table->boolean('is_group')->default(false);     // هل هذه محادثة جماعية؟
+            $table->unsignedBigInteger('created_by');
             $table->timestamps();
 
-            $table->foreign('user_one')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('user_two')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

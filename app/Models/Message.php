@@ -21,6 +21,12 @@ class Message extends Model
         'parent_id',
     ];
 
+    // العلاقة مع المحادثة
+    public function conversation()
+    {
+        return $this->belongsTo(Conversation::class);
+    }
+
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');

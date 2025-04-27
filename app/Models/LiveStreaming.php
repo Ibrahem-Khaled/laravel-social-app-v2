@@ -14,8 +14,16 @@ class LiveStreaming extends Model
         'title',
         'description',
         'live_streaming_id',
+        'thumbnail',
+        'password',
         'status',
         'scheduled_at',
+    ];
+    protected $casts = [
+        'scheduled_at' => 'datetime',
+    ];
+    protected $hidden = [
+        'password',
     ];
 
     protected static function boot()
