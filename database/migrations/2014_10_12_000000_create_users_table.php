@@ -25,7 +25,7 @@ return new class extends Migration {
             $table->json('social_links')->nullable();
             $table->boolean('is_verified')->default(false);
             $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
-            $table->enum('gender', ['male', 'female'])->default('female');
+            $table->enum('gender', ['male', 'female'])->default('male')->nullable();
             $table->enum('role', ['admin', 'moderator', 'user', 'vip'])->default('user');
             $table->string('language')->default('ar');
             $table->text('expo_push_token')->nullable();
