@@ -10,24 +10,23 @@ use Illuminate\Support\Facades\Validator;
 
 class postsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // الحصول على المستخدم الحالي
         $currentUser = auth()->guard('api')->user();
+        $blockedUserIds = $currentUser->blockedUsers()->pluck('blocked_user_id');
 
-        // الحصول على قائمة معرفات المستخدمين المحظورين
-        $blockedUserIds = $currentUser->blockedUsers()->pluck('blocked_user_id')->toArray();
+        // احصل على رقم الصفحة من الاستعلام (افتراضي 1)
+        $pageSize = 10;
 
-        // استعلام المنشورات مع استبعاد المنشورات الخاصة بالمستخدمين المحظورين
         $posts = Post::where('status', 'active')
             ->whereNotIn('user_id', $blockedUserIds)
             ->orderBy('created_at', 'desc')
             ->with('user', 'message')
-            ->take(10)
-            ->get();
+            ->paginate($pageSize);
 
         return response()->json($posts);
     }
+
 
 
     public function getUserPosts($id)
