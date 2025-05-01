@@ -7,6 +7,7 @@ use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\ExpoNotification;
 use Illuminate\Support\Facades\Validator;
@@ -61,12 +62,15 @@ class ChatController extends Controller
         // استعلام يجلب المحادثات الجماعية التي
         // يحتوي جدول الربط عليها على السطر الخاص بهذا المستخدم
         $groups = Conversation::where('is_group', true)
+            ->whereHas('createdBy', function (Builder $q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
             ->whereHas('users', function (Builder $q) use ($user) {
                 $q->where('user_id', $user->id);
             })
-            ->with([
-                'users',
-            ])
+            // ->with([
+            //     'users',
+            // ])
             ->get();
 
         return response()->json([
@@ -119,26 +123,47 @@ class ChatController extends Controller
     {
         $user = auth()->guard('api')->user();
 
-        // التحقق من الاسم وقائمة الأعضاء
-        $request->validate([
+        // 1) التحقق من البيانات الواردة
+        $data = $request->validate([
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'type' => 'nullable|string|in:normal,private',
             'members' => 'required|array|min:2',
             'members.*' => 'exists:users,id|not_in:' . $user->id,
         ]);
 
-        // إنشاء المحادثة كجروب
-        $conversation = Conversation::create([
-            'name' => $request->name,
-            'is_group' => true,
-            'created_by' => $user->id,
-        ]);
+        // 2) استخدام معاملة قاعدة البيانات لضمان الاتساق
+        $conversation = DB::transaction(function () use ($data, $user, $request) {
+            // رفع الصورة إذا وجدت
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')
+                    ->store('uploads/conversations', 'public');
+            }
 
-        // ربط الأعضاء بالجروب
-        $conversation->users()->attach($request->members);
-        // جعل منشئ الجروب Admin
-        $conversation->users()
-            ->updateExistingPivot($user->id, ['role' => 'admin']);
+            // إنشاء الصف في جدول المحادثات
+            $conv = Conversation::create([
+                'name' => $data['name'],
+                'description' => $data['description'] ?? null,
+                'image' => $imagePath,
+                'type' => $data['type'] ?? 'normal',
+                'is_group' => true,
+                'created_by' => $user->id,
+            ]);
 
+            // إرفاق الأعضاء المرسلة من الواجهة
+            $conv->users()->attach($data['members']);
+
+            // تعيين دور المنشئ كـ admin
+            $conv->users()->updateExistingPivot($user->id, [
+                'role' => 'admin'
+            ]);
+
+            return $conv;
+        });
+
+        // 3) إعادة المحادثة مع تحميل العلاقة users (ولاحقاً messages مثلاً)
         return response()->json([
             'conversation' => $conversation->load('users')
         ], 201);
@@ -168,7 +193,7 @@ class ChatController extends Controller
         $validator = Validator::make($request->all(), [
             'conversation_id' => 'required|exists:conversations,id',
             'message' => 'required|string',
-            'receiver_id' => 'required|exists:users,id',
+            'receiver_id' => 'nullable|exists:users,id',
             'media' => 'nullable|file|mimes:jpg,jpeg,png,mp4,mov|max:2048',
         ]);
 

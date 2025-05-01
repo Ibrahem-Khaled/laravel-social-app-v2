@@ -22,8 +22,12 @@ class Conversation extends Model
         )
             ->withPivot(['role', 'is_muted', 'is_blocked', 'is_archived', 'is_favorite'])
             ->withTimestamps();
-
     }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
     public function messages()
     {
         return $this->hasMany(Message::class);

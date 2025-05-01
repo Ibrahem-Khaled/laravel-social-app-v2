@@ -15,6 +15,9 @@ return new class extends Migration {
             $table->string('name')->nullable();              // اسم الجروب (اختياري للمحادثات الثنائية)
             $table->boolean('is_group')->default(false);     // هل هذه محادثة جماعية؟
             $table->unsignedBigInteger('created_by');
+            $table->text('description')->nullable();             // وصف المحادثة (اختياري)
+            $table->string('image')->nullable();             // صورة المحادثة (اختياري)
+            $table->enum('type',['normal', 'private'])->default('normal');       // نوع المحادثة (عادي، خاص، أو غيره)
             $table->timestamps();
 
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
