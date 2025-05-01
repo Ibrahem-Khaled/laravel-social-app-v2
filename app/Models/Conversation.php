@@ -14,9 +14,15 @@ class Conversation extends Model
     // this relationship functions
     public function users()
     {
-        return $this->belongsToMany(User::class, 'conversation_users')
-            ->withPivot('role', 'is_blocked')
+        return $this->belongsToMany(
+            User::class,           // النموذج المرتبط
+            'conversation_users',   // اسم الجدول الوسيط
+            'conversation_id',      // المفتاح الأجنبي في الجدول الوسيط لإشارة إلى Conversation
+            'user_id'               // المفتاح الأجنبي لإشارة إلى User
+        )
+            ->withPivot(['role', 'is_muted', 'is_blocked', 'is_archived', 'is_favorite'])
             ->withTimestamps();
+
     }
     public function messages()
     {

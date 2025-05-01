@@ -27,8 +27,6 @@ class postsController extends Controller
         return response()->json($posts);
     }
 
-
-
     public function getUserPosts($id)
     {
         $posts = Post::where('user_id', $id)->with('user')->get();
