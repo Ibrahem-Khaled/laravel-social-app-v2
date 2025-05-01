@@ -10,7 +10,10 @@ class Conversation extends Model
     use HasFactory;
     protected $guarded = ['id'];
     protected $appends = ['chat_partner', 'last_message', 'members_count', 'is_new'];
-
+    protected $casts = [
+        'is_group' => 'boolean',
+        'created_at' => 'datetime',  // تأكد من أن created_at يُحوَّل تلقائيًا إلى Carbon
+    ];
     // this relationship functions
     public function users()
     {
@@ -49,11 +52,16 @@ class Conversation extends Model
 
     public function getIsNewAttribute()
     {
-        // if created conversation less than 30 days
+        if (!$this->created_at) {
+            return false;
+        }
+        // إذا كانت المحادثة قديمة، نعيد false
+        // إذا كانت المحادثة جديدة (أقل من 7 أيام)، نعيد true
+        // حساب الفرق بين تاريخ الإنشاء والتاريخ الحالي
         $createdAt = $this->created_at;
         $now = now();
         $diffInDays = $createdAt->diffInDays($now);
-        return $diffInDays < 15 ? true : false;
+        return $diffInDays < 7 ? true : false;
     }
 
     public function getMembersCountAttribute()
