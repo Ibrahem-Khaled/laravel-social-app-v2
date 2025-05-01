@@ -9,7 +9,7 @@ class Conversation extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
-    protected $appends = ['chat_partner', 'last_message', 'members_count'];
+    protected $appends = ['chat_partner', 'last_message', 'members_count', 'is_new'];
 
     // this relationship functions
     public function users()
