@@ -54,23 +54,18 @@ class ChatController extends Controller
     /**
      * جلب المحادثات الجماعية فقط (جروبات)
      */
-    public function getGroupConversations()
+    public function getGroupConversations(Request $request)
     {
-        // جلب المستخدم المصادَق عليه عبر حارس الـ API
         $user = auth()->guard('api')->user();
 
-        // استعلام يجلب المحادثات الجماعية التي
-        // يحتوي جدول الربط عليها على السطر الخاص بهذا المستخدم
         $groups = Conversation::where('is_group', true)
-            ->whereHas('createdBy', function (Builder $q) use ($user) {
-                $q->where('created_by', $user->id);
+            ->where(function (Builder $q) use ($user) {
+                $q->where('created_by', $user->id)
+                    // أو الجروبات التي يشارك فيها
+                    ->orWhereHas('users', function (Builder $q2) use ($user) {
+                        $q2->where('user_id', $user->id);
+                    });
             })
-            ->whereHas('users', function (Builder $q) use ($user) {
-                $q->where('user_id', $user->id);
-            })
-            // ->with([
-            //     'users',
-            // ])
             ->get();
 
         return response()->json([
