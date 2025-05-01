@@ -49,7 +49,7 @@ class Conversation extends Model
         $createdAt = $this->created_at;
         $now = now();
         $diffInDays = $createdAt->diffInDays($now);
-        return $diffInDays < 30 ? true : false;
+        return $diffInDays < 15 ? true : false;
     }
 
     public function getMembersCountAttribute()
