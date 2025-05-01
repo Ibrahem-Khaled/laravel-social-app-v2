@@ -9,7 +9,7 @@ class Conversation extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
-    protected $appends = ['chat_partner', 'last_message'];
+    protected $appends = ['chat_partner', 'last_message', 'members_count'];
 
     // this relationship functions
     public function users()
@@ -41,6 +41,14 @@ class Conversation extends Model
         $authId = auth()->guard('api')->id();
         return $this->users
             ->first(fn($user) => $user->id !== $authId);
+    }
+
+    public function getMembersCountAttribute()
+    {
+        if ($this->is_group) {
+            return $this->users()->count();
+        }
+        return 2; // محادثة ثنائية
     }
 
     public function getLastMessageAttribute()
