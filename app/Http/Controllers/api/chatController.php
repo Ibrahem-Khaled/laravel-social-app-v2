@@ -63,7 +63,7 @@ class ChatController extends Controller
         // يحتوي جدول الربط عليها على السطر الخاص بهذا المستخدم
         $groups = Conversation::where('is_group', true)
             ->whereHas('createdBy', function (Builder $q) use ($user) {
-                $q->where('user_id', $user->id);
+                $q->where('created_by', $user->id);
             })
             ->whereHas('users', function (Builder $q) use ($user) {
                 $q->where('user_id', $user->id);
