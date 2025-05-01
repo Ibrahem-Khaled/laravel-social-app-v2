@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\ExpoNotification;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder; // تأكد من استيراد Builder
 use Illuminate\Support\Facades\Storage;
 
 class ChatController extends Controller
@@ -55,14 +55,22 @@ class ChatController extends Controller
      */
     public function getGroupConversations()
     {
+        // جلب المستخدم المصادَق عليه عبر حارس الـ API
         $user = auth()->guard('api')->user();
 
-        $group = Conversation::where('is_group', true)
-            ->whereHas('users', fn($q) => $q->where('user_id', $user->id))
+        // استعلام يجلب المحادثات الجماعية التي
+        // يحتوي جدول الربط عليها على السطر الخاص بهذا المستخدم
+        $groups = Conversation::where('is_group', true)
+            ->whereHas('users', function (Builder $q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->with([
+                'users',
+            ])
             ->get();
 
         return response()->json([
-            'group_conversations' => $group
+            'group_conversations' => $groups
         ], 200);
     }
 
