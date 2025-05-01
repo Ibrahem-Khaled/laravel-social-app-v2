@@ -73,6 +73,17 @@ class ChatController extends Controller
         ], 200);
     }
 
+    public function getConversation(Conversation $conversation)
+    {
+        $user = auth()->guard('api')->user();
+        
+        // get the conversation with the users, createdBy, and rules only it
+        $conversation = $conversation->load(['users', 'createdBy']);
+        return response()->json([
+            'conversation' => $conversation
+        ], 200);
+    }
+
     /**
      * إنشاء أو جلب محادثة ثنائية (1-1)
      */
