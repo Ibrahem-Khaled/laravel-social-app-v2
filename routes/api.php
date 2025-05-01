@@ -62,7 +62,7 @@ Route::group([], function () {
     // جلب المحادثات الجماعية (جروبات)
     Route::get('conversations/group', [ChatController::class, 'getGroupConversations']);
     // جلب محادثة معينة
-    Route::get('conversations/{id}', [ChatController::class, 'getConversation']);
+    Route::get('conversation/{conversation}', [ChatController::class, 'getConversation']);
     // إنشاء محادثة ثنائية
     Route::post('conversations/private', [ChatController::class, 'createPrivate']);
     // إنشاء جروب جديد
