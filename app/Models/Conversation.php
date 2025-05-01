@@ -32,11 +32,17 @@ class Conversation extends Model
     // this accessors functions
     public function getChatPartnerAttribute()
     {
-        // نستخدم المجموعة المحمّلة users (Collection) إن وجدت،
-        // وإلا سيحمّلها ويطبق الفلتر
+        // إذا كانت محادثة جماعية، لا نعطي شريك دردشة
+        if ($this->is_group) {
+            return null;
+        }
+
+        // وإلّا نعيد المستخدم الآخر غير المستخدم الحالي
+        $authId = auth()->guard('api')->id();
         return $this->users
-            ->first(fn($user) => $user->id !== auth()->guard('api')->user()->id);
+            ->first(fn($user) => $user->id !== $authId);
     }
+
     public function getLastMessageAttribute()
     {
         return $this->messages()->latest()->first();
