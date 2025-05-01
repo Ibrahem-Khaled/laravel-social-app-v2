@@ -43,6 +43,15 @@ class Conversation extends Model
             ->first(fn($user) => $user->id !== $authId);
     }
 
+    public function getIsNewAttribute()
+    {
+        // if created conversation less than 30 days
+        $createdAt = $this->created_at;
+        $now = now();
+        $diffInDays = $createdAt->diffInDays($now);
+        return $diffInDays < 30 ? true : false;
+    }
+
     public function getMembersCountAttribute()
     {
         if ($this->is_group) {
