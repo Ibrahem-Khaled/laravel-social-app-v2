@@ -26,9 +26,6 @@ class ChatController extends Controller
         })
             ->with([
                 'users',
-                'messages' => function ($q) {
-                    $q->latest()->limit(1);
-                }
             ])
             ->get();
 
@@ -45,7 +42,6 @@ class ChatController extends Controller
             ->whereHas('users', fn($q) => $q->where('user_id', $user->id))    // التأكد من اشتراك المستخدم
             ->with([
                 'users',
-                'messages' => fn($q) => $q->latest()->limit(1)
             ])
             ->get();                                                        // تنفيذ الاستعلام :contentReference[oaicite:0]{index=0}
 
@@ -61,13 +57,9 @@ class ChatController extends Controller
     {
         $user = auth()->guard('api')->user();
 
-        $group = Conversation::where('is_group', true)                      // فِلترة الجروبات
-            ->whereHas('users', fn($q) => $q->where('user_id', $user->id))  // التأكد من اشتراك المستخدم
-            ->with([
-                'users',
-                'messages' => fn($q) => $q->latest()->limit(1)
-            ])
-            ->get();                                                      // تنفيذ الاستعلام :contentReference[oaicite:1]{index=1}
+        $group = Conversation::where('is_group', true)
+            ->whereHas('users', fn($q) => $q->where('user_id', $user->id))
+            ->get();
 
         return response()->json([
             'group_conversations' => $group
