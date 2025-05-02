@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\PostComment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class postsController extends Controller
 {
@@ -15,13 +16,20 @@ class postsController extends Controller
         $currentUser = auth()->guard('api')->user();
         $blockedUserIds = $currentUser->blockedUsers()->pluck('blocked_user_id');
 
-        // احصل على رقم الصفحة من الاستعلام (افتراضي 1)
         $pageSize = 10;
 
         $posts = Post::where('status', 'active')
             ->whereNotIn('user_id', $blockedUserIds)
-            ->orderBy('created_at', 'desc')
+            // نجلب بيانات المستخدم والرسالة
             ->with('user', 'message')
+            // نضيف حقلين جديدين: likes_count و comments_count
+            ->withCount(['likes', 'comments'])                                  // :contentReference[oaicite:0]{index=0}
+            // ترتيب عشوائي أولاً
+            ->inRandomOrder()                                                   // :contentReference[oaicite:1]{index=1}
+            // ثم من الأحدث للأقدم
+            ->orderBy('created_at', 'desc')                                     // :contentReference[oaicite:2]{index=2}
+            // ثم حسب مجموع التفاعلات (إعجابات + تعليقات) من الأكبر للأصغر
+            ->orderByRaw('(likes_count + comments_count) DESC')                  // :contentReference[oaicite:3]{index=3}
             ->paginate($pageSize);
 
         return response()->json($posts);
