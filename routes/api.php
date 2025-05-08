@@ -59,29 +59,17 @@ Route::group([], function () {
 
     //this chat and conversations routes
     Route::get('conversations', [ChatController::class, 'getConversations']);
-    // جلب المحادثات الثنائية (1-1)
     Route::get('conversations/private', [ChatController::class, 'getPrivateConversations']);
-    // جلب المحادثات الجماعية (جروبات)
     Route::get('conversations/group', [ChatController::class, 'getGroupConversations']);
-    // جلب محادثة معينة
     Route::get('conversation/{conversation}', [ChatController::class, 'getConversation']);
-    // إنشاء محادثة ثنائية
     Route::post('conversations/private', [ChatController::class, 'createPrivate']);
-    // إنشاء جروب جديد
     Route::post('conversations/group', [ChatController::class, 'createGroup']);
-    // مغادرة جروب
+    Route::put('conversations/{conversation}', [ChatController::class, 'updateGroup']);
     Route::post('conversations/{conversation}/leave', [ChatController::class, 'LeaveGroup']);
-    // إضافة مستخدمين إلى جروب
-    Route::post('conversations/group/add-users', [ChatController::class, 'addUsersToGroup']);
-    // جلب الرسائل لمحاثة معينة
     Route::get('conversations/{id}/messages', [ChatController::class, 'getMessages']);
-    // إرسال رسالة جديدة
     Route::post('messages', [ChatController::class, 'sendMessage']);
-    // حذف جميع رسائل محادثة
     Route::delete('conversations/{id}/messages', [ChatController::class, 'deleteConversationMessages']);
-    // حذف محادثة كاملة
     Route::delete('conversations/{id}', [ChatController::class, 'deleteConversation']);
-    // حذف رسالة معينة
     Route::delete('messages/{id}', [ChatController::class, 'deleteMessage']);
 
 
@@ -99,6 +87,4 @@ Route::group([], function () {
 
     //this live streaming routes
     Route::apiResource('live-streamings', 'App\Http\Controllers\api\LiveStreamingController');
-
-
 });

@@ -175,6 +175,36 @@ class ChatController extends Controller
         ], 201);
     }
 
+    public function updateGroup(Request $request, Conversation $conversation)
+    {
+        $user = auth()->guard('api')->user();
+
+        // التحقق من أن المستخدم هو منشئ المحادثة
+        if ($conversation->created_by !== $user->id) {
+            return response()->json(['message' => 'ليس لديك إذن لتحديث هذه المحادثة'], 403);
+        }
+
+        // التحقق من البيانات الواردة
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        // رفع الصورة إذا وجدت
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')
+                ->store('uploads/conversations', 'public');
+        }
+
+        // تحديث المحادثة
+        $conversation->update($data);
+
+        return response()->json([
+            'conversation' => $conversation
+        ], 200);
+    }
+
     public function LeaveGroup(Conversation $conversation)
     {
         $user = auth()->guard('api')->user();
