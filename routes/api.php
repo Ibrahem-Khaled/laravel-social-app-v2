@@ -69,6 +69,10 @@ Route::group([], function () {
     Route::post('conversations/private', [ChatController::class, 'createPrivate']);
     // إنشاء جروب جديد
     Route::post('conversations/group', [ChatController::class, 'createGroup']);
+    // مغادرة جروب
+    Route::post('conversations/group/leave', [ChatController::class, 'LeaveGroup']);
+    // إضافة مستخدمين إلى جروب
+    Route::post('conversations/group/add-users', [ChatController::class, 'addUsersToGroup']);
     // جلب الرسائل لمحاثة معينة
     Route::get('conversations/{id}/messages', [ChatController::class, 'getMessages']);
     // إرسال رسالة جديدة

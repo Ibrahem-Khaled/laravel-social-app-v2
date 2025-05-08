@@ -175,6 +175,21 @@ class ChatController extends Controller
         ], 201);
     }
 
+    public function LeaveGroup(Conversation $conversation)
+    {
+        $user = auth()->guard('api')->user();
+
+        // التحقق من أن المستخدم هو أحد أعضاء المحادثة
+        if (!$conversation->users()->where('user_id', $user->id)->exists()) {
+            return response()->json(['message' => 'لا يمكنك مغادرة هذه المحادثة'], 403);
+        }
+
+        // حذف المستخدم من المحادثة
+        $conversation->users()->detach($user->id);
+
+        return response()->json(['message' => 'تم مغادرة المحادثة بنجاح'], 200);
+    }
+
     /**
      * استرجاع جميع الرسائل من محادثة محددة
      */
