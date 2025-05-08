@@ -76,7 +76,7 @@ class ChatController extends Controller
     public function getConversation(Conversation $conversation)
     {
         $user = auth()->guard('api')->user();
-        
+
         // get the conversation with the users, createdBy, and rules only it
         $conversation = $conversation->load(['users', 'createdBy']);
         return response()->json([
@@ -189,15 +189,17 @@ class ChatController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'type' => 'nullable|string|in:normal,private',
         ]);
 
         // رفع الصورة إذا وجدت
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')
+            $imagePath = $request->file('image')
                 ->store('uploads/conversations', 'public');
+            $conversation->update(['image' => $imagePath]);
         }
 
-        // تحديث المحادثة
+        // تحديث بيانات المحادثة
         $conversation->update($data);
 
         return response()->json([
@@ -230,10 +232,10 @@ class ChatController extends Controller
             ->where('type_message', 'normal')
             ->with([
                 'sender' => function ($q) {
-                    $q->select('id', 'name' );
+                    $q->select('id', 'name');
                 },
                 'receiver' => function ($q) {
-                    $q->select('id', 'name' );
+                    $q->select('id', 'name');
                 },
             ])
             ->get();
@@ -293,7 +295,6 @@ class ChatController extends Controller
 
             \DB::commit();
             return response()->json($message, 201);
-
         } catch (\Exception $e) {
             \DB::rollBack();
             return response()->json([

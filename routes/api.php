@@ -64,7 +64,7 @@ Route::group([], function () {
     Route::get('conversation/{conversation}', [ChatController::class, 'getConversation']);
     Route::post('conversations/private', [ChatController::class, 'createPrivate']);
     Route::post('conversations/group', [ChatController::class, 'createGroup']);
-    Route::put('conversations/{conversation}', [ChatController::class, 'updateGroup']);
+    Route::post('conversations/{conversation}', [ChatController::class, 'updateGroup']);
     Route::post('conversations/{conversation}/leave', [ChatController::class, 'LeaveGroup']);
     Route::get('conversations/{id}/messages', [ChatController::class, 'getMessages']);
     Route::post('messages', [ChatController::class, 'sendMessage']);
