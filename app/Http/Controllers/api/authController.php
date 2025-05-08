@@ -183,11 +183,9 @@ class authController extends Controller
         // عدد المنشورات في الصفحة الواحدة (يمكن تغييره عبر ?per_page=...)
         $perPage = $request->input('per_page', 10);
 
-        // جلب المستخدم نفسه
-        $user->load('posts.user', 'posts.message');
-
         // جلب المنشورات مع Pagination
         $posts = $user->posts()
+            ->with(['user', 'likes', 'comments'])
             ->orderBy('created_at', 'desc')
             ->paginate($perPage)
             ->appends($request->only(['page', 'per_page']));
