@@ -70,7 +70,7 @@ Route::group([], function () {
     // إنشاء جروب جديد
     Route::post('conversations/group', [ChatController::class, 'createGroup']);
     // مغادرة جروب
-    Route::post('conversations/group/leave', [ChatController::class, 'LeaveGroup']);
+    Route::post('conversations/{conversation}/leave', [ChatController::class, 'LeaveGroup']);
     // إضافة مستخدمين إلى جروب
     Route::post('conversations/group/add-users', [ChatController::class, 'addUsersToGroup']);
     // جلب الرسائل لمحاثة معينة
