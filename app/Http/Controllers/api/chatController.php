@@ -185,10 +185,10 @@ class ChatController extends Controller
             ->where('type_message', 'normal')
             ->with([
                 'sender' => function ($q) {
-                    $q->select('id', 'name', 'image');
+                    $q->select('id', 'name' );
                 },
                 'receiver' => function ($q) {
-                    $q->select('id', 'name', 'image');
+                    $q->select('id', 'name' );
                 },
             ])
             ->get();
