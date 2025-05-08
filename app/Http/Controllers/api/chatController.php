@@ -183,6 +183,14 @@ class ChatController extends Controller
         // جلب الرسائل العادية فقط
         $messages = Message::where('conversation_id', $conversationId)
             ->where('type_message', 'normal')
+            ->with([
+                'sender' => function ($q) {
+                    $q->select('id', 'name', 'image');
+                },
+                'receiver' => function ($q) {
+                    $q->select('id', 'name', 'image');
+                },
+            ])
             ->get();
 
         return response()->json($messages, 200);
