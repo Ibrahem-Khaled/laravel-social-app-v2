@@ -28,6 +28,8 @@ Route::post('/change-password', [authController::class, 'changePassword']);
 Route::get('me', [authController::class, 'user']);
 Route::get('user/{user}', [authController::class, 'getUser']);
 Route::post('/addExpoPushToken', [authController::class, 'addExpoPushToken']);
+Route::post('/delete-account', [authController::class, 'deleteAccount']);
+
 
 Route::group([], function () {
     //this main routes

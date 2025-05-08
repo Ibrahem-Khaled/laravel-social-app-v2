@@ -169,18 +169,31 @@ class authController extends Controller
         ], 200);
     }
 
-    public function getUser(User $user)
+    public function getUser(User $user, Request $request)
     {
         $currentUser = auth()->guard('api')->user();
 
-        // التحقق مما إذا كان المستخدم الحالي قد حظر المستخدم المطلوب
-        if ($currentUser->blockedUsers()->where('blocked_user_id', $user->id)->exists()) {
+        if ($currentUser->blockedUsers()
+            ->where('blocked_user_id', $user->id)
+            ->exists()
+        ) {
             return response()->json(['error' => 'هذا المستخدم محظور'], 403);
         }
 
-        $posts = $user->posts()->with('user', 'message')->get();
+        // عدد المنشورات في الصفحة الواحدة (يمكن تغييره عبر ?per_page=...)
+        $perPage = $request->input('per_page', 10);
+
+        // جلب المستخدم نفسه
+        $user->load('posts.user', 'posts.message');
+
+        // جلب المنشورات مع Pagination
+        $posts = $user->posts()
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage)
+            ->appends($request->only(['page', 'per_page']));
+
         return response()->json([
-            'user' => $user,
+            'user'  => $user,
             'posts' => $posts
         ]);
     }
@@ -193,4 +206,10 @@ class authController extends Controller
         return response()->json('success added token');
     }
 
+    public function deleteAccount()
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+        $user->delete();
+        return response()->json('success deleted account');
+    }
 }
