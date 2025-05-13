@@ -23,6 +23,7 @@ class questionController extends Controller
 
         // 1) جلب كل الرسائل (بما في ذلك المجهولة وغير المجهولة)
         $messages = $user->receivedMessages()
+            ->where('is_read', 0)
             ->where('type_message', 'anonymous')
             ->whereIn('is_anonymous', [0, 1])
             ->orderBy('created_at', 'desc')
@@ -57,7 +58,6 @@ class questionController extends Controller
 
         if ($receiver->expo_push_token) {
             Notification::send($receiver, new ExpoNotification([$receiver->expo_push_token], 'رسالة جديدة', $question->message));
-
         }
 
         return response()->json($question);
@@ -96,8 +96,8 @@ class questionController extends Controller
             Notification::send($message->sender, new ExpoNotification([$message->sender->expo_push_token], 'رسالة جديدة', $reply->message));
         }
 
-        $message->delete();
-
+        // $message->delete();
+        $message->update(['is_read' => 1]);
         return response()->json([
             'status' => 'success',
             'message' => 'تم إرسال الرد بنجاح',
@@ -119,5 +119,4 @@ class questionController extends Controller
         $question->delete();
         return response()->json(['message' => 'question deleted successfully']);
     }
-
 }
