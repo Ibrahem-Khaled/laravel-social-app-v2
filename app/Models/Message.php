@@ -37,6 +37,11 @@ class Message extends Model
         return $this->belongsTo(User::class, 'receiver_id');
     }
 
+    public function post()
+    {
+        return $this->hasOne(Post::class, 'message_id');
+    }
+
     // العلاقة مع الرسالة الأصل (التي يتم الرد عليها)
     public function parent()
     {
@@ -48,5 +53,4 @@ class Message extends Model
     {
         return $this->hasMany(Message::class, 'parent_id');
     }
-
 }
