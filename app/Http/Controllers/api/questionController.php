@@ -24,7 +24,7 @@ class questionController extends Controller
         // 1) جلب كل الرسائل (بما في ذلك المجهولة وغير المجهولة)
         $messages = $user->receivedMessages()
             ->where('type_message', 'anonymous')
-            ->where('is_anonymous', 0)
+            ->whereIn('is_anonymous', [0, 1])
             ->orderBy('created_at', 'desc')
             ->get();
 
