@@ -185,7 +185,7 @@ class authController extends Controller
 
         // جلب المنشورات مع Pagination
         $posts = $user->posts()
-            ->with(['user', 'likes', 'comments'])
+            ->with(['user', 'likes', 'comments', 'message'])
             ->orderBy('created_at', 'desc')
             ->paginate($perPage)
             ->appends($request->only(['page', 'per_page']));
