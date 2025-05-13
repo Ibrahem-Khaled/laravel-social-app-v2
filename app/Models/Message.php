@@ -39,7 +39,7 @@ class Message extends Model
 
     public function post()
     {
-        return $this->hasOne(Post::class, 'message_id');
+        return $this->hasOne(Post::class, 'message_id', 'id');
     }
 
     // العلاقة مع الرسالة الأصل (التي يتم الرد عليها)
