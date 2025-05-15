@@ -20,7 +20,7 @@ class notificationController extends Controller
                 return [
                     'id' => $notification->id,
                     'user' => $notification->related?->user?->name ?? 'مستخدم',
-                    'image' => $notification->related?->user?->avatar ?? 'https://example.com/default.jpg',
+                    'image' => $notification->related?->user?->avatar_url,
                     'action' => $notification->message,
                     'time' => $notification->created_at->diffForHumans(),
                 ];
