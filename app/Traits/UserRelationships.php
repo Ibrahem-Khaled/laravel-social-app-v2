@@ -91,7 +91,7 @@ trait UserRelationships
     }
 
 
-    public function notifications()
+    public function userNotifications()
     {
         return $this->hasMany(Notification::class);
     }

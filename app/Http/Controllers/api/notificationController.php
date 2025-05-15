@@ -11,7 +11,7 @@ class notificationController extends Controller
     public function index()
     {
         $user = auth()->guard('api')->user();
-        $notifications = $user->notifications()->paginate(10);
+        $notifications = $user->userNotifications()->paginate(10);
         return response()->json($notifications);
     }
 
