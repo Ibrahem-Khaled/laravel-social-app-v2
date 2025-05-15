@@ -4,6 +4,7 @@ use App\Http\Controllers\api\authController;
 use App\Http\Controllers\api\CallLogController;
 use App\Http\Controllers\api\chatController;
 use App\Http\Controllers\api\followerController;
+use App\Http\Controllers\api\HashtagController;
 use App\Http\Controllers\api\homeController;
 use App\Http\Controllers\api\postsController;
 use App\Http\Controllers\api\questionController;
@@ -87,4 +88,8 @@ Route::group([], function () {
 
     //this live streaming routes
     Route::apiResource('live-streamings', 'App\Http\Controllers\api\LiveStreamingController');
+
+    //this hashtags routes
+    Route::get('/hashtags', [HashtagController::class, 'index']);
+    Route::get('/hashtag/{hashtag}', [HashtagController::class, 'getPostsByHashtag']);
 });

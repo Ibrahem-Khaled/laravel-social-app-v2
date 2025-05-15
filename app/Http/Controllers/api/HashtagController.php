@@ -17,9 +17,9 @@ class HashtagController extends Controller
         return response()->json($topHashtags);
     }
 
-    public function getPostsByHashtag(Request $request)
+    public function getPostsByHashtag($hashtag)
     {
-        $hashtag = Hashtag::where('name', $request->hashtag)->first();
+        $hashtag = Hashtag::where('name', $hashtag)->first();
         if (!$hashtag) {
             return response()->json(['message' => 'Hashtag not found.'], 404);
         }
