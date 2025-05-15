@@ -6,6 +6,7 @@ use App\Models\CallLog;
 use App\Models\Conversation;
 use App\Models\Gift;
 use App\Models\Message;
+use App\Models\Notification;
 use App\Models\Post;
 use App\Models\PostComment;
 use App\Models\PostLike;
@@ -69,8 +70,7 @@ trait UserRelationships
     // العلاقات للمستخدم الذي قام بحظر مستخدمين آخرين
     public function blockedUsers()
     {
-        return $this->belongsToMany(User::class, 'blocked_users', 'user_id', 'blocked_user_id')->
-            withTimestamps();
+        return $this->belongsToMany(User::class, 'blocked_users', 'user_id', 'blocked_user_id')->withTimestamps();
     }
 
     public function socialMedia()
@@ -88,5 +88,11 @@ trait UserRelationships
     {
         // جميع المكالمات التي استقبلها المستخدم
         return $this->hasMany(CallLog::class, 'recipient_id');
+    }
+
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,12 @@ class followerController extends Controller
 
         // تبديل حالة متابعة المستخدم الآخر (إضافة إذا لم يكن موجوداً أو إزالته إذا كان موجوداً)
         $user->followings()->toggle($otherUserId);
+
+        NotificationService::notify(
+            $otherUserId,
+            auth()->guard('api')->user()->name . ' قام بمتابعةك',
+            $user
+        );
 
         return response()->json('success');
     }

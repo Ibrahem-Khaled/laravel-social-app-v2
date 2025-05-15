@@ -6,6 +6,7 @@ use App\Http\Controllers\api\chatController;
 use App\Http\Controllers\api\followerController;
 use App\Http\Controllers\api\HashtagController;
 use App\Http\Controllers\api\homeController;
+use App\Http\Controllers\api\notificationController;
 use App\Http\Controllers\api\postsController;
 use App\Http\Controllers\api\questionController;
 use Illuminate\Http\Request;
@@ -92,4 +93,10 @@ Route::group([], function () {
     //this hashtags routes
     Route::get('/hashtags', [HashtagController::class, 'index']);
     Route::get('/hashtag/{hashtag}', [HashtagController::class, 'getPostsByHashtag']);
+
+    //this notifications routes
+    Route::get('/notifications', [notificationController::class, 'index']);
+    Route::post('/notifications', [NotificationController::class, 'store']);
+    Route::put('/notifications/{notification}', [NotificationController::class, 'update']);
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
 });

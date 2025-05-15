@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use App\Models\PostComment;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -156,6 +157,12 @@ class postsController extends Controller
             'content' => $request->content
         ]);
 
+        NotificationService::notify(
+            $post->post->user_id,
+            auth()->guard('api')->user()->name . ' قام بتعليق على منشورك',
+            $post->post
+        );
+
         return response()->json($post);
     }
 
@@ -173,12 +180,18 @@ class postsController extends Controller
     {
         if ($post->likes()->where('user_id', auth()->guard('api')->user()->id)->exists()) {
             $post->likes()->where('user_id', auth()->guard('api')->user()->id)->delete();
-
         } else {
             $post->likes()->create([
                 'user_id' => auth()->guard('api')->user()->id
             ]);
         }
+
+        NotificationService::notify(
+            $post->user_id,
+            auth()->guard('api')->user()->name . ' قام بعمل اعجاب على منشورك',
+            $post
+        );
+
         return response()->json($post);
     }
 }
