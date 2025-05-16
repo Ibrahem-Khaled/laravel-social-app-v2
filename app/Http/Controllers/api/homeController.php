@@ -77,6 +77,6 @@ class homeController extends Controller
             'back_id_image' => $backImagePath,
         ]);
 
-        return redirect()->back()->with('success', 'تم تقديم طلب التوثيق بنجاح.');
+        return response()->json(['message' => 'تم تقديم طلب التوثيق بنجاح.'], 200);
     }
 }

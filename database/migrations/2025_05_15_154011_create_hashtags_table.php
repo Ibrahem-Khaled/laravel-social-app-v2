@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('hashtags', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->unsignedBigInteger('usage_count')->default(1); // عدد مرات الاستخدام
+            $table->unsignedBigInteger('usage_count')->default(0); // عدد مرات الاستخدام
             $table->timestamps();
         });
     }
