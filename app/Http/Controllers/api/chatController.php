@@ -135,7 +135,7 @@ class ChatController extends Controller
             'description' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'type' => 'nullable|string|in:normal,private',
-            'members' => 'required|array|min:2',
+            'members' => 'required|array|min:1',
             'members.*' => 'exists:users,id|not_in:' . $user->id,
         ]);
 
