@@ -10,8 +10,9 @@ class Gift extends Model
     use HasFactory;
     protected $guarded = ['id'];
 
-    public function user()
+    public function users()
     {
-        return $this->belongsToMany(User::class, 'user_gifts', 'gift_id', 'user_id');
+        return $this->belongsToMany(User::class, 'user_gifts', 'gift_id', 'user_id')
+            ->withPivot('sender_id', 'quantity');
     }
 }

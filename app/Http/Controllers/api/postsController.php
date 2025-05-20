@@ -194,4 +194,9 @@ class postsController extends Controller
 
         return response()->json($post);
     }
+
+    public function getLikes(Post $post)
+    {
+        return response()->json($post->likes()->with('user')->get());
+    }
 }

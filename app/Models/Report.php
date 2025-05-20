@@ -8,13 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class ReportPost extends Model
 {
     use HasFactory;
-
+    protected $table = 'reports';
     protected $fillable = [
         'user_id',
-        'post_id',
+        'related_id',
+        'related_type',
         'reason',
         'details',
         'is_hidden',
+    ];
+
+    protected $casts = [
+        'is_hidden' => 'boolean',
     ];
 
     public function user()
@@ -22,8 +27,8 @@ class ReportPost extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function post()
+    public function reportable()
     {
-        return $this->belongsTo(Post::class);
+        return $this->morphTo();
     }
 }

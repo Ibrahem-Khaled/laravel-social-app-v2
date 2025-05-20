@@ -10,16 +10,17 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('report_posts', function (Blueprint $table) {
+        Schema::create('reports', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->unsignedBigInteger('post_id');
-            $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');
+            $table->unsignedBigInteger('related_id')->nullable(); // معرف الكائن المرتبط بالإشعار (مثل معرف المنشور أو المحادثة)
+            $table->string('related_type')->nullable(); // نوع الكائن المرتبط بالإشعار (مثل "post" أو "conversation")
             $table->string('reason');
             $table->text('details')->nullable();
             $table->boolean('is_hidden')->default(false);
             $table->timestamps();
+            
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

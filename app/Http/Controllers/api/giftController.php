@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Http\Controllers\api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Gift;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+
+class giftController extends Controller
+{
+    public function index()
+    {
+        $gifts = Gift::all();
+        return response()->json($gifts);
+    }
+
+    public function sendGift(Request $request)
+    {
+        $user = auth()->guard('api')->user();
+        $validator = Validator::make($request->all(), [
+            'gift_id' => 'required|exists:gifts,id',
+            'receiver_id' => 'required|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $gift = Gift::findOrFail($request->gift_id);
+        $receiver = User::findOrFail($request->receiver_id);
+
+        if ($user->coins < $gift->price) {
+            return response()->json(['message' => 'ليس لديك كافة النقاط'], 422);
+        }
+
+        // خصم النقاط
+        $user->coins -= $gift->price;
+        $user->save();
+
+        // نفذ داخل معاملة لضمان الاتساق
+        DB::transaction(function () use ($gift, $receiver, $user) {
+            // ابحث عن السجل الوسيط وقم بقفله للتحديث
+            $pivot = DB::table('user_gifts')
+                ->where('gift_id', $gift->id)
+                ->where('user_id', $receiver->id)
+                ->where('sender_id', $user->id)
+                ->lockForUpdate()
+                ->first();
+
+            if ($pivot) {
+                // إذا وُجد، زِد الكمية
+                DB::table('user_gifts')
+                    ->where('gift_id', $gift->id)
+                    ->where('user_id', $receiver->id)
+                    ->where('sender_id', $user->id)
+                    ->update([
+                        'quantity' => $pivot->quantity + 1
+                    ]);
+            } else {
+                // وإلّا أضف سجلّاً جديداً
+                $gift->users()->attach($receiver->id, [
+                    'quantity'  => 1,
+                    'sender_id' => $user->id
+                ]);  // :contentReference[oaicite:0]{index=0}
+            }
+        });
+
+        return response()->json(['message' => 'تم ارسال الهدية بنجاح']);
+    }
+}

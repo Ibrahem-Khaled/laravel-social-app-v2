@@ -4,6 +4,7 @@ use App\Http\Controllers\api\authController;
 use App\Http\Controllers\api\CallLogController;
 use App\Http\Controllers\api\chatController;
 use App\Http\Controllers\api\followerController;
+use App\Http\Controllers\api\giftController;
 use App\Http\Controllers\api\HashtagController;
 use App\Http\Controllers\api\homeController;
 use App\Http\Controllers\api\notificationController;
@@ -47,6 +48,7 @@ Route::group([], function () {
     Route::delete('/posts/{post}', [postsController::class, 'delete']);
     Route::post('/posts/{post}/pinned', [postsController::class, 'pinnedPost']);
     Route::post('/posts/{post}/like', [postsController::class, 'like']);
+    Route::get('/post/{post}/likers', [postsController::class, 'getLikes']);
 
     //this posts comments routes
     Route::get('/posts/{post}/comments', [postsController::class, 'getComments']);
@@ -99,4 +101,9 @@ Route::group([], function () {
     Route::post('/notifications', [NotificationController::class, 'store']);
     Route::put('/notifications/{notification}', [NotificationController::class, 'update']);
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
+
+
+    //this gift routes
+    Route::get('/gifts', [giftController::class, 'index']);
+    Route::post('/send-gift', [giftController::class, 'sendGift']);
 });
