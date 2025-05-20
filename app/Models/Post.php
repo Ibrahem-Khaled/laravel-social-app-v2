@@ -46,7 +46,7 @@ class Post extends Model
 
     public function reports()
     {
-        return $this->hasMany(ReportPost::class);
+        return $this->hasMany(Report::class);
     }
 
     public function hashtags()

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Gift;
 use App\Models\Message;
 use App\Models\Post;
-use App\Models\ReportPost;
+use App\Models\Report;
 use App\Models\PostComment as Comment;
 use App\Models\PostLike as Like;
 use App\Models\User;
@@ -25,7 +25,7 @@ class homeController extends Controller
         $totalPosts = Post::count();
         $totalComments = Comment::count();
         $totalMessages = Message::count();
-        $totalReports = ReportPost::count();
+        $totalReports = Report::count();
         $totalGifts = Gift::count();
 
         $totalLikes = Like::count(); // إجمالي الإعجابات

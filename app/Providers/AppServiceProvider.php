@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\ReportPost;
+use App\Models\Report;
 use App\Models\VerificationRequest;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
     {
         if (!app()->runningInConsole() && \Schema::hasTable('verification_requests') && \Schema::hasTable('report_posts')) {
             $pendingVerificationCount = VerificationRequest::where('status', 'pending')->count();
-            $unhiddenReportsCount = ReportPost::where('is_hidden', false)->count();
+            $unhiddenReportsCount = Report::where('is_hidden', false)->count();
 
             view()->share([
                 'pendingVerificationCount' => $pendingVerificationCount,

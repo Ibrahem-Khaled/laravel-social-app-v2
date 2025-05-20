@@ -4,7 +4,7 @@ namespace App\Http\Controllers\dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
-use App\Models\ReportPost;
+use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -125,7 +125,7 @@ class PostController extends Controller
     public function reports(Request $request)
     {
         // بدء الاستعلام الأساسي
-        $reports = ReportPost::query();
+        $reports = Report::query();
 
         // تصفية البلاغات حسب الحالة (مخفية/غير مخفية)
         if ($request->has('hidden') && $request->get('hidden')) {
@@ -143,9 +143,9 @@ class PostController extends Controller
         $reports = $reports->with('post', 'user')->paginate(10);
 
         // إحصائيات
-        $totalReports = ReportPost::count(); // إجمالي البلاغات
-        $reportedPosts = ReportPost::distinct('post_id')->count('post_id'); // عدد المنشورات المبلغ عنها
-        $topReasons = ReportPost::select('reason', \DB::raw('count(*) as count'))
+        $totalReports = Report::count(); // إجمالي البلاغات
+        $reportedPosts = Report::distinct('post_id')->count('post_id'); // عدد المنشورات المبلغ عنها
+        $topReasons = Report::select('reason', \DB::raw('count(*) as count'))
             ->groupBy('reason')
             ->orderByDesc('count')
             ->take(5)
@@ -156,7 +156,7 @@ class PostController extends Controller
     }
 
 
-    public function toggleVisibility(ReportPost $report)
+    public function toggleVisibility(Report $report)
     {
         $report->update([
             'is_hidden' => !$report->is_hidden, // تبديل حالة الإخفاء
