@@ -13,7 +13,7 @@ class giftController extends Controller
 {
     public function index()
     {
-        $gifts = Gift::all();
+        $gifts = Gift::where('is_active', true)->get();
         return response()->json($gifts);
     }
 
@@ -68,6 +68,11 @@ class giftController extends Controller
             }
         });
 
-        return response()->json(['message' => 'تم ارسال الهدية بنجاح']);
+        return response()->json([
+            'message' => 'تم ارسال الهدية بنجاح',
+            'gift' => $gift,
+            'receiver' => $receiver,
+            'sender' => $user
+        ]);
     }
 }
