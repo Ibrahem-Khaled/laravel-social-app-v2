@@ -82,10 +82,10 @@ class giftController extends Controller
         $gifts = DB::table('user_gifts')
             ->join('gifts', 'gifts.id', '=', 'user_gifts.gift_id')
             ->where('user_gifts.user_id', $user->id)
-            ->groupBy('gifts.id', 'gifts.name', 'gifts.description', 'gifts.created_at', 'gifts.updated_at')
+            ->groupBy('gifts.id', 'gifts.title', 'gifts.description', 'gifts.created_at', 'gifts.updated_at')
             ->select([
                 'gifts.id',
-                'gifts.name',
+                'gifts.title',
                 'gifts.description',
                 DB::raw('SUM(user_gifts.quantity) as total_quantity'),
             ])
