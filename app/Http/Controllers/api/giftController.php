@@ -87,6 +87,7 @@ class giftController extends Controller
                 'gifts.id',
                 'gifts.title',
                 'gifts.description',
+                'gifts.price',
                 'gifts.image',
                 DB::raw('SUM(user_gifts.quantity) as total_quantity'),
             ])
