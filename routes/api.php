@@ -106,4 +106,5 @@ Route::group([], function () {
     //this gift routes
     Route::get('/gifts', [giftController::class, 'index']);
     Route::post('/send-gift', [giftController::class, 'sendGift']);
+    Route::get('/get-gifts', [giftController::class, 'getGifts']);
 });
