@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\LiveStreaming;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class LiveStreamingController extends Controller
 {
@@ -43,7 +44,7 @@ class LiveStreamingController extends Controller
 
     public function store(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -59,7 +60,7 @@ class LiveStreamingController extends Controller
         }
 
         $liveStream = LiveStreaming::create([
-            'user_id' => auth()->id(),
+            'user_id' => auth()->guard('api')->user()->id,
             'title' => $request->title,
             'description' => $request->description,
             'thumbnail' => $request->file('thumbnail') ? $request->file('thumbnail')->store('thumbnails', 'public') : null,
@@ -76,7 +77,7 @@ class LiveStreamingController extends Controller
 
     public function update(Request $request, LiveStreaming $liveStream)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -89,6 +90,13 @@ class LiveStreamingController extends Controller
                 'message' => 'Validation error',
                 'errors' => $validator->errors(),
             ], 422);
+        }
+
+        if (auth()->guard('api')->user()->id !== $liveStream->user_id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'You are not authorized to update this live stream',
+            ], 403);
         }
 
         $liveStream->update([
@@ -114,5 +122,4 @@ class LiveStreamingController extends Controller
             'message' => 'Live stream deleted successfully',
         ]);
     }
-
 }

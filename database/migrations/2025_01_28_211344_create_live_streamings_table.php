@@ -14,20 +14,21 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->unsignedBigInteger('agency_id')->nullable();
-            $table->string('title');
+            $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->bigInteger('live_streaming_id')->unique()->nullable()->comment('ID of the live streaming from the streaming platform');
             $table->string('thumbnail')->nullable()->comment('URL of the thumbnail image');
             $table->string('password')->nullable()->comment('Password for the live stream');
 
-            $table->enum('status', ['pending', 'live', 'completed', 'cancelled'])->default('live');
+            $table->enum('type', ['live', 'audio_room'])->default('live');
+            $table->boolean('status')->default(false)->comment('Status of the live stream');
             $table->timestamp('scheduled_at')->nullable();
 
             $table->timestamps();
             $table->foreign('agency_id')->references('id')->on('agencies')->onDelete('cascade');
         });
     }
- 
+
     /**
      * Reverse the migrations.
      */

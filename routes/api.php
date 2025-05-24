@@ -7,6 +7,7 @@ use App\Http\Controllers\api\followerController;
 use App\Http\Controllers\api\giftController;
 use App\Http\Controllers\api\HashtagController;
 use App\Http\Controllers\api\homeController;
+use App\Http\Controllers\api\LiveStreamingController;
 use App\Http\Controllers\api\notificationController;
 use App\Http\Controllers\api\postsController;
 use App\Http\Controllers\api\questionController;
@@ -90,7 +91,7 @@ Route::group([], function () {
     Route::delete('/call-logs/{callLog}', [CallLogController::class, 'destroy']);
 
     //this live streaming routes
-    Route::apiResource('live-streamings', 'App\Http\Controllers\api\LiveStreamingController');
+    Route::apiResource('live-streamings', LiveStreamingController::class);
 
     //this hashtags routes
     Route::get('/hashtags', [HashtagController::class, 'index']);

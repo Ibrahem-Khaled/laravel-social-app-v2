@@ -42,7 +42,7 @@
 </head>
 
 <body>
-    @include('components.header')
+    {{-- @include('components.header') --}}
 
     <div class="container mt-5">
         <h1 class="text-center mb-4">الملف الشخصي</h1>
@@ -140,7 +140,7 @@
         </div>
     </div>
 
-    @include('components.footer')
+    {{-- @include('components.footer') --}}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,19 +9,10 @@ class LiveStreaming extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'agency_id',
-        'title',
-        'description',
-        'live_streaming_id',
-        'thumbnail',
-        'password',
-        'status',
-        'scheduled_at',
-    ];
+    protected $guarded = ['id'];
     protected $casts = [
         'scheduled_at' => 'datetime',
+        'status' => 'boolean',
     ];
     protected $hidden = [
         'password',
