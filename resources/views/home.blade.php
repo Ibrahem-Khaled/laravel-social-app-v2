@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الكاسر - سننطلق قريبًا</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -48,7 +49,7 @@
         <!-- الشعار -->
         <div class="flex justify-center mb-12">
             <div class="bg-blue-500/20 p-6 rounded-full border border-blue-400/30 backdrop-blur-sm">
-                <i class="fas fa-bolt text-4xl text-blue-400"></i>
+                <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-16 h-16">
             </div>
         </div>
 
@@ -106,19 +107,24 @@
         </div>
 
         <!-- وسائل التواصل -->
-        <div class="flex justify-center space-x-6 mt-12 animate__animated animate__fadeInUp animate__delay-4s">
-            <a href="#"
-                class="text-blue-300 hover:text-blue-400 text-2xl transition-all duration-300 transform hover:scale-125">
-                <i class="fab fa-twitter"></i>
-            </a>
-            <a href="#"
+        <div
+            class="flex justify-around space-x-5 max-w-2xl mx-auto mt-12 animate__animated animate__fadeInUp animate__delay-4s">
+            <a href="https://www.instagram.com/alkaser_live"
                 class="text-blue-300 hover:text-blue-400 text-2xl transition-all duration-300 transform hover:scale-125">
                 <i class="fab fa-instagram"></i>
             </a>
-            <a href='#'
+            <a href="https://twitter.com/alkaser.live"
+                class="text-blue-300 hover:text-blue-400 text-2xl transition-all duration-300 transform hover:scale-125">
+                <i class="fab fa-twitter"></i>
+            </a>
+            <a href='https://www.snapchat.com/add/alkaser.live'
                 class="text-blue-300 hover:text-blue-400 text-2xl transition-all duration-300 transform hover:scale-125">
                 <i class="fab fa-snapchat"></i>
-        </a>
+            </a>
+            <a href="https://api.whatsapp.com/send?phone=00966511053423"
+                class="text-blue-300 hover:text-blue-400 text-2xl transition-all duration-300 transform hover:scale-125">
+                <i class="fab fa-whatsapp"></i>
+            </a>
         </div>
     </div>
 

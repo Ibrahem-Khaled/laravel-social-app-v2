@@ -11,115 +11,129 @@ class LiveStreamingController extends Controller
 {
     public function index()
     {
-        $liveStreams = LiveStreaming::with('user')
-            ->where('status', 'live')
+        $liveStreams = LiveStreaming::with(['user', 'agency'])
+            ->where('status', true)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        if ($liveStreams->isEmpty()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'No live streams found',
-                'data' => [],
-            ]);
-        }
-
         return response()->json([
-            'status' => true,
-            'message' => 'Live streams retrieved successfully',
-            'data' => $liveStreams,
+            'status'  => true,
+            'message' => $liveStreams->isEmpty()
+                ? 'لا توجد بثوث حية حالياً'
+                : 'تم استرجاع البثوث الحية بنجاح',
+            'data'    => $liveStreams,
         ]);
     }
 
     public function show(LiveStreaming $liveStream)
     {
-        $liveStream->load('user');
+        $liveStream->load(['user', 'agency']);
 
         return response()->json([
-            'status' => true,
-            'message' => 'Live stream retrieved successfully',
-            'data' => $liveStream,
+            'status'  => true,
+            'message' => 'تم استرجاع البث بنجاح',
+            'data'    => $liveStream,
         ]);
     }
+
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'password' => 'nullable|string|max:255',
-            'scheduled_at' => 'nullable|date',
-        ]);
+            'agency_id'         => 'nullable|exists:agencies,id',
+            'title'             => 'required|string|max:255',
+            'description'       => 'nullable|string|max:1000',
+            'thumbnail'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'password'          => 'nullable|string|max:255',
+            'type'              => 'required|in:live,audio_room',
+            'scheduled_at'      => 'nullable|date',
+        ]);                                                       // قواعد التحقق من البيانات :contentReference[oaicite:1]{index=1}
+
         if ($validator->fails()) {
             return response()->json([
-                'status' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
+                'status'  => false,
+                'message' => 'خطأ في التحقق من البيانات',
+                'errors'  => $validator->errors(),
             ], 422);
         }
 
-        $liveStream = LiveStreaming::create([
-            'user_id' => auth()->guard('api')->user()->id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'thumbnail' => $request->file('thumbnail') ? $request->file('thumbnail')->store('thumbnails', 'public') : null,
-            'password' => $request->password,
-            'scheduled_at' => $request->scheduled_at,
-        ]);
+        $data = $validator->validated();
+        $data['user_id'] = auth()->guard('api')->id();
+        $data['status']  = true;  // افتراضياً غير مُباشر
+
+        // تخزين الصورة إن وجدت
+        if ($request->hasFile('thumbnail')) {
+            $data['thumbnail'] = $request->file('thumbnail')
+                ->store('thumbnails', 'public');
+        }
+
+        $liveStream = LiveStreaming::create($data);
 
         return response()->json([
-            'status' => true,
-            'message' => 'Live stream created successfully',
-            'data' => $liveStream,
-        ]);
+            'status'  => true,
+            'message' => 'تم إنشاء البث بنجاح',
+            'data'    => $liveStream,
+        ], 201);
     }
 
     public function update(Request $request, LiveStreaming $liveStream)
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'password' => 'nullable|string|max:255',
-            'scheduled_at' => 'nullable|date',
-        ]);
-        if ($validator->fails()) {
+        if (auth()->guard('api')->id() !== $liveStream->user_id) {
             return response()->json([
-                'status' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        if (auth()->guard('api')->user()->id !== $liveStream->user_id) {
-            return response()->json([
-                'status' => false,
-                'message' => 'You are not authorized to update this live stream',
+                'status'  => false,
+                'message' => 'غير مصرح لك بتعديل هذا البث',
             ], 403);
         }
 
-        $liveStream->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'thumbnail' => $request->file('thumbnail') ? $request->file('thumbnail')->store('thumbnails', 'public') : null,
-            'password' => $request->password,
-            'scheduled_at' => $request->scheduled_at,
+        $validator = Validator::make($request->all(), [
+            'agency_id'         => 'nullable|exists:agencies,id',
+            'title'             => 'required|string|max:255',
+            'description'       => 'nullable|string|max:1000',
+            'thumbnail'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'password'          => 'nullable|string|max:255',
+            'type'              => 'required|in:live,audio_room',
+            'status'            => 'required|boolean',
+            'scheduled_at'      => 'nullable|date',
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'خطأ في التحقق من البيانات',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        $data = $validator->validated();
+
+        if ($request->hasFile('thumbnail')) {
+            $data['thumbnail'] = $request->file('thumbnail')
+                ->store('thumbnails', 'public');
+        }
+
+        $liveStream->update($data);
+
         return response()->json([
-            'status' => true,
-            'message' => 'Live stream updated successfully',
-            'data' => $liveStream,
+            'status'  => true,
+            'message' => 'تم تحديث البث بنجاح',
+            'data'    => $liveStream,
         ]);
     }
+
     public function destroy(LiveStreaming $liveStream)
     {
+        if (auth()->guard('api')->id() !== $liveStream->user_id) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'غير مصرح لك بحذف هذا البث',
+            ], 403);
+        }
+
         $liveStream->delete();
 
         return response()->json([
-            'status' => true,
-            'message' => 'Live stream deleted successfully',
+            'status'  => true,
+            'message' => 'تم حذف البث بنجاح',
         ]);
     }
 }
