@@ -9,6 +9,7 @@ class LiveStreaming extends Model
 {
     use HasFactory;
 
+    protected $appends = ['thumbnail_url'];
     protected $guarded = ['id'];
     protected $casts = [
         'scheduled_at' => 'datetime',
