@@ -36,4 +36,13 @@ class LiveStreaming extends Model
     {
         return $this->belongsTo(Agency::class);
     }
+
+
+
+
+    ///this accessors functions
+    public function getThumbnailUrlAttribute()
+    {
+        return $this->thumbnail ? asset('storage/' . $this->thumbnail) : asset('assets/img/logo.png');
+    }
 }
