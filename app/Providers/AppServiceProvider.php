@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (!app()->runningInConsole() && \Schema::hasTable('verification_requests') && \Schema::hasTable('report_posts')) {
+        if (!app()->runningInConsole() && Schema::hasTable('verification_requests') && Schema::hasTable('reports')) {
             $pendingVerificationCount = VerificationRequest::where('status', 'pending')->count();
             $unhiddenReportsCount = Report::where('is_hidden', false)->count();
 
