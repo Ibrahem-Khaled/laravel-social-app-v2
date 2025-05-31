@@ -93,12 +93,17 @@
         <!-- نموذج الاشتراك -->
         <div
             class="max-w-md mx-auto bg-blue-900/20 rounded-xl p-8 border border-blue-400/30 backdrop-blur-sm animate__animated animate__fadeInUp animate__delay-3s">
+            @include('components.alerts')
             <h3 class="text-xl font-bold text-center mb-4 text-blue-300">كن أول من يعرف عند الإطلاق!</h3>
-            <form class="space-y-4">
-                <input type="text" placeholder="اسمك"
+            <form class="space-y-4" action="{{ route('subscribe') }}" method="POST">
+                @csrf
+                <input type="text" placeholder="اسمك" name="name"
                     class="w-full px-4 py-3 rounded-lg bg-blue-900/40 border border-blue-400/30 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <input type="email" placeholder="بريدك الإلكتروني"
+                <input type="email" placeholder="بريدك الإلكتروني" name="email"
                     class="w-full px-4 py-3 rounded-lg bg-blue-900/40 border border-blue-400/30 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="tel" placeholder="رقم هاتفك" name="phone"
+                    class="w-full px-4 py-3 rounded-lg bg-blue-900/40 border border-blue-400/30 focus:outline-none focus:ring-2 focus:ring-blue-500 text-right">
+
                 <button type="submit"
                     class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">
                     إشعارني عند الإطلاق <i class="fas fa-paper-plane ml-2"></i>
@@ -195,7 +200,7 @@
         });
 
         // عداد التنازلي (اضبط تاريخ الإطلاق هنا)
-        const launchDate = new Date("2025-06-01T00:00:00").getTime();
+        const launchDate = new Date("2025-06-04T00:00:00").getTime();
 
         function updateCountdown() {
             const now = new Date().getTime();

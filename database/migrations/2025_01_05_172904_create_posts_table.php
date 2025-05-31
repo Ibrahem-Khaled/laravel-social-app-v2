@@ -18,6 +18,8 @@ return new class extends Migration {
             ///
             $table->text('content')->nullable();
             $table->json('images')->nullable();
+            $table->text('video')->nullable();
+            $table->enum('type', ['text', 'image', 'video', 'audio', 'link'])->default('text');
             $table->boolean('pinned')->default(false);
             $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
             $table->timestamps();

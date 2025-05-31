@@ -12,6 +12,7 @@ use App\Http\Controllers\dashboard\PostController;
 use App\Http\Controllers\dashboard\UserController;
 use App\Http\Controllers\dashboard\UserFamilyController;
 use App\Http\Controllers\dashboard\VerificationController;
+use App\Http\Controllers\webController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,9 +26,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('home');
-})->name('home');
+Route::get('/', [webController::class, 'index'])->name('home');
+Route::post('/subscribe', [webController::class, 'subscribe'])->name('subscribe');
 
 
 

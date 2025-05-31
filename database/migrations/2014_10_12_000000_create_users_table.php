@@ -31,7 +31,7 @@ return new class extends Migration {
             $table->text('expo_push_token')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->date('birth_date')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->json('settings')->nullable();
             $table->rememberToken();
             $table->bigInteger('coins')->default(0);

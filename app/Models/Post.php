@@ -19,6 +19,8 @@ class Post extends Model
         'message_id',
         'content',
         'images',
+        'video',
+        'type',
         'pinned',
         'status',
     ];
@@ -75,7 +77,7 @@ class Post extends Model
     }
 
 
-    //this booted methods 
+    //this booted methods
     // استخراج الهاشتاجات وربطها تلقائياً بعد إنشاء أو تحديث المنشور
     protected static function booted()
     {
