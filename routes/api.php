@@ -11,6 +11,7 @@ use App\Http\Controllers\api\LiveStreamingController;
 use App\Http\Controllers\api\notificationController;
 use App\Http\Controllers\api\postsController;
 use App\Http\Controllers\api\questionController;
+use App\Http\Controllers\api\ReelsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -45,7 +46,6 @@ Route::group([], function () {
     //this posts routes
     Route::get('/posts', [postsController::class, 'index']);
     Route::post('/posts', [postsController::class, 'create']);
-    Route::post('/posts/reel', [postsController::class, 'createReel']);
     Route::post('/posts/{post}', [postsController::class, 'update']);
     Route::delete('/posts/{post}', [postsController::class, 'delete']);
     Route::post('/posts/{post}/pinned', [postsController::class, 'pinnedPost']);
@@ -104,6 +104,8 @@ Route::group([], function () {
     Route::put('/notifications/{notification}', [NotificationController::class, 'update']);
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
 
+    Route::post('/posts/reel', [ReelsController::class, 'createReel']);
+    Route::get('/reels', [ReelsController::class, 'getReels']);
 
     //this gift routes
     Route::get('/gifts', [giftController::class, 'index']);
