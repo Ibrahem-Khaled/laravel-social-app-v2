@@ -104,7 +104,7 @@ Route::group([], function () {
     Route::put('/notifications/{notification}', [NotificationController::class, 'update']);
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
 
-    Route::post('/posts/reel', [ReelsController::class, 'createReel']);
+    Route::post('/create/reel', [ReelsController::class, 'createReel']);
     Route::get('/reels', [ReelsController::class, 'getReels']);
 
     //this gift routes
