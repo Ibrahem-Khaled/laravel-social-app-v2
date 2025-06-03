@@ -70,6 +70,41 @@ class postsController extends Controller
 
         return response()->json($post);
     }
+
+    public function createReel(Request $request)
+    {
+        $user = auth()->guard('api')->user();
+
+        $validator = Validator::make($request->all(), [
+            'content' => 'nullable|string',
+            'video' => 'required|file|mimes:mp4,avi,mov|max:20480', // 20MB
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $data = $request->except('video');
+        // معالجة الفيديو
+        if ($request->hasFile('video')) {
+            try {
+                $path = $request->file('video')->store('public/reels');
+                $data['video'] = str_replace('public/', '', $path);
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'فشل رفع الفيديو', 'error' => $e->getMessage()], 500);
+            }
+        }
+
+        $post = $user->posts()->create([
+            'content' => $data['content'] ?? null,
+            'video' => $data['video'],
+            'type' => 'video',
+        ]);
+
+        return response()->json($post);
+    }
+
+
     public function update(Request $request, $post)
     {
         $user = auth()->guard('api')->user();

@@ -45,6 +45,7 @@ Route::group([], function () {
     //this posts routes
     Route::get('/posts', [postsController::class, 'index']);
     Route::post('/posts', [postsController::class, 'create']);
+    Route::post('/posts/reel', [postsController::class, 'createReel']);
     Route::post('/posts/{post}', [postsController::class, 'update']);
     Route::delete('/posts/{post}', [postsController::class, 'delete']);
     Route::post('/posts/{post}/pinned', [postsController::class, 'pinnedPost']);
