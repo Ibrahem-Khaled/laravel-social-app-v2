@@ -13,6 +13,7 @@ use App\Models\PostComment;
 use App\Models\PostLike;
 use App\Models\SocialMediaAccounts;
 use App\Models\User;
+use App\Models\VerificationRequest;
 
 trait UserRelationships
 {
@@ -100,5 +101,10 @@ trait UserRelationships
     public function Livestream()
     {
         return $this->hasOne(LiveStreaming::class, 'user_id');
+    }
+
+    public function IsRequestVerified()
+    {
+        return $this->hasMany(VerificationRequest::class, 'user_id');
     }
 }

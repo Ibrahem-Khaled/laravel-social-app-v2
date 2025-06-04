@@ -22,6 +22,7 @@ return new class extends Migration {
 
             $table->enum('type', ['live', 'audio_room'])->default('live');
             $table->boolean('status')->default(false)->comment('Status of the live stream');
+            $table->bigInteger('likes')->default(0);
             $table->timestamp('scheduled_at')->nullable();
 
             $table->timestamps();
