@@ -5,6 +5,7 @@ namespace App\Traits;
 use App\Models\CallLog;
 use App\Models\Conversation;
 use App\Models\Gift;
+use App\Models\LiveStreaming;
 use App\Models\Message;
 use App\Models\Notification;
 use App\Models\Post;
@@ -94,5 +95,10 @@ trait UserRelationships
     public function userNotifications()
     {
         return $this->hasMany(Notification::class);
+    }
+
+    public function Livestream()
+    {
+        return $this->hasOne(LiveStreaming::class, 'user_id');
     }
 }

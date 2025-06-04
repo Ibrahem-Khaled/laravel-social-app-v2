@@ -5,9 +5,11 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\Gift;
 use App\Models\User;
+use App\Notifications\ExpoNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Notification;
 
 class giftController extends Controller
 {
@@ -39,6 +41,15 @@ class giftController extends Controller
         // خصم النقاط
         $user->coins -= $gift->price;
         $user->save();
+
+        // زيادة النقاط للمستلم
+        $receiver->coins += $gift->price;
+        $receiver->save();
+
+        // send notification
+        if ($receiver->expo_push_token) {
+            Notification::send($receiver, new ExpoNotification([$receiver->expo_push_token], 'هناك هدية جديدة', $gift->name));
+        }
 
         // نفذ داخل معاملة لضمان الاتساق
         DB::transaction(function () use ($gift, $receiver, $user) {

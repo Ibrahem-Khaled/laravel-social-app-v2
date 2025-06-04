@@ -44,7 +44,8 @@ class ChatController extends Controller
             ->with([
                 'users',
             ])
-            ->get();                                                        // تنفيذ الاستعلام :contentReference[oaicite:0]{index=0}
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return response()->json([
             'private_conversations' => $private
