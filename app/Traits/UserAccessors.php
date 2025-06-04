@@ -64,6 +64,13 @@ trait UserAccessors
 
     public function getVerificationRequestAttribute()
     {
-        return $this->IsRequestVerified()->latest()->first()->status == 'pending' ? true : false;
+        // 1. نطلب آخر سجل من العلاقة IsRequestVerified (قد تكون علاقة hasMany إلى موديل VerificationRequest)
+        $latestRequest = $this->IsRequestVerified()->latest()->first();
+        // 2. إذا لم يكن هناك أي سجل (null)، نعيد false (أو أي قيمة افتراضية تراها مناسبة)
+        if (! $latestRequest) {
+            return false;
+        }
+        // 3. إذا كان موجودًا، نتحقق من حالة الطلب فإذا كانت 'pending' نعيد true وإلا false
+        return $latestRequest->status === 'pending';
     }
 }
