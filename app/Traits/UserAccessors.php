@@ -48,13 +48,19 @@ trait UserAccessors
         return $this->followers()->where('follower_id', auth()->guard('api')->id())->exists();
     }
 
-    public function getIsAuthanticatedUserBlockedThisUserAttribute()
+    public function getIsAuthenticatedUserBlockedThisUserAttribute()
     {
-        return $this->blockedUsers()->where('blocked_user_id', auth()->guard('api')->id())
-            ->orWhere('user_id', auth()->guard('api')->id())
+        $authUserId = auth()->guard('api')->id();
+
+        if (!$authUserId) {
+            return false;
+        }
+
+        return \DB::table('user_blocks')
+            ->where('user_id', $authUserId)           // أنت قمت بحظره
+            ->where('blocked_user_id', $this->id)     // المستخدم الحالي
             ->exists();
     }
-
     public function allCallLogs()
     {
         return CallLog::with(['sender', 'recipient'])
