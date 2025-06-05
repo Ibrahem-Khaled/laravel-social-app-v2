@@ -48,7 +48,7 @@ trait UserAccessors
         return $this->followers()->where('follower_id', auth()->guard('api')->id())->exists();
     }
 
-    public function getIsAuthenticatedUserBlockedThisUserAttribute()
+    public function getIsAuthanticatedUserBlockedThisUserAttribute()
     {
         $authUser = auth()->guard('api')->user();
 
