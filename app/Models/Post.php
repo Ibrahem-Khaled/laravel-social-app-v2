@@ -9,7 +9,7 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $appends = ['comment_count', 'like_count', 'is_liked'];
+    protected $appends = ['comment_count', 'like_count', 'is_liked', 'given_coins'];
     protected $casts = [
         'images' => 'array',
     ];
@@ -56,6 +56,13 @@ class Post extends Model
         return $this->belongsToMany(Hashtag::class, 'hashtag_posts', 'post_id', 'hashtag_id');
     }
 
+    public function userSentCoins()
+    {
+        return $this->belongsToMany(User::class, 'user_post_coins', 'post_id', 'user_id')
+            ->withPivot('amount')
+            ->withTimestamps();
+    }
+
     //this accessor functions
     public function getCommentCountAttribute()
     {
@@ -74,6 +81,11 @@ class Post extends Model
             return $this->likes()->where('user_id', $user->id)->exists();
         }
         return false;
+    }
+
+    public function getGivenCoinsAttribute()
+    {
+        return $this->userSentCoins()->sum('amount');
     }
 
 

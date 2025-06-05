@@ -107,4 +107,11 @@ trait UserRelationships
     {
         return $this->hasMany(VerificationRequest::class, 'user_id');
     }
+
+    public function postCoins()
+    {
+        return $this->belongsToMany(Post::class, 'user_post_coins', 'user_id', 'post_id')
+            ->withPivot('amount')
+            ->withTimestamps();
+    }
 }

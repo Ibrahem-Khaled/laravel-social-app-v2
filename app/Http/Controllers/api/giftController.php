@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Gift;
+use App\Models\Post;
 use App\Models\User;
 use App\Notifications\ExpoNotification;
 use Illuminate\Http\Request;
@@ -105,5 +106,50 @@ class giftController extends Controller
             ->get();
 
         return response()->json($gifts);
+    }
+
+
+    public function sentCoinsFromPost(Request $request, Post $post)
+    {
+        $user = auth()->guard('api')->user();
+
+        $validator = Validator::make($request->all(), [
+            'receiver_id' => 'required|exists:users,id',
+            'amount' => 'required|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $receiver = User::findOrFail($request->receiver_id);
+
+        if ($user->coins < $request->amount) {
+            return response()->json(['message' => 'ليس لديك كافة النقاط'], 422);
+        }
+
+        // خصم النقاط
+        $user->coins -= $request->amount;
+        $user->save();
+
+        // زيادة النقاط للمستلم
+        $receiver->coins += $request->amount;
+        $receiver->save();
+
+        // send notification
+        if ($receiver->expo_push_token) {
+            Notification::send($receiver, new ExpoNotification([$receiver->expo_push_token], 'هناك هدية جديدة', $post->title));
+        }
+        //save this tansaction
+        $post->userSentCoins()->attach($receiver->id, [
+            'amount' => $request->amount
+        ]);
+
+        return response()->json([
+            'message' => 'تم ارسال الهدية بنجاح',
+            'post' => $post,
+            'receiver' => $receiver,
+            'sender' => $user
+        ]);
     }
 }
