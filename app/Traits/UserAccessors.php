@@ -56,10 +56,7 @@ trait UserAccessors
             return false;
         }
 
-        return \DB::table('user_blocks')
-            ->where('user_id', $authUserId)           // أنت قمت بحظره
-            ->where('blocked_user_id', $this->id)     // المستخدم الحالي
-            ->exists();
+        return $authUser->blockedUsers()->where('blocked_user_id', $this->id)->exists();
     }
     public function allCallLogs()
     {
