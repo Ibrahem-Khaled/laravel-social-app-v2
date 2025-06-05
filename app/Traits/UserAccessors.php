@@ -50,9 +50,9 @@ trait UserAccessors
 
     public function getIsAuthenticatedUserBlockedThisUserAttribute()
     {
-        $authUserId = auth()->guard('api')->id();
+        $authUser = auth()->guard('api')->user();
 
-        if (!$authUserId) {
+        if (!$authUser) {
             return false;
         }
 
