@@ -114,7 +114,6 @@ class giftController extends Controller
         $user = auth()->guard('api')->user();
 
         $validator = Validator::make($request->all(), [
-            'receiver_id' => 'required|exists:users,id',
             'amount' => 'required|integer|min:1',
         ]);
 
@@ -122,7 +121,7 @@ class giftController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $receiver = User::findOrFail($request->receiver_id);
+        $receiver = User::findOrFail($post->user_id);
 
         if ($user->coins < $request->amount) {
             return response()->json(['message' => 'ليس لديك كافة النقاط'], 422);
