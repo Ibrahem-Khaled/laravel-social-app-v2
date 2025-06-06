@@ -14,28 +14,28 @@ class postsController extends Controller
 {
     public function index(Request $request)
     {
+        // ١. جلب المستخدم الحالي ومعرّفات المحظورين
         $currentUser = auth()->guard('api')->user();
-        $blockedUserIds = $currentUser->blockedUsers()->pluck('blocked_user_id');
+        $blockedUserIds = $currentUser
+            ->blockedUsers()
+            ->pluck('blocked_user_id');
 
+        // ٢. تحديد حجم الصفحة (مثلاً 10 منشورات)
         $pageSize = 10;
 
+        // ٣. بناء الاستعلام
         $posts = Post::where('status', 'active')
-            ->whereNotIn('user_id', $blockedUserIds)
-            // نجلب بيانات المستخدم والرسالة
-            ->with('user', 'message')
-            // نضيف حقلين جديدين: likes_count و comments_count
-            ->withCount(['likes', 'comments'])                                  // :contentReference[oaicite:0]{index=0}
-            // ترتيب عشوائي أولاً
-            ->inRandomOrder()                                                   // :contentReference[oaicite:1]{index=1}
-            // ثم من الأحدث للأقدم
-            ->orderBy('created_at', 'desc')                                     // :contentReference[oaicite:2]{index=2}
-            // ثم حسب مجموع التفاعلات (إعجابات + تعليقات) من الأكبر للأصغر
-            ->orderByRaw('(likes_count + comments_count) DESC')                  // :contentReference[oaicite:3]{index=3}
-            ->paginate($pageSize);
+            ->whereNotIn('user_id', $blockedUserIds)               // تجاهل منشورات المحظورين
+            ->with('user', 'message')                              // تحميل العلاقات إذا لزم الأمر
+            ->withCount(['likes', 'comments'])                     // إضافة likes_count و comments_count
+            ->orderBy('created_at', 'desc')                        // الأحدث أولًا
+            ->orderBy('likes_count', 'desc')                       // ثم حسب الإعجابات
+            ->orderBy('comments_count', 'desc')                    // ثم حسب التعليقات
+            ->paginate($pageSize);                                 // تقسيم الصفحات
 
+        // ٤. إرجاع الاستجابة بصيغة JSON
         return response()->json($posts);
     }
-
     public function getUserPosts($id)
     {
         $posts = Post::where('user_id', $id)->with('user')->get();
