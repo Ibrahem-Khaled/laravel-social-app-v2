@@ -40,8 +40,10 @@ class postsController extends Controller
     public function getFollowPosts()
     {
         $user = auth()->guard('api')->user();
-        $followingIds = $user->following()->pluck('following_id');
-        $posts = Post::whereIn('user_id', $followingIds)->with('user')->get();
+        $followingIds = $user->followings()->pluck('following_id');
+        $posts = Post::whereIn('user_id', $followingIds)
+            ->with('user')
+            ->paginate(10);
         return response()->json($posts);
     }
 
