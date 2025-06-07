@@ -21,12 +21,8 @@ class homeController extends Controller
             ->withCount('followers')
             ->orderByDesc('followers_count')
             ->limit(5)
-            ->get()
-            ->map(function ($user) {
-                $user->is_authanticated_user_following_this_user = $user->isFollowedBy(auth()->guard('api')->user());
-                $user->is_current_user = $user->id === auth()->guard('api')->user()->id;
-                return $user;
-            });
+            ->get();
+
 
         // الهاشتاجات الشائعة
         $trendingHashtags = Hashtag::query()
