@@ -77,7 +77,7 @@ class homeController extends Controller
         $posts = Post::query()
             ->where('content', 'LIKE', "%{$searchTerm}%")
             ->withCount('likes', 'comments')
-            ->with('user', 'hashtag', 'likes', 'comments')
+            ->with('user', 'hashtags', 'likes', 'comments')
             ->get();
 
         return response()->json([
