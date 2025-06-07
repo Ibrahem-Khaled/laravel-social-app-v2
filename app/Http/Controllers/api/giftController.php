@@ -88,9 +88,8 @@ class giftController extends Controller
         ]);
     }
 
-    public function getGifts(Request $request)
+    public function getGifts(User $user)
     {
-        $user = auth()->guard('api')->user();
         $gifts = DB::table('user_gifts')
             ->join('gifts', 'gifts.id', '=', 'user_gifts.gift_id')
             ->where('user_gifts.user_id', $user->id)
