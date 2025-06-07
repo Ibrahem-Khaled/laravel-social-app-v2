@@ -65,12 +65,7 @@ class homeController extends Controller
                     ->orWhere('username', 'LIKE', "%{$searchTerm}%");
             })
             ->where('id', '!=', auth()->guard('api')->user()->id)
-            ->get()
-            ->map(function ($user) {
-                $user->is_authanticated_user_following_this_user = $user->isFollowedBy(auth()->guard('api')->user());
-                $user->is_current_user = $user->id === auth()->guard('api')->user()->id;
-                return $user;
-            });
+            ->get();
 
         // البحث في الهاشتاجات
         $hashtags = Hashtag::query()
