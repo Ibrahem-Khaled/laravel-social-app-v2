@@ -75,8 +75,9 @@ class homeController extends Controller
 
         // البحث في المنشورات
         $posts = Post::query()
-            ->where('text', 'LIKE', "%{$searchTerm}%")
-            ->withCount('likes')
+            ->where('content', 'LIKE', "%{$searchTerm}%")
+            ->withCount('likes', 'comments')
+            ->with('user', 'hashtag', 'likes', 'comments')
             ->get();
 
         return response()->json([
