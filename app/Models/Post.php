@@ -28,7 +28,7 @@ class Post extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class)->select('id', 'name', 'avatar');
+        return $this->belongsTo(User::class)->select('id', 'name', 'avatar', 'is_verified');
     }
 
     public function message()
