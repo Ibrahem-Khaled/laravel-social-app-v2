@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Hashtag;
+use App\Models\Post;
 use App\Models\User;
 use App\Models\VerificationRequest;
 use Illuminate\Http\Request;
@@ -10,30 +12,87 @@ use Illuminate\Http\Request;
 class homeController extends Controller
 {
 
-    public function deepSearch(Request $request)
+    // جلب الاقتراحات الأولية
+    public function getSuggestions()
     {
-        $search = $request->input('search');
+        // المستخدمون المقترحون (يمكن تغيير الخوارزمية حسب احتياجاتك)
+        $suggestedUsers = User::query()
+            ->where('id', '!=', auth()->guard('api')->user()->id)
+            ->withCount('followers')
+            ->orderByDesc('followers_count')
+            ->limit(5)
+            ->get()
+            ->map(function ($user) {
+                $user->is_authanticated_user_following_this_user = $user->isFollowedBy(auth()->guard('api')->user());
+                $user->is_current_user = $user->id === auth()->guard('api')->user()->id;
+                return $user;
+            });
 
-        // إذا كان البحث فارغاً يمكن إرجاع مصفوفة فارغة أو رسالة مناسبة
-        if (empty($search)) {
-            return response()->json([], 200);
+        // الهاشتاجات الشائعة
+        $trendingHashtags = Hashtag::query()
+            ->withCount('posts')
+            ->orderByDesc('posts_count')
+            ->limit(5)
+            ->get();
+
+        // المنشورات الشائعة
+        $trendingPosts = Post::query()
+            ->withCount('likes')
+            ->orderByDesc('likes_count')
+            ->limit(5)
+            ->get();
+
+        return response()->json([
+            'suggested_users' => $suggestedUsers,
+            'trending_hashtags' => $trendingHashtags,
+            'trending_posts' => $trendingPosts,
+        ]);
+    }
+
+    // البحث الشامل
+    public function search(Request $request)
+    {
+        $searchTerm = $request->query('search');
+
+        if (empty($searchTerm)) {
+            return response()->json([
+                'users' => [],
+                'hashtags' => [],
+                'posts' => [],
+            ]);
         }
 
-        // تهيئة الـ Query بشكل صحيح
-        $query = User::query();
+        // البحث في المستخدمين
+        $users = User::query()
+            ->where(function ($query) use ($searchTerm) {
+                $query->where('name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('username', 'LIKE', "%{$searchTerm}%");
+            })
+            ->where('id', '!=', auth()->guard('api')->user()->id)
+            ->get()
+            ->map(function ($user) {
+                $user->is_authanticated_user_following_this_user = $user->isFollowedBy(auth()->guard('api')->user());
+                $user->is_current_user = $user->id === auth()->guard('api')->user()->id;
+                return $user;
+            });
 
-        // تطبيق شرط البحث
-        $query->where(function ($q) use ($search) {
-            $q->where('name', 'like', '%' . $search . '%')
-                ->orWhere('email', 'like', '%' . $search . '%')
-                ->orWhere('phone', 'like', '%' . $search . '%')
-                ->orWhere('uuid', 'like', '%' . $search . '%')
-                ->orWhere('username', 'like', '%' . $search . '%');
-        });
+        // البحث في الهاشتاجات
+        $hashtags = Hashtag::query()
+            ->where('name', 'LIKE', "%{$searchTerm}%")
+            ->withCount('posts')
+            ->get();
 
-        $users = $query->get();
+        // البحث في المنشورات
+        $posts = Post::query()
+            ->where('text', 'LIKE', "%{$searchTerm}%")
+            ->withCount('likes')
+            ->get();
 
-        return response()->json($users, 200);
+        return response()->json([
+            'users' => $users,
+            'hashtags' => $hashtags,
+            'posts' => $posts,
+        ]);
     }
 
     public function getHigherPointsFromUsersFollowers(Request $request)

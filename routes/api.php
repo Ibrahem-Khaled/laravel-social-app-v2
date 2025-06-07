@@ -38,7 +38,10 @@ Route::post('/delete-account', [authController::class, 'deleteAccount']);
 
 Route::group([], function () {
     //this main routes
-    Route::get('/deep/search', [homeController::class, 'deepSearch']);
+    Route::group(['prefix' => 'deep/search'], function () {
+        Route::get('suggestions', [homeController::class, 'getSuggestions']);
+        Route::get('/', [homeController::class, 'search']);
+    });
     Route::get('/get/higher/points/from/users', [homeController::class, 'getHigherPointsFromUsers']);
     Route::get('/get/higher/points/from/users/followers', [homeController::class, 'getHigherPointsFromUsersFollowers']);
     Route::post('/submit/verification', [homeController::class, 'submitVerification']);
