@@ -42,7 +42,10 @@ class postsController extends Controller
         $user = auth()->guard('api')->user();
         $followingIds = $user->followings()->pluck('following_id');
         $posts = Post::whereIn('user_id', $followingIds)
-            ->with('user')
+            ->where('status', 'active')
+            ->orderBy('created_at', 'desc')
+            ->withCount(['likes', 'comments'])
+            ->with('user', 'message')                              // تحميل العلاقات إذا لزم الأمر
             ->paginate(10);
         return response()->json($posts);
     }
