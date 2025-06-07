@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class postsController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         // ١. جلب المستخدم الحالي ومعرّفات المحظورين
         $currentUser = auth()->guard('api')->user();
@@ -36,6 +36,15 @@ class postsController extends Controller
         // ٤. إرجاع الاستجابة بصيغة JSON
         return response()->json($posts);
     }
+
+    public function getFollowPosts()
+    {
+        $user = auth()->guard('api')->user();
+        $followingIds = $user->following()->pluck('following_id');
+        $posts = Post::whereIn('user_id', $followingIds)->with('user')->get();
+        return response()->json($posts);
+    }
+
     public function getUserPosts($id)
     {
         $posts = Post::where('user_id', $id)->with('user')->get();
