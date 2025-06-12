@@ -19,9 +19,11 @@ class notificationController extends Controller
             ->map(function ($notification) {
                 return [
                     'id' => $notification->id,
+                    'user_id ' => $notification->user_id,
                     'user' => $notification->related?->user?->name ?? 'مستخدم',
                     'image' => $notification->related?->user?->avatar_url,
                     'action' => $notification->message,
+                    'is_read' => $notification->is_read,
                     'time' => $notification->created_at->diffForHumans(),
                 ];
             });

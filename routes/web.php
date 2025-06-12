@@ -29,9 +29,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [webController::class, 'index'])->name('home');
 Route::post('/subscribe', [webController::class, 'subscribe'])->name('subscribe');
 
-
-
-
 Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], function () {
     //this is dashboard route
     Route::get('/', [homeController::class, 'dashboard'])->name('home.dashboard');
