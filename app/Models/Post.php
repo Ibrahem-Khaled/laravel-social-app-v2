@@ -48,7 +48,7 @@ class Post extends Model
 
     public function reports()
     {
-        return $this->hasMany(Report::class);
+        return $this->morphMany(Report::class, 'related');
     }
 
     public function hashtags()

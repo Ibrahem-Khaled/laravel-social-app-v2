@@ -240,7 +240,7 @@
                         <div class="absolute inset-0 w-12 h-12 rounded-full bg-primary-500 pulse-ring opacity-20"></div>
                         <div
                             class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-purple-600 flex items-center justify-center glow">
-                            <img src="{{ $websiteData?->avatar_url }}" alt="{{ $websiteData->name }}"
+                            <img src="{{ asset('storage/' . $websiteData?->avatar) }}" alt="{{ $websiteData?->name }}"
                                 class="w-8 h-8 rounded-full">
                         </div>
                     </div>

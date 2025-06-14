@@ -144,7 +144,7 @@ class PostController extends Controller
 
         // إحصائيات
         $totalReports = Report::count(); // إجمالي البلاغات
-        $reportedPosts = Report::distinct('post_id')->count('post_id'); // عدد المنشورات المبلغ عنها
+        $reportedPosts = 0;
         $topReasons = Report::select('reason', \DB::raw('count(*) as count'))
             ->groupBy('reason')
             ->orderByDesc('count')
