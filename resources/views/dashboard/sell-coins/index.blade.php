@@ -196,9 +196,9 @@
                                         </button>
 
                                         {{-- تضمين المودالات لكل عرض --}}
-                                        @include('sell-coins.modals.show', ['coin' => $coin])
-                                        @include('sell-coins.modals.edit', ['coin' => $coin])
-                                        @include('sell-coins.modals.delete', ['coin' => $coin])
+                                        @include('dashboard.sell-coins.modals.show', ['coin' => $coin])
+                                        @include('dashboard.sell-coins.modals.edit', ['coin' => $coin])
+                                        @include('dashboard.sell-coins.modals.delete', ['coin' => $coin])
                                     </td>
                                 </tr>
                             @empty

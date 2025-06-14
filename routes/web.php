@@ -66,13 +66,13 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::resource('families', FamilyController::class);
     Route::resource('user-families', UserFamilyController::class)->only(['store', 'update', 'destroy']);
 
-    Route::resource('live_streamings', LiveStreamingController::class);
+    Route::resource('live-streamings', LiveStreamingController::class);
+    Route::get('live-streamings/statistics', [LiveStreamingController::class, 'statistics'])->name('live-streamings.statistics');
 
     Route::resource('agencies', AgencyController::class);
     Route::resource('agency-users', AgencyUserController::class);
 
     Route::resource('sell-coins', SellCoinController::class);
-
 });
 
 

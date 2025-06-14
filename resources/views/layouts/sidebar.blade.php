@@ -89,7 +89,7 @@
                     <i class="fas fa-fw fa-users"></i>
                     <span>العائلات</span>
                 </a>
-                <a class="collapse-item" href="{{ route('live_streamings.index') }}">
+                <a class="collapse-item" href="{{ route('live-streamings.index') }}">
                     <i class="fas fa-fw fa-tv"></i>
                     <span>اللايفات الحية</span>
                 </a>
