@@ -59,6 +59,11 @@
             <span>الاشعارات</span></a>
     </li>
     <li class="nav-item">
+        <a class="nav-link" href="{{ route('sell-coins.index') }}">
+            <i class="fas fa-fw fa-exchange-alt"></i>
+            <span>عرض بيع العملات</span></a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link" href="{{ route('verification.index') }}">
             <i class="fas fa-fw fa-envelope"></i>
             <span>طلبات التحقق</span>
@@ -98,7 +103,7 @@
                 <a class="collapse-item" href="blank.html">Blank Page</a> --}}
             </div>
         </div>
-    </li> 
+    </li>
     <!-- Sidebar Toggler (Sidebar) -->
     <div class="text-center d-none d-md-inline">
         <button class="rounded-circle border-0" id="sidebarToggle"></button>

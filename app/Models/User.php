@@ -40,6 +40,10 @@ class User extends Authenticatable implements JWTSubject
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'birth_date' => 'date',
+        'social_links' => 'array',
+        'settings' => 'array',
+        'is_verified' => 'boolean',
     ];
 
     public function addCoins($amount)
@@ -61,6 +65,41 @@ class User extends Authenticatable implements JWTSubject
     {
         return $query->where('country', $country);
     }
+
+    public function getRoleNameAttribute()
+    {
+        $roles = [
+            'admin' => 'مدير',
+            'moderator' => 'مشرف',
+            'user' => 'مستخدم عادي',
+            'vip' => 'مستخدم مميز',
+            'website-data' => 'بيانات الموقع'
+        ];
+
+        return $roles[$this->role] ?? $this->role;
+    }
+
+    public function getStatusNameAttribute()
+    {
+        $statuses = [
+            'active' => 'نشط',
+            'inactive' => 'غير نشط',
+            'banned' => 'محظور'
+        ];
+
+        return $statuses[$this->status] ?? $this->status;
+    }
+
+    public function getGenderNameAttribute()
+    {
+        $genders = [
+            'male' => 'ذكر',
+            'female' => 'أنثى'
+        ];
+
+        return $genders[$this->gender] ?? 'غير محدد';
+    }
+
 
     //this method is used to get the identifier that will be stored in the subject claim of the JWT
     /**

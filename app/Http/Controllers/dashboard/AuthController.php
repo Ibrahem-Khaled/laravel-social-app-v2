@@ -167,4 +167,8 @@ class AuthController extends Controller
         return redirect()->back()->with('success', 'تم إرسال رابط استعادة كلمة المرور إلى بريدك الإلكتروني.');
     }
 
+    public function shippingAgent()
+    {
+        return view('Auth.shipping-agent');
+    }
 }

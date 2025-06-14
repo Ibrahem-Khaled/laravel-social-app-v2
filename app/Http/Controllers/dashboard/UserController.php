@@ -5,54 +5,125 @@ namespace App\Http\Controllers\dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query();
+        $roles = ['admin', 'moderator', 'user', 'vip', 'website-data'];
+        $selectedRole = $request->role ?? 'all';
 
-        if ($request->has('filter') && $request->filter != 'all') {
-            switch ($request->filter) {
-                case 'active':
-                    $query->where('status', 'active');
-                    break;
-                case 'banned':
-                    $query->where('status', 'banned');
-                    break;
-                case 'admin':
-                    $query->where('role', 'admin');
-                    break;
-                case 'moderator':
-                    $query->where('role', 'moderator');
-                    break;
-                case 'user':
-                    $query->where('role', 'user');
-                    break;
+        $users = User::query()
+            ->when($selectedRole !== 'all', function ($query) use ($selectedRole) {
+                return $query->where('role', $selectedRole);
+            })
+            ->when($request->search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%")
+                        ->orWhere('email', 'like', "%$search%")
+                        ->orWhere('phone', 'like', "%$search%")
+                        ->orWhere('username', 'like', "%$search%");
+                });
+            })
+            ->latest()
+            ->paginate(15);
+
+        $usersCount = User::count();
+        $activeUsersCount = User::where('status', 'active')->count();
+        $adminsCount = User::where('role', 'admin')->count();
+
+        return view('dashboard.users.index', compact(
+            'users',
+            'roles',
+            'selectedRole',
+            'usersCount',
+            'activeUsersCount',
+            'adminsCount'
+        ));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'nullable|string|max:20|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|in:admin,moderator,user,vip,website-data',
+            'status' => 'required|in:active,inactive,banned',
+            'gender' => 'nullable|in:male,female',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'bio' => 'nullable|string|max:500',
+            'birth_date' => 'nullable|date',
+        ]);
+
+        $userData = $request->except('password', 'avatar');
+        $userData['password'] = Hash::make($request->password);
+        $userData['uuid'] = (string) Str::uuid();
+
+        if ($request->hasFile('avatar')) {
+            $userData['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        User::create($userData);
+
+        return redirect()->route('users.index')->with('success', 'تم إضافة المستخدم بنجاح');
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:20|unique:users,phone,' . $user->id,
+            'password' => 'nullable|string|min:8|confirmed',
+            'role' => 'required|in:admin,moderator,user,vip,website-data',
+            'status' => 'required|in:active,inactive,banned',
+            'gender' => 'nullable|in:male,female',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'bio' => 'nullable|string|max:500',
+            'birth_date' => 'nullable|date',
+        ]);
+
+        $userData = $request->except('password', 'avatar');
+
+        if ($request->filled('password')) {
+            $userData['password'] = Hash::make($request->password);
+        }
+
+        if ($request->hasFile('avatar')) {
+            // حذف الصورة القديمة إذا كانت موجودة
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
             }
-        }
-        // التحقق من وجود بحث
-        if ($request->has('search')) {
-            $search = $request->get('search');
-            $query->where('uuid', 'like', "%$search%")
-                ->orWhere('name', 'like', "%$search%")
-                ->orWhere('username', 'like', "%$search%")
-                ->orWhere('email', 'like', "%$search%")
-                ->orWhere('phone', 'like', "%$search%");
+            $userData['avatar'] = $request->file('avatar')->store('avatars', 'public');
         }
 
-        $users = $query->paginate(10);
+        $user->update($userData);
 
-        // إحصائيات
-        $totalUsers = User::count();
-        $activeUsers = User::where('status', 'active')->count();
-        $bannedUsers = User::where('status', 'banned')->count();
-        $topCountry = User::select('country', \DB::raw('count(*) as count'))
-            ->groupBy('country')
-            ->orderByDesc('count')
-            ->first();
+        return redirect()->route('users.index')->with('success', 'تم تحديث بيانات المستخدم بنجاح');
+    }
 
-        return view('dashboard.users.index', compact('users', 'totalUsers', 'activeUsers', 'bannedUsers', 'topCountry'));
+    public function destroy(User $user)
+    {
+        // لا تسمح بحذف المستخدم الحالي
+        if ($user->id === auth()->id()) {
+            return redirect()->back()->with('error', 'لا يمكنك حذف حسابك الخاص');
+        }
+
+        // حذف الصورة إذا كانت موجودة
+        if ($user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+
+        $user->delete();
+
+        return redirect()->route('users.index')->with('success', 'تم حذف المستخدم بنجاح');
     }
 
 
@@ -63,52 +134,6 @@ class UserController extends Controller
         $followingCount = $user->followings()->count();
         $giftsCount = $user->gifts()->count();
         return view('dashboard.users.show', compact('user', 'followersCount', 'followingCount', 'giftsCount'));
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'username' => 'required|unique:users',
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'phone' => 'required|unique:users',
-            'password' => 'required|min:6',
-        ]);
-
-        User::create([
-            'username' => $request->username,
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => bcrypt($request->password),
-        ]);
-
-        return redirect()->route('users.index')->with('success', 'تم إضافة المستخدم بنجاح');
-    }
-
-    public function update(Request $request, User $user)
-    {
-        $request->validate([
-            'username' => 'required|unique:users,username,' . $user->id,
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'phone' => 'required|unique:users,phone,' . $user->id,
-        ]);
-
-        $user->update([
-            'username' => $request->username,
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-        ]);
-
-        return redirect()->route('users.index')->with('success', 'تم تحديث المستخدم بنجاح');
-    }
-
-    public function destroy(User $user)
-    {
-        $user->delete();
-        return redirect()->route('users.index')->with('success', 'تم حذف المستخدم بنجاح');
     }
 
     public function toggleBan(Request $request, User $user)
@@ -155,4 +180,13 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', $message);
     }
 
+    public function toggleIsVerified(User $user)
+    {
+        $user->update([
+            'is_verified' => !$user->is_verified,
+        ]);
+
+        $message = $user->is_verified ? 'تم توثيق المستخدم بنجاح' : 'تم حذف التوثيق من المستخدم بنجاح';
+        return redirect()->route('users.index')->with('success', $message);
+    }
 }

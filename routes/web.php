@@ -9,6 +9,7 @@ use App\Http\Controllers\dashboard\LiveStreamingController;
 use App\Http\Controllers\dashboard\MessageController;
 use App\Http\Controllers\dashboard\NotificationController;
 use App\Http\Controllers\dashboard\PostController;
+use App\Http\Controllers\dashboard\SellCoinController;
 use App\Http\Controllers\dashboard\UserController;
 use App\Http\Controllers\dashboard\UserFamilyController;
 use App\Http\Controllers\dashboard\VerificationController;
@@ -37,6 +38,8 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::patch('/users/{user}/toggle-ban', [UserController::class, 'toggleBan'])->name('users.toggleBan');
     Route::get('/users/search', [UserController::class, 'search'])->name('users.search');
     Route::post('/users/{user}/manage-coins', [UserController::class, 'manageCoins'])->name('users.manageCoins');
+    Route::patch('/users/{user}/toggle-is-verified', [UserController::class, 'toggleIsVerified'])->name('users.toggleIsVerified');
+
 
     Route::resource('posts', PostController::class);
     Route::get('/reports', [PostController::class, 'reports'])->name('reports.index');
@@ -67,6 +70,9 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
 
     Route::resource('agencies', AgencyController::class);
     Route::resource('agency-users', AgencyUserController::class);
+
+    Route::resource('sell-coins', SellCoinController::class);
+
 });
 
 

@@ -22,4 +22,6 @@ Route::group(['prefix' => 'auth'], function () {
 
     Route::get('forget-password', [AuthController::class, 'forgetPassword'])->name('forgetPassword');
     Route::post('resetPassword', [AuthController::class, 'resetPassword'])->name('resetPassword');
+
+    Route::get('shipping-agent', [AuthController::class, 'shippingAgent'])->name('shippingAgent');
 });

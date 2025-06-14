@@ -201,7 +201,7 @@
                             <span class="text-gray-300">دعم فني متواصل</span>
                         </li>
                     </ul>
-                    <a href="#"
+                    <a href="{{ route('shippingAgent') }}"
                         class="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-full font-medium transition transform hover:scale-105">
                         سجل كوكيل شحن
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
