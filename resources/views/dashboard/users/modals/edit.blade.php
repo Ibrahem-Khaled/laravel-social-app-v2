@@ -74,8 +74,7 @@
                                     </option>
                                     <option value="vip" {{ $user->role === 'vip' ? 'selected' : '' }}>مستخدم مميز
                                     </option>
-                                    <option value="website-data"
-                                        {{ $user->role === 'website-data' ? 'selected' : '' }}>بيانات الموقع</option>
+
                                 </select>
                             </div>
                         </div>

@@ -14,6 +14,7 @@ use App\Http\Controllers\dashboard\UserController;
 use App\Http\Controllers\dashboard\UserFamilyController;
 use App\Http\Controllers\dashboard\VerificationController;
 use App\Http\Controllers\webController;
+use App\Http\Controllers\website\WebsiteDataController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -73,6 +74,11 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::resource('agency-users', AgencyUserController::class);
 
     Route::resource('sell-coins', SellCoinController::class);
+
+
+
+    Route::get('/website-data', [WebsiteDataController::class, 'index'])->name('website-data.index');
+    Route::post('/website-data', [WebsiteDataController::class, 'storeOrUpdate'])->name('website-data.store-or-update');
 });
 
 

@@ -66,7 +66,6 @@
                                     <option value="admin">مدير</option>
                                     <option value="moderator">مشرف</option>
                                     <option value="vip">مستخدم مميز</option>
-                                    <option value="website-data">بيانات الموقع</option>
                                 </select>
                             </div>
                         </div>

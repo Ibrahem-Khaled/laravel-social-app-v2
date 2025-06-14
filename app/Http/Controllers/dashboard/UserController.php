@@ -13,7 +13,7 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $roles = ['admin', 'moderator', 'user', 'vip', 'website-data'];
+        $roles = ['admin', 'moderator', 'user', 'vip'];
         $selectedRole = $request->role ?? 'all';
 
         $users = User::query()

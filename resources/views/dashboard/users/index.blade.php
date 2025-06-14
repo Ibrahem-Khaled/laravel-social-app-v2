@@ -113,15 +113,7 @@
                         <li class="nav-item">
                             <a class="nav-link {{ $selectedRole === $role ? 'active' : '' }}"
                                 href="{{ route('users.index', ['role' => $role]) }}">
-                                {{ $role === 'admin'
-                                    ? 'مدير'
-                                    : ($role === 'moderator'
-                                        ? 'مشرف'
-                                        : ($role === 'vip'
-                                            ? 'مميز'
-                                            : ($role === 'website-data'
-                                                ? 'بيانات الموقع'
-                                                : 'عادي'))) }}
+                                {{ $role === 'admin' ? 'مدير' : ($role === 'moderator' ? 'مشرف' : ($role === 'vip' ? 'مميز' : 'عادي')) }}
                             </a>
                         </li>
                     @endforeach
@@ -214,10 +206,13 @@
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                             {{-- /زر التاكيد والغاء التاكيد --}}
-                                            <form action="{{ route('users.toggleIsVerified', $user->id) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('users.toggleIsVerified', $user->id) }}"
+                                                method="POST" class="d-inline">
                                                 @csrf
                                                 @method('PATCH')
-                                                <button type="submit" class="btn btn-sm btn-{{ $user->is_verified ? 'danger' : 'success' }}" title="تحديث حالة التحقق">
+                                                <button type="submit"
+                                                    class="btn btn-sm btn-{{ $user->is_verified ? 'danger' : 'success' }}"
+                                                    title="تحديث حالة التحقق">
                                                     <i class="fas fa-{{ $user->is_verified ? 'times' : 'check' }}"></i>
                                                 </button>
                                             </form>

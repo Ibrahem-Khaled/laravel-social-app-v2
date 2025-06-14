@@ -43,6 +43,50 @@
             @endif
         </a>
     </li>
+
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
+            aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-fw fa-globe"></i>
+            <span>إدارة الموقع</span>
+        </a>
+        <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">الصفحات الثابتة:</h6>
+                <a class="collapse-item" href="{{ route('website-data.index') }}">
+                    <i class="fas fa-fw fa-home"></i>
+                    <span>الصفحة الرئيسية</span>
+                </a>
+                <a class="collapse-item" href="#">
+                    <i class="fas fa-fw fa-file-contract"></i>
+                    <span>الشروط والأحكام</span>
+                </a>
+                <a class="collapse-item" href="#">
+                    <i class="fas fa-fw fa-shield-alt"></i>
+                    <span>سياسة الخصوصية</span>
+                </a>
+                <a class="collapse-item" href="#">
+                    <i class="fas fa-fw fa-question-circle"></i>
+                    <span>الأسئلة الشائعة</span>
+                </a>
+                <a class="collapse-item" href="#">
+                    <i class="fas fa-fw fa-envelope"></i>
+                    <span>اتصل بنا</span>
+                </a>
+                <div class="collapse-divider"></div>
+                <h6 class="collapse-header">إعدادات الموقع:</h6>
+                <a class="collapse-item" href="#">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>الإعدادات العامة</span>
+                </a>
+                <a class="collapse-item" href="#">
+                    <i class="fas fa-fw fa-sliders-h"></i>
+                    <span>إعدادات SEO</span>
+                </a>
+            </div>
+        </div>
+    </li>
+
     <li class="nav-item">
         <a class="nav-link" href="{{ route('gifts.index') }}">
             <i class="fas fa-fw fa-gift"></i>
@@ -76,7 +120,7 @@
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
     <!-- Nav Item - Pages Collapse Menu -->
-     <li class="nav-item">
+    <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
             aria-expanded="true" aria-controls="collapsePages">
             <i class="fas fa-fw fa-tv"></i>
