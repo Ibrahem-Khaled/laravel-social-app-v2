@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ env('APP_NAME') }}</title>
+    <title>{{ $websiteData->name }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
+    <link rel="icon" href="{{ asset('storage/' . $websiteData?->avatar) }}" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -125,7 +126,7 @@
             will-change: transform;
         }
 
-        .neon-border {
+        . {
             border: 2px solid transparent;
             background: linear-gradient(45deg, #6366f1, #8b5cf6) border-box;
             -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
@@ -358,10 +359,9 @@
 
                 <div class="relative" style="animation: slideUp 0.8s 0.6s both;">
                     <div class="relative floating">
-                        <div class="relative neon-border rounded-3xl overflow-hidden shadow-2xl">
-                            <img src="{{ $heroImage ?? 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80' }}"
-                                alt="Voice Communication" class="w-full h-auto">
-                            <div class="absolute inset-0 bg-gradient-to-tr from-primary-500/20 to-transparent"></div>
+                        <div class="relative  rounded-3xl overflow-hidden shadow-2xl">
+                            <img src="{{ asset('assets/img/demo.png') }}" alt="Voice Communication"
+                                class="w-full h-auto">
                         </div>
                     </div>
 
@@ -439,7 +439,6 @@
                                     d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
                                     clip-rule="evenodd" />
                             </svg>
-                            <div class="absolute inset-0 shimmer opacity-0 group-hover:opacity-100"></div>
                         </a>
                     </div>
                 </div>
@@ -447,14 +446,11 @@
                 <div class="order-1 lg:order-2 relative">
                     <div class="relative floating">
                         <div class="neon-border rounded-3xl overflow-hidden shadow-2xl">
-                            <img src="https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-                                alt="Shipping Agent" class="w-full h-auto">
-                            <div class="absolute inset-0 bg-gradient-to-tl from-primary-500/20 to-transparent"></div>
+                            <img src="{{ asset('assets/img/agent.jpg') }}" alt="Shipping Agent"
+                                class="w-full h-auto">
                         </div>
                     </div>
-                    <div
-                        class="absolute -bottom-8 -right-8 w-32 h-32 bg-primary-500/30 rounded-full filter blur-2xl floating">
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -515,9 +511,7 @@
                         </div>
                         <img src="{{ asset('assets/img/demo.png') }}" alt="Demo Image" class="w-full">
                     </div>
-                    <div
-                        class="absolute -bottom-8 -left-8 w-32 h-32 bg-purple-500/30 rounded-full filter blur-2xl floating">
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -542,8 +536,8 @@
                     <div class="glass rounded-2xl overflow-hidden hover-lift card-3d group cursor-pointer">
                         <div class="relative overflow-hidden">
                             <img src="{{ asset('storage/' . $live->thumbnail) }}" alt="{{ $live->title }}"
+                                loading="lazy"
                                 class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                             <div
                                 class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold glow">
                                 مباشر
@@ -630,6 +624,7 @@
                                         class="absolute inset-0 w-24 h-24 bg-primary-500 rounded-full pulse-ring opacity-20">
                                     </div>
                                     <img src="{{ asset('storage/' . $item->icon) }}" alt="{{ $item->price }}"
+                                        loading="lazy"
                                         class="w-24 h-24 mx-auto glow rounded-full object-cover border-4 border-gray-700 group-hover:border-primary-500 transition-all duration-300">
                                 </div>
 

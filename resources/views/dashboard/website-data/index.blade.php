@@ -14,7 +14,8 @@
                             </div>
                         @endif
 
-                        <form method="POST" action="{{ route('website-data.store-or-update') }}">
+                        <form method="POST" action="{{ route('website-data.store-or-update') }}"
+                            enctype="multipart/form-data">
                             @csrf
 
                             <div class="row">
@@ -42,19 +43,6 @@
                                         @enderror
                                     </div>
 
-                                    <!-- حقل كلمة المرور (يظهر فقط عند الإضافة) -->
-                                    @if (!isset($websiteData->id))
-                                        <div class="mb-3">
-                                            <label for="password" class="form-label">كلمة المرور *</label>
-                                            <input type="password"
-                                                class="form-control @error('password') is-invalid @enderror" id="password"
-                                                name="password" required>
-                                            @error('password')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    @endif
-
                                     <!-- حقل الهاتف -->
                                     <div class="mb-3">
                                         <label for="phone" class="form-label">الهاتف</label>
@@ -69,7 +57,7 @@
                                     <!-- حقل صورة الموقع -->
                                     <div class="mb-3">
                                         <label for="avatar" class="form-label">رابط الصورة</label>
-                                        <input type="text" class="form-control @error('avatar') is-invalid @enderror"
+                                        <input type="file" class="form-control @error('avatar') is-invalid @enderror"
                                             id="avatar" name="avatar"
                                             value="{{ old('avatar', $websiteData->avatar ?? '') }}">
                                         @error('avatar')
@@ -77,7 +65,7 @@
                                         @enderror
                                         @if (isset($websiteData->avatar) && $websiteData->avatar)
                                             <div class="mt-2">
-                                                <img src="{{ $websiteData->avatar }}" alt="صورة الموقع"
+                                                <img src="{{ asset('storage/' . $websiteData->avatar) }}" alt="صورة الموقع"
                                                     style="max-height: 100px;">
                                             </div>
                                         @endif
@@ -86,26 +74,6 @@
 
                                 <!-- العمود الثاني -->
                                 <div class="col-md-6">
-                                    <!-- حقل حالة الموقع -->
-                                    <div class="mb-3">
-                                        <label for="status" class="form-label">حالة الموقع *</label>
-                                        <select class="form-select @error('status') is-invalid @enderror" id="status"
-                                            name="status" required>
-                                            <option value="active"
-                                                {{ old('status', $websiteData->status ?? '') == 'active' ? 'selected' : '' }}>
-                                                نشط</option>
-                                            <option value="inactive"
-                                                {{ old('status', $websiteData->status ?? '') == 'inactive' ? 'selected' : '' }}>
-                                                غير نشط</option>
-                                            <option value="banned"
-                                                {{ old('status', $websiteData->status ?? '') == 'banned' ? 'selected' : '' }}>
-                                                محظور</option>
-                                        </select>
-                                        @error('status')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
                                     <!-- حقل اللغة -->
                                     <div class="mb-3">
                                         <label for="language" class="form-label">اللغة *</label>
@@ -142,9 +110,8 @@
                                     <!-- حقل تاريخ التأسيس -->
                                     <div class="mb-3">
                                         <label for="birth_date" class="form-label">تاريخ التأسيس</label>
-                                        <input type="date"
-                                            class="form-control @error('birth_date') is-invalid @enderror" id="birth_date"
-                                            name="birth_date"
+                                        <input type="date" class="form-control @error('birth_date') is-invalid @enderror"
+                                            id="birth_date" name="birth_date"
                                             value="{{ old('birth_date', $websiteData->birth_date ?? '') }}">
                                         @error('birth_date')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -173,14 +140,14 @@
                             </div>
 
                             <!-- حقل الإعدادات -->
-                            <div class="mb-3">
+                            {{-- <div class="mb-3">
                                 <label for="settings" class="form-label">الإعدادات (JSON)</label>
                                 <textarea class="form-control @error('settings') is-invalid @enderror" id="settings" name="settings"
                                     rows="2">{{ old('settings', $websiteData->settings ?? '') }}</textarea>
                                 @error('settings')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> --}}
 
                             <!-- زر الحفظ -->
                             <div class="d-flex justify-content-end">

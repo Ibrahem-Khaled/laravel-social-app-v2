@@ -5,6 +5,7 @@ use App\Http\Controllers\Dashboard\AgencyUserController;
 use App\Http\Controllers\dashboard\FamilyController;
 use App\Http\Controllers\dashboard\GiftController;
 use App\Http\Controllers\dashboard\homeController;
+use App\Http\Controllers\dashboard\LevelController;
 use App\Http\Controllers\dashboard\LiveStreamingController;
 use App\Http\Controllers\dashboard\MessageController;
 use App\Http\Controllers\dashboard\NotificationController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\dashboard\UserController;
 use App\Http\Controllers\dashboard\UserFamilyController;
 use App\Http\Controllers\dashboard\VerificationController;
 use App\Http\Controllers\webController;
+use App\Http\Controllers\website\FAQController;
 use App\Http\Controllers\website\WebsiteDataController;
 use Illuminate\Support\Facades\Route;
 
@@ -75,10 +77,14 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
 
     Route::resource('sell-coins', SellCoinController::class);
 
+    Route::resource('levels', LevelController::class);
 
-
+    //this routes to control from website data
     Route::get('/website-data', [WebsiteDataController::class, 'index'])->name('website-data.index');
     Route::post('/website-data', [WebsiteDataController::class, 'storeOrUpdate'])->name('website-data.store-or-update');
+    Route::resource('faqs', FAQController::class);
+    Route::post('faqs.toggle-status', [FAQController::class, 'toggleStatus'])->name('faqs.toggle-status');
+    Route::post('faqs.toggle-featured', [FAQController::class, 'toggleFeatured'])->name('faqs.toggle-featured');
 });
 
 

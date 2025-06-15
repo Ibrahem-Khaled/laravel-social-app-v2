@@ -35,6 +35,11 @@
             <span>المنشورات</span></a>
     </li>
     <li class="nav-item">
+        <a class="nav-link" href="{{ route('levels.index') }}">
+            <i class="fas fa-fw fa-level-up-alt"></i>
+            <span>المستويات || levels</span></a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link" href="{{ route('reports.index') }}">
             <i class="fas fa-fw fa-exclamation-triangle"></i>
             <span>البلاغات</span>
@@ -45,12 +50,12 @@
     </li>
 
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
-            aria-expanded="true" aria-controls="collapsePages">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#websiteActions"
+            aria-expanded="true" aria-controls="websiteActions">
             <i class="fas fa-fw fa-globe"></i>
             <span>إدارة الموقع</span>
         </a>
-        <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+        <div id="websiteActions" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">الصفحات الثابتة:</h6>
                 <a class="collapse-item" href="{{ route('website-data.index') }}">
@@ -65,7 +70,7 @@
                     <i class="fas fa-fw fa-shield-alt"></i>
                     <span>سياسة الخصوصية</span>
                 </a>
-                <a class="collapse-item" href="#">
+                <a class="collapse-item" href="{{ route('faqs.index') }}">
                     <i class="fas fa-fw fa-question-circle"></i>
                     <span>الأسئلة الشائعة</span>
                 </a>

@@ -20,78 +20,30 @@
         @include('components.alerts')
 
         {{-- إحصائيات المستخدمين --}}
-        <div class="row mb-4">
+        <div class="row mb-4 w-100 justify-content-between">
             {{-- إجمالي المستخدمين --}}
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-primary shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                    إجمالي المستخدمين</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $usersCount }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-users fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <x-stats-card icon="fas fa-users" title="إجمالي المستخدمين" :value="$usersCount" color="primary" />
             </div>
 
             {{-- المستخدمون النشطون --}}
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-success shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                    المستخدمون النشطون</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $activeUsersCount }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-user-check fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+                <x-stats-card icon="fas fa-user-check" title="المستخدمون النشطون" :value="$activeUsersCount" color="success" />
             </div>
 
             {{-- عدد المشرفين --}}
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                    عدد المشرفين</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $adminsCount }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-user-shield fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+                <x-stats-card icon="fas fa-user-shield" title="عدد المشرفين" :value="$adminsCount" color="info" />
             </div>
 
             {{-- عدد الأدوار --}}
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-warning shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                    عدد الأدوار</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ count($roles) }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-user-tag fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+                <x-stats-card icon="fas fa-user-tag" title="عدد الأدوار" :value="count($roles)" color="warning" />
             </div>
+
         </div>
 
         {{-- بطاقة قائمة المستخدمين --}}
@@ -206,8 +158,8 @@
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                             {{-- /زر التاكيد والغاء التاكيد --}}
-                                            <form action="{{ route('users.toggleIsVerified', $user->id) }}"
-                                                method="POST" class="d-inline">
+                                            <form action="{{ route('users.toggleIsVerified', $user->id) }}" method="POST"
+                                                class="d-inline">
                                                 @csrf
                                                 @method('PATCH')
                                                 <button type="submit"
@@ -220,9 +172,15 @@
                                         </div>
 
                                         {{-- تضمين المودالات لكل مستخدم --}}
-                                        @include('dashboard.users.modals.show', ['user' => $user])
-                                        @include('dashboard.users.modals.edit', ['user' => $user])
-                                        @include('dashboard.users.modals.delete', ['user' => $user])
+                                        @include('dashboard.users.modals.show', [
+                                            'user' => $user,
+                                        ])
+                                        @include('dashboard.users.modals.edit', [
+                                            'user' => $user,
+                                        ])
+                                        @include('dashboard.users.modals.delete', [
+                                            'user' => $user,
+                                        ])
                                     </td>
                                 </tr>
                             @empty

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\website;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class WebsiteDataController extends Controller
 {
@@ -18,40 +19,37 @@ class WebsiteDataController extends Controller
 
     public function storeOrUpdate(Request $request)
     {
-        // التحقق من وجود بيانات الموقع
         $websiteData = User::where('role', 'website-data')->first();
 
         $rules = [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . ($websiteData ? $websiteData->id : 'NULL'),
-            'phone' => 'nullable|unique:users,phone,' . ($websiteData ? $websiteData->id : 'NULL'),
-            'avatar' => 'nullable|string',
+            'email' => ['required', 'email', Rule::unique('users')->ignore(optional($websiteData)->id)],
+            'phone' => ['nullable', Rule::unique('users')->ignore(optional($websiteData)->id)],
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'bio' => 'nullable|string',
             'address' => 'nullable|string',
             'country' => 'nullable|string',
             'website' => 'nullable|url',
             'social_links' => 'nullable|json',
-            'status' => 'required|in:active,inactive,banned',
             'gender' => 'nullable|in:male,female',
             'language' => 'required|string',
             'birth_date' => 'nullable|date',
             'settings' => 'nullable|json',
         ];
-
-        // إذا كانت إضافة جديدة، نضيف شرطًا لكلمة المرور
-        if (!$websiteData) {
-            $rules['password'] = 'required|string|min:8';
-        }
-
         $validated = $request->validate($rules);
 
-        // إذا كانت بيانات الموقع موجودة، نقوم بالتحديث
+        // التعامل مع الصورة إن وجدت
+        if ($request->hasFile('avatar')) {
+            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
         if ($websiteData) {
+            if ($request->filled('password')) {
+                $validated['password'] = bcrypt($request->input('password'));
+            }
             $websiteData->update($validated);
             $message = 'تم تحديث بيانات الموقع بنجاح';
-        }
-        // إذا لم تكن موجودة، نقوم بإنشاء جديدة
-        else {
+        } else {
             $validated['role'] = 'website-data';
             $validated['password'] = bcrypt($validated['password']);
             $websiteData = User::create($validated);

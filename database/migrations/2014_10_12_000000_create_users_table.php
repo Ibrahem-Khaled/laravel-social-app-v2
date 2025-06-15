@@ -26,7 +26,7 @@ return new class extends Migration {
             $table->boolean('is_verified')->default(false);
             $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
             $table->enum('gender', ['male', 'female'])->default('male')->nullable();
-            $table->enum('role', ['admin', 'moderator', 'user', 'vip','website-data'])->default('user');
+            $table->enum('role', ['admin', 'moderator', 'user', 'vip', 'streamer', 'website-data'])->default('user');
             $table->string('language')->default('ar');
             $table->text('expo_push_token')->nullable();
             $table->timestamp('email_verified_at')->nullable();

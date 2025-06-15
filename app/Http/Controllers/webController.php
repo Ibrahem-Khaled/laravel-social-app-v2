@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FAQ;
 use App\Models\LiveStreaming;
 use App\Models\SellCoins;
 use App\Models\User;
@@ -16,12 +17,14 @@ class webController extends Controller
         $users = User::all();
         $latestLives = LiveStreaming::latest()->with('user')->take(8)->get();
         $coins = SellCoins::where('platform', 'web')->get();
+        $faqs = FAQ::all();
 
         return view('home', [
             'websiteData' => $websiteData,
             'users' => $users,
             'latestLives' => $latestLives,
             'coins' => $coins,
+            'faqs' => $faqs,
             'heroImage' => 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
             'testimonials' => [
                 [
@@ -39,12 +42,6 @@ class webController extends Controller
                 'بث مباشر للفعاليات',
                 'تسجيل المحادثات',
                 'واجهة سهلة الاستخدام'
-            ],
-            'faqs' => [
-                [
-                    'question' => 'كيف يمكنني إنشاء غرفة صوتية؟',
-                    'answer' => 'بعد تسجيل الدخول، اضغط على زر "إنشاء غرفة" في الصفحة الرئيسية، ثم حدد إعدادات الغرفة وانقر على "بدء الغرفة".'
-                ],
             ],
         ]);
     }
