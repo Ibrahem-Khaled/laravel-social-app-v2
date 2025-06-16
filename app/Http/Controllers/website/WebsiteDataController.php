@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
+
 class WebsiteDataController extends Controller
 {
     public function index()
@@ -48,11 +49,10 @@ class WebsiteDataController extends Controller
             $websiteData->update($validated);
             $message = 'تم تحديث بيانات الموقع بنجاح';
         } else {
-            $validated['role'] = 'website-data';
-            $websiteData = User::create($validated);
             $username = Str::slug($request->name) . '-' . Str::random(5);
             $websiteData->username = $username;
-            $websiteData->save();
+            $validated['role'] = 'website-data';
+            $websiteData = User::create($validated);
             $message = 'تم إضافة بيانات الموقع بنجاح';
         }
 
