@@ -44,14 +44,10 @@ class WebsiteDataController extends Controller
         }
 
         if ($websiteData) {
-            if ($request->filled('password')) {
-                $validated['password'] = bcrypt($request->input('password'));
-            }
             $websiteData->update($validated);
             $message = 'تم تحديث بيانات الموقع بنجاح';
         } else {
             $validated['role'] = 'website-data';
-            $validated['password'] = bcrypt($validated['password']);
             $websiteData = User::create($validated);
             $message = 'تم إضافة بيانات الموقع بنجاح';
         }
