@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-
+use Illuminate\Support\Str;
 class WebsiteDataController extends Controller
 {
     public function index()
@@ -36,6 +36,7 @@ class WebsiteDataController extends Controller
             'birth_date' => 'nullable|date',
             'settings' => 'nullable|json',
         ];
+
         $validated = $request->validate($rules);
 
         // التعامل مع الصورة إن وجدت
@@ -49,6 +50,9 @@ class WebsiteDataController extends Controller
         } else {
             $validated['role'] = 'website-data';
             $websiteData = User::create($validated);
+            $username = Str::slug($request->name) . '-' . Str::random(5);
+            $websiteData->username = $username;
+            $websiteData->save();
             $message = 'تم إضافة بيانات الموقع بنجاح';
         }
 
