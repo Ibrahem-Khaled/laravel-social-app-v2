@@ -50,7 +50,7 @@ class WebsiteDataController extends Controller
             $message = 'تم تحديث بيانات الموقع بنجاح';
         } else {
             $username = Str::slug($request->name) . '-' . Str::random(5);
-            $websiteData->username = $username;
+            $validated['username'] = $username; // ✅ أضف هنا الـ username
             $validated['role'] = 'website-data';
             $websiteData = User::create($validated);
             $message = 'تم إضافة بيانات الموقع بنجاح';
