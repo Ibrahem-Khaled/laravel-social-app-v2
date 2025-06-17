@@ -13,14 +13,12 @@ class webController extends Controller
 {
     public function index()
     {
-        $websiteData = User::where('role', 'website-data')->latest()->first();
         $users = User::all();
         $latestLives = LiveStreaming::latest()->with('user')->take(8)->get();
         $coins = SellCoins::where('platform', 'web')->get();
         $faqs = FAQ::all();
 
         return view('home', [
-            'websiteData' => $websiteData,
             'users' => $users,
             'latestLives' => $latestLives,
             'coins' => $coins,
