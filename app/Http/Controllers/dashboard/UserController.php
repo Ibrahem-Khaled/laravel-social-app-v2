@@ -17,6 +17,7 @@ class UserController extends Controller
         $selectedRole = $request->role ?? 'all';
 
         $users = User::query()
+            ->where('role', '!=', 'website-data')
             ->when($selectedRole !== 'all', function ($query) use ($selectedRole) {
                 return $query->where('role', $selectedRole);
             })
