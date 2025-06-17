@@ -549,16 +549,16 @@
                         <div class="p-6">
                             <div class="flex items-center mb-4">
                                 <img class="w-12 h-12 rounded-full ml-4 ring-2 ring-primary-500/50"
-                                    src="{{ $live?->user?->avatar_url }}" alt="{{ $live->user->name }}">
+                                    src="{{ $live?->user?->avatar_url }}" alt="{{ $live?->user?->name }}">
                                 <div>
-                                    <h4 class="font-bold text-lg">{{ $live->user->name }}</h4>
-                                    <p class="text-primary-400 text-sm">{{ $live->description }}</p>
+                                    <h4 class="font-bold text-lg">{{ $live?->user?->name }}</h4>
+                                    <p class="text-primary-400 text-sm">{{ $live?->description }}</p>
                                 </div>
                             </div>
                             <h3 class="text-xl font-bold mb-3 group-hover:text-primary-400 transition-colors">
-                                {{ $live->title }}</h3>
+                                {{ $live?->title }}</h3>
                             <p class="text-gray-400 text-sm mb-6 leading-relaxed">
-                                {{ Str::limit($live->description, 100) }}</p>
+                                {{ Str::limit($live?->description, 100) }}</p>
                             <a href="#"
                                 class="inline-flex items-center text-primary-500 hover:text-primary-400 transition-all group-hover:translate-x-1 font-medium">
                                 انضم الآن
