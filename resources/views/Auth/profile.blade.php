@@ -373,7 +373,7 @@
                     <!-- Profile Image with Rotating Border -->
                     <div class="relative">
                         <div class="rotating-border w-40 h-40">
-                            <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}"
+                            <img src="{{ $user->userAvatar() }}" alt="{{ $user->name }}"
                                 class="w-full h-full object-cover rounded-full profile-image">
                         </div>
                         <!-- Online Status -->
