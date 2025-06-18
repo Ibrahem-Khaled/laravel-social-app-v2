@@ -96,7 +96,8 @@
                                 <th>الدور</th>
                                 <th>البريد الإلكتروني</th>
                                 <th>الحالة</th>
-                                <th>النقاط</th>
+                                <th>العملات</th>
+                                <th>المستوي</th>
                                 <th>الإجراءات</th>
                             </tr>
                         </thead>
@@ -139,6 +140,9 @@
                                         <span class="badge badge-info">{{ $user->coins }}</span>
                                     </td>
                                     <td>
+                                        <span class="badge badge-primary">{{ $user->current_level->name }}</span>
+                                    </td>
+                                    <td>
                                         <div class="btn-group" role="group">
                                             {{-- زر عرض --}}
                                             <button type="button" class="btn btn-sm btn-info" data-toggle="modal"
@@ -169,6 +173,11 @@
                                                     <i class="fas fa-{{ $user->is_verified ? 'times' : 'check' }}"></i>
                                                 </button>
                                             </form>
+
+                                            <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
+                                                data-target="#changeLevelModal{{ $user->id }}" title="تغيير المستوى">
+                                                <i class="fas fa-level-up-alt"></i>
+                                            </button>
                                         </div>
 
                                         {{-- تضمين المودالات لكل مستخدم --}}
@@ -179,6 +188,9 @@
                                             'user' => $user,
                                         ])
                                         @include('dashboard.users.modals.delete', [
+                                            'user' => $user,
+                                        ])
+                                        @include('dashboard.users.modals.set_level', [
                                             'user' => $user,
                                         ])
                                     </td>

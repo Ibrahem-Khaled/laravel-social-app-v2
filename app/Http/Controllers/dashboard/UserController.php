@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Models\Level;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -189,5 +190,18 @@ class UserController extends Controller
 
         $message = $user->is_verified ? 'تم توثيق المستخدم بنجاح' : 'تم حذف التوثيق من المستخدم بنجاح';
         return redirect()->route('users.index')->with('success', $message);
+    }
+
+    public function setLevel(Request $request, User $user)
+    {
+        $request->validate([
+            'level_id' => 'required|exists:levels,id',
+        ]);
+
+        $user->update([
+            'points' => Level::find($request->level_id)->points_required,
+        ]);
+
+        return redirect()->route('users.index')->with('success', 'تم تغيير المستوى للمستخدم بنجاح');
     }
 }

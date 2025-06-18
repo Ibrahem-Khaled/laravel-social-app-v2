@@ -42,7 +42,7 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::get('/users/search', [UserController::class, 'search'])->name('users.search');
     Route::post('/users/{user}/manage-coins', [UserController::class, 'manageCoins'])->name('users.manageCoins');
     Route::patch('/users/{user}/toggle-is-verified', [UserController::class, 'toggleIsVerified'])->name('users.toggleIsVerified');
-
+    Route::patch('/users/{user}/set-level', [UserController::class, 'setLevel'])->name('users.setLevel');
 
     Route::resource('posts', PostController::class);
     Route::get('/reports', [PostController::class, 'reports'])->name('reports.index');
