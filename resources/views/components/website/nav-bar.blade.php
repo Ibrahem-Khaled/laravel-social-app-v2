@@ -57,7 +57,7 @@
                     <button @click="open = !open" type="button"
                         class="flex items-center space-x-2 space-x-reverse focus:outline-none">
                         <div class="relative">
-                            <img src="{{ Auth::user()->avatar_url }}"
+                            <img src="{{ Auth::user()->user_avatar }}"
                                 class="w-10 h-10 rounded-full border-2 border-primary-500 hover:border-purple-400 transition-all"
                                 alt="{{ Auth::user()->name }}">
                             <span
@@ -78,7 +78,7 @@
                         style="display: none;">
                         <div class="py-3 px-4 space-y-2">
                             <div class="flex items-center space-x-3 space-x-reverse border-b pb-3 border-gray-700/30">
-                                <img src="{{ Auth::user()->avatar_url }}" class="w-10 h-10 rounded-full"
+                                <img src="{{ Auth::user()->user_avatar }}" class="w-10 h-10 rounded-full"
                                     alt="{{ Auth::user()->name }}">
                                 <div>
                                     <p class="font-medium text-white">{{ Auth::user()->name }}</p>
