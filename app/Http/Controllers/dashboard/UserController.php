@@ -32,8 +32,8 @@ class UserController extends Controller
             ->latest()
             ->paginate(15);
 
-        $usersCount = User::count();
-        $activeUsersCount = User::where('status', 'active')->count();
+        $usersCount = User::where('role', '!=', 'website-data')->count();
+        $activeUsersCount = User::where('status', 'active')->where('role', '!=', 'website-data')->count();
         $adminsCount = User::where('role', 'admin')->count();
 
         return view('dashboard.users.index', compact(
