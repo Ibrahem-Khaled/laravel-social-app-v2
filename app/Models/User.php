@@ -47,7 +47,7 @@ class User extends Authenticatable implements JWTSubject
         'is_verified' => 'boolean',
     ];
 
-    public function userAvatar()
+    public function getUserAvatarAttribute()
     {
         // إذا كانت قيمة avatar موجودة تُبنى باستخدام asset() مع مجلد storage
         return $this->avatar ? asset(env('APP_URL') . '/' . $this->avatar) : ($this->gender == 'male' ? asset(env('APP_URL') . '/assets/img/avatar-male2.png')
