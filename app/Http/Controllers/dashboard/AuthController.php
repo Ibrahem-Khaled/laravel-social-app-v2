@@ -13,6 +13,7 @@ class AuthController extends Controller
     public function profile()
     {
         $user = auth()->user();
+        // return response()->json($user);
         $followersCount = $user->followers()->count();
         $followingCount = $user->followings()->count();
         $giftsCount = $user->gifts()->count();

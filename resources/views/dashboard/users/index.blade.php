@@ -108,8 +108,8 @@
                                         <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('img/default-avatar.png') }}"
                                             alt="{{ $user->name }}" class="rounded-circle" width="40" height="40">
                                     </td>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $user->username }}</td>
+                                    <td>{{ \Illuminate\Support\Str::limit($user->name, 8) }}</td>
+                                    <td>{{ \Illuminate\Support\Str::limit($user->username, 8) }}</td>
                                     <td>
                                         <span
                                             class="badge
@@ -163,12 +163,12 @@
                                                 @csrf
                                                 @method('PATCH')
                                                 <button type="submit"
+                                                    onclick="return confirm('{{ $user->is_verified ? 'هل تريد حذف التوثيق من المستخدم؟' : 'هل تريد اضافة التوثيق للمستخدم؟' }}')"
                                                     class="btn btn-sm btn-{{ $user->is_verified ? 'danger' : 'success' }}"
                                                     title="تحديث حالة التحقق">
                                                     <i class="fas fa-{{ $user->is_verified ? 'times' : 'check' }}"></i>
                                                 </button>
                                             </form>
-
                                         </div>
 
                                         {{-- تضمين المودالات لكل مستخدم --}}

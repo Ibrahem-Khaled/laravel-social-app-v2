@@ -31,6 +31,7 @@ class User extends Authenticatable implements JWTSubject
         'is_authanticated_user_following_this_user',
         'is_authanticated_user_blocked_this_user',
         'verification_request',
+        'current_level',
     ];
     protected $guarded = ['id'];
     protected $hidden = [
