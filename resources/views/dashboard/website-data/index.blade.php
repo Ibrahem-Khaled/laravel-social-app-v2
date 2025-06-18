@@ -131,23 +131,59 @@
 
                             <!-- حقل روابط التواصل الاجتماعي -->
                             <div class="mb-3">
-                                <label for="social_links" class="form-label">روابط التواصل الاجتماعي (JSON)</label>
-                                <textarea class="form-control @error('social_links') is-invalid @enderror" id="social_links" name="social_links"
-                                    rows="2">{{ old('social_links', $websiteData->social_links ?? '') }}</textarea>
-                                @error('social_links')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                                <label class="form-label">روابط التواصل الاجتماعي</label>
 
-                            <!-- حقل الإعدادات -->
-                            {{-- <div class="mb-3">
-                                <label for="settings" class="form-label">الإعدادات (JSON)</label>
-                                <textarea class="form-control @error('settings') is-invalid @enderror" id="settings" name="settings"
-                                    rows="2">{{ old('settings', $websiteData->settings ?? '') }}</textarea>
-                                @error('settings')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div> --}}
+                                <div id="socialLinksContainer">
+                                    @php
+                                        $socialLinks = json_decode($websiteData->social_links ?? '{}', true);
+                                    @endphp
+
+                                    @if (!empty($socialLinks))
+                                        @foreach ($socialLinks as $key => $value)
+                                            <div class="row g-2 mb-2 social-link-item">
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" name="social_keys[]"
+                                                        placeholder="اسم المنصة (مثال: فيسبوك)"
+                                                        value="{{ $key }}" required>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <input type="url" class="form-control" name="social_values[]"
+                                                        placeholder="رابط المنصة" value="{{ $value }}" required>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <button type="button" class="btn btn-danger btn-sm remove-link">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="row g-2 mb-2 social-link-item">
+                                            <div class="col-md-5">
+                                                <input type="text" class="form-control" name="social_keys[]"
+                                                    placeholder="اسم المنصة (مثال: فيسبوك)" required>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <input type="url" class="form-control" name="social_values[]"
+                                                    placeholder="رابط المنصة" required>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button type="button" class="btn btn-danger btn-sm remove-link">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <button type="button" id="addSocialLink" class="btn btn-primary btn-sm mt-2">
+                                    <i class="fas fa-plus"></i> إضافة رابط جديد
+                                </button>
+
+                                <!-- ستحتاج هذا الحقل المخفي لتخزين البيانات النهائية -->
+                                <input type="hidden" name="social_links" id="socialLinksJson"
+                                    value="{{ $websiteData->social_links ?? '{}' }}">
+                            </div>
 
                             <!-- زر الحفظ -->
                             <div class="d-flex justify-content-end">
@@ -162,4 +198,75 @@
             </div>
         </div>
     </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('socialLinksContainer');
+            const addButton = document.getElementById('addSocialLink');
+            const jsonInput = document.getElementById('socialLinksJson');
+
+            // إضافة رابط جديد
+            addButton.addEventListener('click', function() {
+                const newItem = document.createElement('div');
+                newItem.className = 'row g-2 mb-2 social-link-item';
+                newItem.innerHTML = `
+            <div class="col-md-5">
+                <input type="text" class="form-control" name="social_keys[]"
+                       placeholder="اسم المنصة (مثال: فيسبوك)" required>
+            </div>
+            <div class="col-md-5">
+                <input type="url" class="form-control" name="social_values[]"
+                       placeholder="رابط المنصة" required>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger btn-sm remove-link">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+                container.appendChild(newItem);
+
+                // إضافة حدث للحذف
+                newItem.querySelector('.remove-link').addEventListener('click', function() {
+                    container.removeChild(newItem);
+                    updateJsonInput();
+                });
+
+                // تحديث عند التعديل
+                newItem.querySelectorAll('input').forEach(input => {
+                    input.addEventListener('input', updateJsonInput);
+                });
+            });
+
+            // حذف عنصر موجود
+            document.querySelectorAll('.remove-link').forEach(button => {
+                button.addEventListener('click', function() {
+                    const item = this.closest('.social-link-item');
+                    container.removeChild(item);
+                    updateJsonInput();
+                });
+            });
+
+            // تحديث الـ JSON عند التعديل
+            document.querySelectorAll('#socialLinksContainer input').forEach(input => {
+                input.addEventListener('input', updateJsonInput);
+            });
+
+            // دالة لتحديث الحقل المخفي
+            function updateJsonInput() {
+                const keys = document.querySelectorAll('input[name="social_keys[]"]');
+                const values = document.querySelectorAll('input[name="social_values[]"]');
+                const data = {};
+
+                keys.forEach((keyInput, index) => {
+                    if (keyInput.value.trim() && values[index].value.trim()) {
+                        data[keyInput.value.trim()] = values[index].value.trim();
+                    }
+                });
+
+                jsonInput.value = JSON.stringify(data);
+            }
+        });
+    </script>
 @endsection
