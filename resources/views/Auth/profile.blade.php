@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الملف الشخصي - أحمد محمد</title>
+    <title>الملف الشخصي </title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
@@ -324,9 +324,9 @@
                     this.animateNumbers();
                 },
                 animateNumbers() {
-                    this.animateValue('followers', {{ $user->followers->count() }} , 2000);
-                    this.animateValue('following', {{ $user->followings->count() }} , 1500);
-                    this.animateValue('posts', {{ $user->posts->count() }} , 1800);
+                    this.animateValue('followers', {{ $user->followers->count() }}, 2000);
+                    this.animateValue('following', {{ $user->followings->count() }}, 1500);
+                    this.animateValue('posts', {{ $user->posts->count() }}, 1800);
                 },
                 animateValue(property, target, duration) {
                     const start = Date.now();

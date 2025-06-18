@@ -719,10 +719,10 @@
                             </div>
                         </div>
 
-                        <div class="input-group full-width">
+                        {{-- <div class="input-group full-width">
                             <input type="text" name="address" class="form-input" placeholder="العنوان" required>
                             <i class="fas fa-map-marker-alt input-icon"></i>
-                        </div>
+                        </div> --}}
 
                         <div class="form-grid">
                             <div class="input-group">
