@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\CallLog;
+use App\Models\Level;
 
 trait UserAccessors
 {
@@ -75,5 +76,11 @@ trait UserAccessors
         }
         // 3. إذا كان موجودًا، نتحقق من حالة الطلب فإذا كانت 'pending' نعيد true وإلا false
         return $latestRequest->status === 'pending';
+    }
+    public function getCurrentLevelAttribute()
+    {
+        return Level::where('points_required', '<=', $this->points)
+            ->orderByDesc('points_required')
+            ->first();
     }
 }

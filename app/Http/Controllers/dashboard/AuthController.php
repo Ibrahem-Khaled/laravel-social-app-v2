@@ -16,7 +16,7 @@ class AuthController extends Controller
         $followersCount = $user->followers()->count();
         $followingCount = $user->followings()->count();
         $giftsCount = $user->gifts()->count();
-        return view('dashboard.users.show', compact('user', 'followersCount', 'followingCount', 'giftsCount'));
+        return view('Auth.profile', compact('user', 'followersCount', 'followingCount', 'giftsCount'));
     }
 
     public function update(Request $request)

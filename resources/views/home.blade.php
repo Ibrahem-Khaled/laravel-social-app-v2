@@ -233,61 +233,7 @@
     </div>
 
     <!-- Header -->
-    <header class="fixed w-full z-50 glass">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center group">
-                    <div class="relative">
-                        <div class="absolute inset-0 w-12 h-12 rounded-full bg-primary-500 pulse-ring opacity-20"></div>
-                        <div
-                            class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-purple-600 flex items-center justify-center glow">
-                            <img src="{{ asset('storage/' . $websiteData?->avatar) }}" alt="{{ $websiteData?->name }}"
-                                class="w-8 h-8 rounded-full">
-                        </div>
-                    </div>
-                    <span
-                        class="mr-4 text-xl font-bold bg-gradient-to-r from-white to-primary-200 bg-clip-text text-transparent">
-                        {{ $websiteData->name }}
-                    </span>
-                </div>
-
-                <div class="hidden md:flex space-x-8 space-x-reverse">
-                    <a href="#features"
-                        class="text-gray-300 hover:text-white transition-all duration-300 hover:scale-110 relative group">
-                        المميزات
-                        <span
-                            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 transition-all duration-300 group-hover:w-full"></span>
-                    </a>
-                    <a href="#how-it-works"
-                        class="text-gray-300 hover:text-white transition-all duration-300 hover:scale-110 relative group">
-                        كيف يعمل
-                        <span
-                            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 transition-all duration-300 group-hover:w-full"></span>
-                    </a>
-                    <a href="#pricing"
-                        class="text-gray-300 hover:text-white transition-all duration-300 hover:scale-110 relative group">
-                        الأسعار
-                        <span
-                            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 transition-all duration-300 group-hover:w-full"></span>
-                    </a>
-                    <a href="#contact"
-                        class="text-gray-300 hover:text-white transition-all duration-300 hover:scale-110 relative group">
-                        اتصل بنا
-                        <span
-                            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 transition-all duration-300 group-hover:w-full"></span>
-                    </a>
-                </div>
-
-                <div>
-                    <a href="{{ route('register') }}"
-                        class="relative px-8 py-3 rounded-full font-medium overflow-hidden group bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-2xl">
-                        <span class="relative z-10">ابدأ الآن</span>
-                        <div class="absolute inset-0 shimmer opacity-0 group-hover:opacity-100"></div>
-                    </a>
-                </div>
-            </div>
-        </nav>
-    </header>
+    @include('components.website.nav-bar')
 
     <!-- Hero Section -->
     <section class="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden">

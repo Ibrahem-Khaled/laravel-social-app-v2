@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
@@ -35,20 +36,35 @@ return new class extends Migration {
             $table->json('settings')->nullable();
             $table->rememberToken();
             $table->bigInteger('coins')->default(0);
+            $table->bigInteger('points')->default(0);
             $table->timestamps();
         });
 
         DB::table('users')->insert([
-            'uuid' => 1,
-            'username' => 'admin',
-            'name' => 'Admin',
-            'email' => 'admin@gmail.com',
-            'password' => bcrypt('12345678'),
-            'role' => 'admin',
-            'is_verified' => true,
-            'status' => 'active',
-            'gender' => 'male',
-            'language' => 'en',
+            [
+                'uuid' => 1,
+                'username' => 'admin',
+                'name' => 'Admin',
+                'email' => 'admin@gmail.com',
+                'password' => bcrypt('12345678'),
+                'role' => 'admin',
+                'is_verified' => true,
+                'status' => 'active',
+                'gender' => 'male',
+                'language' => 'en',
+            ],
+            [
+                'uuid' => 2,
+                'username' => 'moderator',
+                'name' => 'Moderator',
+                'email' => 'moderator@gmail.com',
+                'password' => bcrypt('12345678'),
+                'role' => 'website-data',
+                'is_verified' => true,
+                'status' => 'active',
+                'gender' => 'male',
+                'language' => 'en',
+            ]
         ]);
     }
 
