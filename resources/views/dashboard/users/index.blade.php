@@ -140,7 +140,7 @@
                                         <span class="badge badge-info">{{ $user->coins }}</span>
                                     </td>
                                     <td>
-                                        <span class="badge badge-primary">{{ $user->current_level->name }}</span>
+                                        <span class="badge badge-primary">{{ $user?->current_level?->name ?? 'بدون مستوى' }}</span>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
