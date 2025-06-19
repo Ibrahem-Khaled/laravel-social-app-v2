@@ -106,7 +106,7 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>
-                                        <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('img/default-avatar.png') }}"
+                                        <img src="{{ $user->user_avatar }}"
                                             alt="{{ $user->name }}" class="rounded-circle" width="40" height="40">
                                     </td>
                                     <td>{{ \Illuminate\Support\Str::limit($user->name, 8) }}</td>
