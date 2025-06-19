@@ -17,7 +17,8 @@
                     @method('PATCH')
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="level_id">المستوى الحالي: {{ $user->level->name ?? 'بدون مستوى' }}</label>
+                            <label for="level_id">المستوى الحالي:
+                                {{ $user?->current_level?->name ?? 'بدون مستوى' }}</label>
                             <select class="form-control" id="level_id" name="level_id" required>
                                 <option value="">اختر مستوى جديد</option>
                                 @foreach ($levels as $level)
