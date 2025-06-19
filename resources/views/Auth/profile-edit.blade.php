@@ -225,8 +225,7 @@
                             <div class="avatar-upload">
                                 <div
                                     class="w-40 h-40 rounded-full overflow-hidden border-4 border-primary-500/30 profile-pulse">
-                                    <img x-bind:src="avatarPreview ||
-                                        'https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random'"
+                                    <img x-bind:src="{{ $user->user_avatar }}"
                                         alt="{{ $user->name }}" class="w-full h-full object-cover">
                                 </div>
                                 <div class="avatar-edit" @click="showAvatarOptions = !showAvatarOptions">
