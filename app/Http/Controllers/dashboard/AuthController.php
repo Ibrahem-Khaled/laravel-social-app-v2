@@ -20,6 +20,12 @@ class AuthController extends Controller
         return view('Auth.profile', compact('user', 'followersCount', 'followingCount', 'giftsCount'));
     }
 
+    public function profileUpdate()
+    {
+        $user = auth()->user();
+        return view('Auth.profile-edit', compact('user'));
+    }
+
     public function update(Request $request)
     {
         $request->validate([

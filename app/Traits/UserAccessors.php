@@ -79,6 +79,10 @@ trait UserAccessors
     }
     public function getCurrentLevelAttribute()
     {
+        if ($this->points === null) {
+            return null; // أو أي قيمة افتراضية
+        }
+
         return Level::where('points_required', '<=', $this->points)
             ->orderByDesc('points_required')
             ->first();

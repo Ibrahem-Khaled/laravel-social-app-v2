@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <title>📡 بث Laravel Reverb</title>
+    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo/dist/echo.iife.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            direction: rtl;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+
+        #messages li {
+            background: white;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            list-style: none;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        #error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>📡 استقبال بث Laravel Reverb</h1>
+    <p id="status">🕒 في انتظار الرسائل...</p>
+    <ul id="messages"></ul>
+    <p id="error"></p>
+
+
+
+    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo/dist/echo.iife.js"></script>
+    <script>
+        window.Pusher = Pusher;
+
+        const status = document.getElementById("status");
+        const error = document.getElementById("error");
+
+        try {
+            window.Echo = new window.Echo.default({
+                broadcaster: 'pusher',
+                key: 'local',
+                wsHost: '127.0.0.1',
+                wsPort: 8080,
+                enabledTransports: ['ws'],
+                forceTLS: false,
+                disableStats: true,
+            });
+
+            console.log("✅ Laravel Echo initialized.");
+
+            Echo.connector.pusher.connection.bind('connected', () => {
+                console.log("✅ WebSocket connected.");
+                status.textContent = "✅ تم الاتصال بالسيرفر بنجاح.";
+            });
+
+            Echo.connector.pusher.connection.bind('disconnected', () => {
+                console.warn("⚠️ WebSocket disconnected.");
+                status.textContent = "⚠️ تم فصل الاتصال بالسيرفر.";
+            });
+
+            Echo.connector.pusher.connection.bind('error', (err) => {
+                console.error("❌ حدث خطأ في الاتصال:", err);
+                error.textContent = "❌ خطأ في الاتصال: " + JSON.stringify(err);
+            });
+
+            Echo.channel('chat')
+                .listen('.message.sent', (e) => {
+                    console.log("📩 استقبلنا رسالة:", e);
+                    const msg = document.createElement('li');
+                    msg.textContent = `${e.user.name}: ${e.message}`;
+                    document.getElementById('messages').appendChild(msg);
+                })
+                .error((err) => {
+                    console.error("❌ خطأ في الاشتراك بالقناة:", err);
+                    error.textContent = "❌ خطأ في الاشتراك بالقناة: " + JSON.stringify(err);
+                });
+
+        } catch (ex) {
+            console.error("❌ فشل التهيئة:", ex);
+            error.textContent = "❌ فشل التهيئة: " + ex.message;
+        }
+    </script>
+</body>
+
+</html>

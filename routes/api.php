@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\MessageSent;
 use App\Http\Controllers\api\authController;
 use App\Http\Controllers\api\CallLogController;
 use App\Http\Controllers\api\chatController;
@@ -14,6 +15,8 @@ use App\Http\Controllers\api\questionController;
 use App\Http\Controllers\api\ReelsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -116,4 +119,11 @@ Route::group([], function () {
     Route::post('/send-gift', [giftController::class, 'sendGift']);
     Route::get('/get-gifts/{user}', [giftController::class, 'getGifts']);
     Route::post('/sent-coins-from-post/{post}', [giftController::class, 'sentCoinsFromPost']);
+
+    Route::get('/test-broadcast', function () {
+        $user = User::first(); // أو أي يوزر عندك
+        event(new MessageSent($user));
+
+        return "تم إرسال البث يدوياً!";
+    });
 });

@@ -14,10 +14,11 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('register', [AuthController::class, 'customRegister'])->name('customRegister');
 
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
-    Route::post('deleteAccount', [AuthController::class, 'deleteAccount'])->name('deleteAccount');
+    Route::post('deleteAccount', [AuthController::class, 'deleteAccount'])->name('profile.destroy');
 
     Route::get('profile', [AuthController::class, 'profile'])->name('profile')->middleware('auth');
-    Route::put('/update', [AuthController::class, 'update'])->name('user.update');
+    Route::get('profile-edit', [AuthController::class, 'profileUpdate'])->name('profile.edit')->middleware('auth');
+    Route::put('/update', [AuthController::class, 'update'])->name('profile.update');
     Route::put('/update-password', [AuthController::class, 'updatePassword'])->name('user.update.password');
 
     Route::get('forget-password', [AuthController::class, 'forgetPassword'])->name('forgetPassword');
