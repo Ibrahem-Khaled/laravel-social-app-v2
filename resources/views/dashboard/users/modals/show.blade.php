@@ -68,6 +68,9 @@
                                     <td>{{ $user->country ?? 'غير محدد' }}</td>
                                 </tr>
                                 <tr>
+                                    <th>المستوي</th>
+                                    <td>{{ $user?->current_level?->name ?? 'بدون مستوى' }}</td>
+                                <tr>
                                     <th>النقاط</th>
                                     <td>{{ $user->coins }}</td>
                                 </tr>

@@ -97,7 +97,7 @@
                                 <th>البريد الإلكتروني</th>
                                 <th>الحالة</th>
                                 <th>العملات</th>
-                                <th>المستوي</th>
+                                {{-- <th>المستوي</th> --}}
                                 <th>الإجراءات</th>
                             </tr>
                         </thead>
@@ -139,9 +139,9 @@
                                     <td>
                                         <span class="badge badge-info">{{ $user->coins }}</span>
                                     </td>
-                                    <td>
+                                    {{-- <td>
                                         <span class="badge badge-primary">{{ $user?->current_level?->name ?? 'بدون مستوى' }}</span>
-                                    </td>
+                                    </td> --}}
                                     <td>
                                         <div class="btn-group" role="group">
                                             {{-- زر عرض --}}
