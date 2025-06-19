@@ -19,7 +19,7 @@
 
             <!-- Desktop Navigation -->
             <div class="hidden md:flex space-x-8 space-x-reverse">
-                <a href="#home"
+                <a href="{{ route('home') }}"
                     class="text-gray-300 hover:text-white transition-all duration-300 hover:scale-110 relative group">
                     الرئيسية
                     <span
