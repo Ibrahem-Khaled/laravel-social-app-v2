@@ -30,7 +30,6 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:users,email,' . auth()->id(),
             'phone' => 'nullable|string|unique:users,phone,' . auth()->id(),
             'address' => 'nullable|string|max:255',
             'avatar' => 'nullable|image|max:2048',
@@ -38,7 +37,6 @@ class AuthController extends Controller
 
         $user = auth()->user();
         $user->name = $request->name;
-        $user->email = $request->email;
         $user->phone = $request->phone;
         $user->address = $request->address;
 

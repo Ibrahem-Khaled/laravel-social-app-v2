@@ -167,7 +167,14 @@
                     <!-- Profile Info -->
                     <div class="flex-1 text-center lg:text-right">
                         <div class="mb-4">
-                            <h1 class="text-4xl lg:text-5xl font-bold text-white mb-2">{{ $user->name }}</h1>
+                            <h1 class="text-4xl lg:text-5xl font-bold text-white mb-2 flex items-center">
+                                {{ $user->name }}
+                                @if ($user->is_verified)
+                                    <img src="https://cdn-icons-png.flaticon.com/128/15050/15050690.png" alt="موثق"
+                                        class="w-10 h-10">
+                                @endif
+
+                            </h1>
                             <p class="text-xl text-primary-300 mb-2">{{ '@' . $user->username }}</p>
 
                             <!-- Level and Coins -->

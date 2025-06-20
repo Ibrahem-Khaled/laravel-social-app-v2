@@ -121,7 +121,7 @@ Route::group([], function () {
     Route::post('/sent-coins-from-post/{post}', [giftController::class, 'sentCoinsFromPost']);
 
     Route::get('/test-broadcast', function () {
-        $user = User::first(); // أو أي يوزر عندك
+        $user = User::inRandomOrder()->first();
         event(new MessageSent($user));
 
         return "تم إرسال البث يدوياً!";
