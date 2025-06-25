@@ -29,6 +29,9 @@ use App\Models\User;
 |
 */
 
+Route::post('/auth/phone/check', [AuthController::class, 'checkPhoneExistence']);
+Route::post('/auth/phone/verify', [AuthController::class, 'verifyPhoneNumber']); // هذا موجود من قبل
+
 Route::post('/login', [authController::class, 'login']);
 Route::post('/register', [authController::class, 'register']);
 Route::post('/update-profile', [authController::class, 'update']);

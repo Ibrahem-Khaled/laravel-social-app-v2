@@ -37,7 +37,7 @@ class authController extends Controller
         // إرجاع التوكن وبيانات المستخدم
         return response()->json([
             'token' => $token,
-            'user' => auth()->user(),
+            'user' => auth()->guard('api')->user(),
         ]);
     }
 
@@ -72,6 +72,70 @@ class authController extends Controller
         return response()->json([
             'user' => $user,
             'token' => $token,
+        ]);
+    }
+
+
+    public function checkPhoneExistence(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            // تأكد من أن رقم الهاتف بنفس الصيغة التي تخزنها في قاعدة البيانات
+            // يفضل استخدام صيغة دولية مثل +201001234567
+            'phone_number' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $phoneNumber = $request->input('phone_number');
+
+        $userExists = User::where('phone_number', $phoneNumber)->exists();
+
+        return response()->json([
+            'exists' => $userExists,
+        ]);
+    }
+
+    public function verifyPhoneNumber(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id_token' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $idToken = $request->input('id_token');
+        $auth = app('firebase.auth');
+
+        try {
+            $verifiedIdToken = $auth->verifyIdToken($idToken);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Invalid ID Token.'], 401);
+        }
+
+        $firebaseUser = $auth->getUser($verifiedIdToken->claims()->get('sub'));
+        $phoneNumber = $firebaseUser->phoneNumber;
+
+        // --- الجزء الجديد والمهم ---
+        // 1. ابحث عن المستخدم في قاعدة بياناتك
+        $user = User::where('phone', 'LIKE', '%' . $phoneNumber . '%')->first();
+
+        // 2. إذا لم تجد المستخدم لسبب ما، أرجع خطأ
+        if (!$user) {
+            return response()->json(['message' => 'User not found in our database.'], 404);
+        }
+
+        // 3. أنشئ token خاص بلارافيل ليسجل المستخدم دخوله
+        $apiToken = JWTAuth::fromUser($user);
+
+        // 4. أرجع بيانات المستخدم مع الـ token
+        return response()->json([
+            'message' => 'Login successful!',
+            'user' => $user, // يمكنك إرجاع بيانات المستخدم التي يحتاجها التطبيق
+            'api_token' => $apiToken,
         ]);
     }
 
