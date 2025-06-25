@@ -90,7 +90,7 @@ class authController extends Controller
 
         $phoneNumber = $request->input('phone_number');
 
-        $userExists = User::where('phone_number', $phoneNumber)->exists();
+        $userExists = User::where('phone', 'LIKE', '%' . $phoneNumber . '%')->exists();
 
         return response()->json([
             'exists' => $userExists,
