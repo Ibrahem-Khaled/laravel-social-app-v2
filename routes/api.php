@@ -123,6 +123,8 @@ Route::group([], function () {
     Route::get('/get-gifts/{user}', [giftController::class, 'getGifts']);
     Route::post('/sent-coins-from-post/{post}', [giftController::class, 'sentCoinsFromPost']);
 
+    //this coins routes
+
     Route::get('/test-broadcast', function () {
         $user = User::inRandomOrder()->first();
         event(new MessageSent($user));
