@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class sellCoinsController extends Controller
 {
-    public function index()
+    public function getCoins()
     {
         $coins = SellCoins::where('is_active', true)
             ->where('platform', 'mobile') // Assuming you want to filter by platform

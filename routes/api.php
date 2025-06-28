@@ -13,6 +13,7 @@ use App\Http\Controllers\api\notificationController;
 use App\Http\Controllers\api\postsController;
 use App\Http\Controllers\api\questionController;
 use App\Http\Controllers\api\ReelsController;
+use App\Http\Controllers\api\sellCoinsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -124,6 +125,7 @@ Route::group([], function () {
     Route::post('/sent-coins-from-post/{post}', [giftController::class, 'sentCoinsFromPost']);
 
     //this coins routes
+    Route::get('/get-coins', [sellCoinsController::class, 'getCoins']);
 
     Route::get('/test-broadcast', function () {
         $user = User::inRandomOrder()->first();
