@@ -25,6 +25,77 @@ class LiveStreamingController extends Controller
         ]);
     }
 
+    public function getLiveStreams()
+    {
+        $liveStream = LiveStreaming::with(['user', 'agency'])
+            ->where('status', true)
+            ->where('type', 'live')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        if (!$liveStream) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'لا يوجد بث مباشر حاليًا',
+            ], 404);
+        }
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'تم استرجاع البث المباشر بنجاح',
+            'data'    => $liveStream,
+        ]);
+    }
+
+    public function getAudioRooms()
+    {
+        $audioRooms = LiveStreaming::with(['user', 'agency'])
+            ->where('status', true)
+            ->where('type', 'audio_room')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        if ($audioRooms->isEmpty()) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'لا توجد غرف صوتية حاليًا',
+            ], 404);
+        }
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'تم استرجاع الغرف الصوتية بنجاح',
+            'data'    => $audioRooms,
+        ]);
+    }
+
+    public function getLiveStreamsByFollowing()
+    {
+        $userId = auth()->guard('api')->id();
+
+        $liveStreams = LiveStreaming::with(['user', 'agency'])
+            ->where('status', true)
+            ->where('type', 'live')
+            ->whereHas('user.followers', function ($query) use ($userId) {
+                $query->where('follower_id', $userId);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        if ($liveStreams->isEmpty()) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'لا توجد بثوث حية من المتابعين',
+            ], 404);
+        }
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'تم استرجاع البثوث الحية من المتابعين بنجاح',
+            'data'    => $liveStreams,
+        ]);
+    }
+
     public function show(LiveStreaming $liveStream)
     {
         $liveStream->load(['user', 'agency']);

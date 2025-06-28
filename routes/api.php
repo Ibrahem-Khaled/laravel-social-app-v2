@@ -104,6 +104,10 @@ Route::group([], function () {
 
     //this live streaming routes
     Route::apiResource('live-streamings', LiveStreamingController::class);
+    Route::get('/live-streams/live', [LiveStreamingController::class, 'getLiveStreams']);
+    Route::get('/live-streams/audio', [LiveStreamingController::class, 'getAudioRooms']);
+    Route::get('/live-streams/following', [LiveStreamingController::class, 'getLiveStreamsByFollowing']);
+
 
     //this hashtags routes
     Route::get('/hashtags', [HashtagController::class, 'index']);
