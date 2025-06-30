@@ -29,25 +29,37 @@ class ReportController extends Controller
      */
     public function store(StoreReportRequest $request)
     {
-        // يتم التحقق من البيانات وإضافة user_id تلقائيًا عبر StoreReportRequest
+        // الحصول على البيانات التي تم التحقق منها فقط
         $validatedData = $request->validated();
-        $user = auth()->guard('api')->user();
-        // تحقق مما إذا كان المستخدم قد أبلغ عن هذا الكائن من قبل
-        $existingReport = Report::where('user_id', $user->id)
+        $userId = auth()->guard('api')->id();
+
+        // التحقق مما إذا كان المستخدم قد أبلغ عن هذا المحتوى من قبل
+        $existingReport = Report::where('user_id', $userId)
             ->where('related_id', $validatedData['related_id'])
             ->where('related_type', $validatedData['related_type'])
             ->first();
 
         if ($existingReport) {
-            return response()->json(['message' => 'لقد قمت بالإبلاغ عن هذا المحتوى مسبقًا.'], Response::HTTP_CONFLICT); // 409
+            return response()->json(['message' => 'لقد قمت بالإبلاغ عن هذا المحتوى مسبقًا.'], 409);
         }
 
-        $report = Report::create($validatedData);
+        // --- الطريقة الجديدة والأكثر أمانًا لإنشاء البلاغ ---
+
+        // 1. إنشاء نسخة جديدة من موديل Report بالبيانات التي تم التحقق منها
+        $report = new Report($validatedData);
+
+        // 2. تعيين user_id بشكل مباشر من المستخدم المصادق عليه
+        $report->user_id = $userId;
+
+        // 3. حفظ الموديل في قاعدة البيانات
+        $report->save();
+
+        // ----------------------------------------------------
 
         return (new ReportResource($report))
             ->additional(['message' => 'تم استلام بلاغك بنجاح، شكرًا لك.'])
             ->response()
-            ->setStatusCode(Response::HTTP_CREATED); // 201
+            ->setStatusCode(201);
     }
 
     /**
