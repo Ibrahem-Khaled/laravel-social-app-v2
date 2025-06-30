@@ -140,7 +140,9 @@ class PostController extends Controller
         }
 
         // إضافة العلاقات اللازمة
-        $reports = $reports->with('post', 'user')->paginate(10);
+        $reports = $reports->with('user','reportable')
+            ->orderByDesc('created_at') // ترتيب حسب تاريخ الإنشاء
+            ->paginate(10); // الترقيم
 
         // إحصائيات
         $totalReports = Report::count(); // إجمالي البلاغات
