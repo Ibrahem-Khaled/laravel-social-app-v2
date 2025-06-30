@@ -13,6 +13,7 @@ use App\Http\Controllers\api\notificationController;
 use App\Http\Controllers\api\postsController;
 use App\Http\Controllers\api\questionController;
 use App\Http\Controllers\api\ReelsController;
+use App\Http\Controllers\api\ReportController;
 use App\Http\Controllers\api\sellCoinsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -121,6 +122,9 @@ Route::group([], function () {
 
     Route::post('/create/reel', [ReelsController::class, 'createReel']);
     Route::get('/reels', [ReelsController::class, 'getReels']);
+
+    // مسار لإنشاء بلاغ جديد (للمستخدمين)
+    Route::post('/reports', [ReportController::class, 'store']);
 
     //this gift routes
     Route::get('/gifts', [giftController::class, 'index']);
