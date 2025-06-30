@@ -12,7 +12,7 @@ class StoreReportRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,7 @@ class StoreReportRequest extends FormRequest
     {
         return [
             // related_type يجب أن يكون نوع موديل صالح يمكن الإبلاغ عنه
-            'related_type' => ['required', 'string', Rule::in(['user', 'post', 'comment'])], // أضف أنواع الموديلات التي تسمح بها
+            'related_type' => ['required', 'string', Rule::in(['user', 'post', 'comment', 'conversation'])], // أضف أنواع الموديلات التي تسمح بها
 
             // related_id يجب أن يكون موجودًا في الجدول الموافق للنوع
             'related_id'   => ['required', 'integer', Rule::exists($this->getTableName(), 'id')],
