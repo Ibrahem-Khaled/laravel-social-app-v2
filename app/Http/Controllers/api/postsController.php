@@ -16,16 +16,12 @@ class postsController extends Controller
     {
         // ١. جلب المستخدم الحالي ومعرّفات المحظورين
         $currentUser = auth()->guard('api')->user();
-        $blockedUserIds = $currentUser
-            ->blockedUsers()
-            ->pluck('blocked_user_id');
 
         // ٢. تحديد حجم الصفحة (مثلاً 10 منشورات)
         $pageSize = 10;
 
         // ٣. بناء الاستعلام
         $posts = Post::where('status', 'active')
-            ->whereNotIn('user_id', $blockedUserIds)               // تجاهل منشورات المحظورين
             ->with('user', 'message')                              // تحميل العلاقات إذا لزم الأمر
             ->withCount(['likes', 'comments'])                     // إضافة likes_count و comments_count
             ->orderBy('created_at', 'desc')                        // الأحدث أولًا
