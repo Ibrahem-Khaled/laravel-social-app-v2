@@ -15,23 +15,33 @@ class homeController extends Controller
     // جلب الاقتراحات الأولية
     public function getSuggestions()
     {
-        // المستخدمون المقترحون (يمكن تغيير الخوارزمية حسب احتياجاتك)
+        $user = auth()->guard('api')->user();
+
+        // المستخدمون المقترحون
         $suggestedUsers = User::query()
-            ->where('id', '!=', auth()->guard('api')->user()->id)
-            ->withCount('followers')
-            ->orderByDesc('followers_count')
-            ->limit(5)
-            ->get();
+            // 1. استبعاد المستخدم الحالي نفسه من الاقتراحات
+            ->where('id', '!=', $user->id)
 
+            // 2. (التعديل الأهم) استبعاد المستخدمين الذين يتابعهم المستخدم الحالي بالفعل
+            // هذا الاستعلام يعني: "أعطني المستخدمين الذين لا يملكون متابِعًا (follower) يكون هو المستخدم الحالي"
+            ->whereDoesntHave('followers', function ($query) use ($user) {
+                $query->where('follower_id', $user->id);
+            })
 
-        // الهاشتاجات الشائعة
+            // 3. (التعديل الثاني) جلب 10 مستخدمين بشكل عشوائي
+            // زدنا العدد قليلًا لضمان وجود تنوع أكبر في كل مرة
+            ->inRandomOrder()
+            ->limit(10)
+            ->get(['id', 'name', 'avatar']); // نختار الحقول المطلوبة فقط لتحسين الأداء
+
+        // الهاشتاجات الشائعة (لا تغيير هنا)
         $trendingHashtags = Hashtag::query()
             ->withCount('posts')
             ->orderByDesc('posts_count')
             ->limit(5)
             ->get();
 
-        // المنشورات الشائعة
+        // المنشورات الشائعة (لا تغيير هنا)
         $trendingPosts = Post::query()
             ->withCount('likes')
             ->orderByDesc('likes_count')
@@ -39,9 +49,9 @@ class homeController extends Controller
             ->get();
 
         return response()->json([
-            'suggested_users' => $suggestedUsers,
+            'suggested_users'   => $suggestedUsers,
             'trending_hashtags' => $trendingHashtags,
-            'trending_posts' => $trendingPosts,
+            'trending_posts'    => $trendingPosts,
         ]);
     }
 
