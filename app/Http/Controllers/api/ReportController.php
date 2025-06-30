@@ -31,9 +31,9 @@ class ReportController extends Controller
     {
         // يتم التحقق من البيانات وإضافة user_id تلقائيًا عبر StoreReportRequest
         $validatedData = $request->validated();
-
+        $user = auth()->guard('api')->user();
         // تحقق مما إذا كان المستخدم قد أبلغ عن هذا الكائن من قبل
-        $existingReport = Report::where('user_id', $validatedData['user_id'])
+        $existingReport = Report::where('user_id', $user->id)
             ->where('related_id', $validatedData['related_id'])
             ->where('related_type', $validatedData['related_type'])
             ->first();
