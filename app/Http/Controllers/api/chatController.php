@@ -21,13 +21,27 @@ class ChatController extends Controller
         $user = auth()->guard('api')->user();
 
         // جلب المحادثات التي يشارك فيها المستخدم
-        // مع تحميل بيانات الأعضاء، وأحدث رسالة لكل محادثة
         $conversations = Conversation::whereHas('users', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })
+            // -- التعديلات --
+            // 1. جلب بيانات الأعضاء وأحدث رسالة بكفاءة عالية
             ->with([
-                'users',
+                'users' => function ($query) use ($user) {
+                    // يمكنك هنا استثناء المستخدم الحالي من قائمة المستخدمين إذا أردت
+                    // $query->where('user_id', '!=', $user->id);
+                },
+                'latestMessage' // استخدام العلاقة التي أنشأناها في الموديل
             ])
+            // 2. الترتيب الأساسي: حسب تاريخ آخر رسالة باستخدام استعلام فرعي
+            ->orderByDesc(
+                Message::select('created_at')
+                    ->whereColumn('conversation_id', 'conversations.id')
+                    ->latest()
+                    ->limit(1)
+            )
+            // 3. الترتيب الثانوي: حسب تاريخ إنشاء المحادثة (مفيد للمحادثات الجديدة الفارغة)
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return response()->json([
@@ -39,11 +53,19 @@ class ChatController extends Controller
     {
         $user = auth()->guard('api')->user();
 
-        $private = Conversation::where('is_group', false)                    // فِلترة المحادثات الثنائية
-            ->whereHas('users', fn($q) => $q->where('user_id', $user->id))    // التأكد من اشتراك المستخدم
-            ->with([
-                'users',
-            ])
+        $private = Conversation::where('is_group', false)
+            ->whereHas('users', fn($q) => $q->where('user_id', $user->id))
+            // -- التعديلات --
+            // 1. جلب المستخدمين وآخر رسالة مع كل محادثة بكفاءة
+            ->with(['users', 'latestMessage'])
+            // 2. الترتيب حسب تاريخ آخر رسالة باستخدام استعلام فرعي
+            ->orderByDesc(
+                Message::select('created_at')
+                    ->whereColumn('conversation_id', 'conversations.id')
+                    ->latest()
+                    ->limit(1)
+            )
+            // 3. كترتيب ثانوي، نرتب حسب تاريخ إنشاء المحادثة (مفيد للمحادثات الجديدة التي لا تحتوي على رسائل)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -53,7 +75,7 @@ class ChatController extends Controller
     }
 
     /**
-     * جلب المحادثات الجماعية فقط (جروبات)
+     * جلب المحادثات الجماعية مرتبة حسب آخر رسالة
      */
     public function getGroupConversations(Request $request)
     {
@@ -62,12 +84,17 @@ class ChatController extends Controller
         $groups = Conversation::where('is_group', true)
             ->where(function (Builder $q) use ($user) {
                 $q->where('created_by', $user->id)
-                    // أو الجروبات التي يشارك فيها
-                    ->orWhereHas('users', function (Builder $q2) use ($user) {
-                        $q2->where('user_id', $user->id);
-                    });
+                    ->orWhereHas('users', fn(Builder $q2) => $q2->where('user_id', $user->id));
             })
-            ->orderBy('created_at', 'desc')
+            // -- نفس التعديلات هنا --
+            ->with(['users', 'latestMessage']) // جلب المستخدمين وآخر رسالة
+            ->orderByDesc( // الترتيب حسب آخر رسالة
+                Message::select('created_at')
+                    ->whereColumn('conversation_id', 'conversations.id')
+                    ->latest()
+                    ->limit(1)
+            )
+            ->orderBy('created_at', 'desc') // ترتيب ثانوي
             ->get();
 
         return response()->json([
@@ -75,11 +102,10 @@ class ChatController extends Controller
         ], 200);
     }
 
+    // ... (دالة getConversation تبقى كما هي)
     public function getConversation(Conversation $conversation)
     {
         $user = auth()->guard('api')->user();
-
-        // get the conversation with the users, createdBy, and rules only it
         $conversation = $conversation->load(['users', 'createdBy']);
         return response()->json([
             'conversation' => $conversation
