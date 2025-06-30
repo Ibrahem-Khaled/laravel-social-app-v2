@@ -125,36 +125,45 @@ class PostController extends Controller
     public function reports(Request $request)
     {
         // بدء الاستعلام الأساسي
-        $reports = Report::query();
+        $query = Report::query();
 
         // تصفية البلاغات حسب الحالة (مخفية/غير مخفية)
-        if ($request->has('hidden') && $request->get('hidden')) {
-            $reports->where('is_hidden', true);
+        if ($request->boolean('hidden')) {
+            $query->where('is_hidden', true);
         } else {
-            $reports->where('is_hidden', false);
+            $query->where('is_hidden', false);
         }
 
-        // تصفية البلاغات حسب معرف المنشور
-        if ($request->has('post_id')) {
-            $reports->where('post_id', $request->get('post_id'));
-        }
+        // جلب البلاغات مع العلاقات اللازمة وتقسيم الصفحات
+        $reports = $query->with('user', 'reportable')
+            ->latest() // الأحدث أولاً
+            ->paginate(15);
 
-        // إضافة العلاقات اللازمة
-        $reports = $reports->with('user','reportable')
-            ->orderByDesc('created_at') // ترتيب حسب تاريخ الإنشاء
-            ->paginate(10); // الترقيم
+        // --- الإحصائيات (محسوبة على البلاغات الجديدة فقط) ---
 
-        // إحصائيات
-        $totalReports = Report::count(); // إجمالي البلاغات
-        $reportedPosts = 0;
+        // إجمالي البلاغات الجديدة (غير المخفية)
+        $totalReports = Report::where('is_hidden', false)->count();
+
+        // عدد البلاغات الجديدة على المنشورات
+        $reportedPosts = Report::where('related_type', 'App\Models\Post')
+            ->where('is_hidden', false)
+            ->count();
+
+        // أكثر الأسباب شيوعًا في البلاغات الجديدة
         $topReasons = Report::select('reason', \DB::raw('count(*) as count'))
+            ->where('is_hidden', false)
             ->groupBy('reason')
             ->orderByDesc('count')
-            ->take(5)
-            ->get(); // الأسباب الأكثر شيوعًا
+            ->limit(5)
+            ->get();
 
-        // عرض الصفحة
-        return view('dashboard.posts.reports', compact('reports', 'totalReports', 'reportedPosts', 'topReasons'));
+        // عرض الصفحة مع تمرير كل البيانات المطلوبة
+        return view('dashboard.posts.reports', compact(
+            'reports',
+            'totalReports',
+            'reportedPosts',
+            'topReasons'
+        ));
     }
 
 
