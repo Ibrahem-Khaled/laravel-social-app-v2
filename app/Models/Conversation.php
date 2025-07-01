@@ -43,6 +43,19 @@ class Conversation extends Model
         return $this->hasOne(Message::class)->latestOfMany();
     }
 
+    public function unreadMessagesForCurrentUser()
+    {
+        if (!auth()->guard('api')->check()) {
+            return collect(); // إذا لم يكن المستخدم مسجلاً دخوله، نعيد مجموعة فارغة
+        }
+        if ($this->is_group) {
+            return 0; // إذا كانت المحادثة جماعية، لا نعيد رسائل غير مقروءة
+        }
+        return $this->hasMany(Message::class)
+            ->where('receiver_id', auth()->guard('api')->id())
+            ->where('is_read', false);
+    }
+
     // this accessors functions
     public function getChatPartnerAttribute()
     {
