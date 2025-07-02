@@ -306,7 +306,7 @@
                 <div class="relative" style="animation: slideUp 0.8s 0.6s both;">
                     <div class="relative floating">
                         <div class="relative  rounded-3xl overflow-hidden shadow-2xl">
-                            <img src="{{ asset('assets/img/demo.png') }}" alt="Voice Communication"
+                            <img src="{{ asset('storage/' . $websiteData?->avatar) }}" alt="{{ $websiteData?->name }}"
                                 class="w-full h-auto">
                         </div>
                     </div>

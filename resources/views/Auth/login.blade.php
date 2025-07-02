@@ -489,7 +489,7 @@
                         </div>
 
                         <div class="logo-container">
-                            <img src="{{ asset('assets/img/logo.png') }}" alt="الشعار">
+                            <img src="{{ asset('storage/' . $websiteData?->avatar) }}" alt="{{ $websiteData?->name }}">
                             <p class="logo-subtitle">أهلاً بك مرة أخرى</p>
                         </div>
 

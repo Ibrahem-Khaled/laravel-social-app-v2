@@ -40,6 +40,11 @@
             <span>المستويات || levels</span></a>
     </li>
     <li class="nav-item">
+        <a class="nav-link" href="{{ route('withdrawal-requests.index') }}">
+            <i class="fas fa-fw fa-wallet"></i>
+            <span>طلبات السحب || Withdrawal Requests</span></a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link" href="{{ route('reports.index') }}">
             <i class="fas fa-fw fa-exclamation-triangle"></i>
             <span>البلاغات</span>

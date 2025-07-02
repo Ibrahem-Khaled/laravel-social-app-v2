@@ -14,6 +14,7 @@ use App\Http\Controllers\dashboard\SellCoinController;
 use App\Http\Controllers\dashboard\UserController;
 use App\Http\Controllers\dashboard\UserFamilyController;
 use App\Http\Controllers\dashboard\VerificationController;
+use App\Http\Controllers\dashboard\WithdrawalRequestController;
 use App\Http\Controllers\webController;
 use App\Http\Controllers\website\FAQController;
 use App\Http\Controllers\website\WebsiteDataController;
@@ -78,6 +79,12 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::resource('sell-coins', SellCoinController::class);
 
     Route::resource('levels', LevelController::class);
+
+    Route::resource('withdrawal-requests', WithdrawalRequestController::class)->only([
+        'index',
+        'update',
+        'destroy'
+    ]);
 
     //this routes to control from website data
     Route::get('/website-data', [WebsiteDataController::class, 'index'])->name('website-data.index');

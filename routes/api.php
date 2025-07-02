@@ -4,6 +4,7 @@ use App\Events\MessageSent;
 use App\Http\Controllers\api\authController;
 use App\Http\Controllers\api\CallLogController;
 use App\Http\Controllers\api\chatController;
+use App\Http\Controllers\api\FinancialController;
 use App\Http\Controllers\api\followerController;
 use App\Http\Controllers\api\giftController;
 use App\Http\Controllers\api\HashtagController;
@@ -134,6 +135,22 @@ Route::group([], function () {
 
     //this coins routes
     Route::get('/get-coins', [sellCoinsController::class, 'getCoins']);
+
+    //this financial routes
+    Route::controller(FinancialController::class)
+        ->prefix('financial')
+        ->group(function () {
+
+            // --- Wallet Endpoints ---
+            Route::get('/wallets', 'listWallets');          // GET /api/v1/financial/wallets
+            Route::post('/wallets', 'createWallet');        // POST /api/v1/financial/wallets
+            Route::get('/wallets/{wallet}', 'showWallet');    // GET /api/v1/financial/wallets/{id}
+            Route::delete('/wallets/{wallet}', 'deleteWallet'); // DELETE /api/v1/financial/wallets/{id}
+
+            // --- Withdrawal Endpoints ---
+            Route::get('/withdrawals', 'listWithdrawals');      // GET /api/v1/financial/withdrawals
+            Route::post('/withdrawals', 'createWithdrawal');    // POST /api/v1/financial/withdrawals
+        });
 
     Route::get('/test-broadcast', function () {
         $user = User::inRandomOrder()->first();

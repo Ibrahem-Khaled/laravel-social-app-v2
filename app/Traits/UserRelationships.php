@@ -114,4 +114,14 @@ trait UserRelationships
             ->withPivot('amount')
             ->withTimestamps();
     }
+
+    // ... (بقية العلاقات الخاصة بك)
+    public function wallets()
+    {
+        return $this->hasMany(\App\Models\Wallet::class);
+    }
+    public function withdrawalRequests()
+    {
+        return $this->hasMany(\App\Models\WithdrawalRequest::class);
+    }
 }
