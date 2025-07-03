@@ -251,6 +251,14 @@ class ChatController extends Controller
      */
     public function getMessages($conversationId)
     {
+        $currentUser = auth()->guard('api')->user();
+
+        Message::where('conversation_id', $conversationId)
+            ->where('receiver_id', $currentUser->id) // الرسائل التي استقبلها المستخدم الحالي فقط
+            ->where('is_read', false)                // التي لم يقرأها بعد
+            ->update(['is_read' => true]);
+
+
         // جلب الرسائل العادية فقط
         $messages = Message::where('conversation_id', $conversationId)
             ->where('type_message', 'normal')
