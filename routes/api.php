@@ -117,8 +117,7 @@ Route::group([], function () {
 
     //this notifications routes
     Route::get('/notifications', [notificationController::class, 'index']);
-    Route::post('/notifications', [NotificationController::class, 'store']);
-    Route::put('/notifications/{notification}', [NotificationController::class, 'update']);
+    Route::post('/notifications/{notification}/read', [notificationController::class, 'markAsRead']);
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
 
     Route::post('/create/reel', [ReelsController::class, 'createReel']);

@@ -26,4 +26,16 @@ class notificationController extends Controller
         $notification->delete();
         return response()->json(['message' => 'تم حذف الاشعار بنجاح']);
     }
+
+    public function markAsRead(Notification $notification)
+    {
+        // التأكد من أن المستخدم يملك هذا الإشعار (حماية إضافية)
+        if ($notification->user_id !== auth()->guard('api')->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $notification->update(['is_read' => true]);
+
+        return response()->json(['message' => 'Notification marked as read.']);
+    }
 }
