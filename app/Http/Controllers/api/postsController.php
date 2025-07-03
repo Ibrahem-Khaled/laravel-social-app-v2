@@ -33,6 +33,13 @@ class postsController extends Controller
         return response()->json($posts);
     }
 
+    public function getPost(Post $post)
+    {
+        // تحميل العلاقات إذا لزم الأمر
+        $post->load('user', 'message');
+        return response()->json($post);
+    }
+
     public function getFollowPosts()
     {
         $user = auth()->guard('api')->user();
