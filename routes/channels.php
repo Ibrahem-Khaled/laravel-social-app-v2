@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Log; //  ✨ أضف هذا السطر
 
 /*
 |--------------------------------------------------------------------------
@@ -26,9 +27,14 @@ Broadcast::presence('chat', function ($user) {
 });
 
 Broadcast::channel('notifications.{userId}', function ($user, $userId) {
-    // هذا السطر هو قلب عملية المصادقة
-    // يقوم بالتأكد من أن المستخدم الذي يحاول الاستماع للقناة
-    // هو نفس المستخدم صاحب القناة
-    // مثلاً، المستخدم رقم 27 فقط هو من يمكنه الاستماع للقناة 'notifications.27'
+
+    // ✨ أضف هذا الكود للتسجيل والتشخيص
+    Log::info('Channel Authorization Attempt:', [
+        'authenticated_user_id' => $user->id ?? 'GUEST (Not Authenticated!)',
+        'requested_channel_for_userId' => $userId,
+        'is_authorized' => isset($user) ? ((int) $user->id === (int) $userId) : false,
+    ]);
+
+    // هذا هو الكود الأصلي للمصادقة
     return (int) $user->id === (int) $userId;
 });
