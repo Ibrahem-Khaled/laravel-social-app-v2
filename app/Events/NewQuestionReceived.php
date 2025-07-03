@@ -37,7 +37,7 @@ class NewQuestionReceived implements ShouldBroadcast
     public function broadcastWith(): array
     {
         // تحميل بيانات المرسل مع السؤال
-        $this->question->load('sender:id,name,avatar_url');
+        $this->question->load('sender:id,name,avatar');
 
         // إذا كان السؤال مجهولاً، قم بإزالة بيانات المرسل
         if ($this->question->is_anonymous) {
