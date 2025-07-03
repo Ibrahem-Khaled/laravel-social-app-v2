@@ -20,7 +20,9 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 
 
 Broadcast::channel('messages.{userId}', function ($user, $userId) {
-    // نسمح للمستخدم بالاستماع فقط إذا كان ID الخاص به يطابق ID القناة
+    return (int) $user->id === (int) $userId;
+});
+Broadcast::channel('questions.{userId}', function ($user, $userId) {
     return (int) $user->id === (int) $userId;
 });
 
