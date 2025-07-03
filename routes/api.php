@@ -151,11 +151,4 @@ Route::group([], function () {
             Route::get('/withdrawals', 'listWithdrawals');      // GET /api/v1/financial/withdrawals
             Route::post('/withdrawals', 'createWithdrawal');    // POST /api/v1/financial/withdrawals
         });
-
-    Route::get('/test-broadcast', function () {
-        $user = User::inRandomOrder()->first();
-        event(new MessageSent($user));
-
-        return "تم إرسال البث يدوياً!";
-    });
 });

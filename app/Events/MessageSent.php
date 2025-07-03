@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Message; // افترض أن اسم الموديل هو Message
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -14,36 +15,51 @@ class MessageSent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $user;
-    public $message;
+    public Message $message;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($user)
+    public function __construct(Message $message)
     {
-        logger("🔔 Event MessageSent Triggered for: " . $user->name);
-
-        $this->user = $user;
-        $this->message = "تم إنشاء مستخدم جديد: " . $user->name;
+        $this->message = $message;
     }
 
     /**
      * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
      */
     public function broadcastOn(): array
     {
+        // سنبث الحدث على قناة خاصة بالمستخدم "المستقبل" للرسالة
         return [
-            // new PrivateChannel('chat'),
-            // new PresenceChannel('chat'),
-            new Channel('chat'),
+            new PrivateChannel('messages.' . $this->message->recipient_id),
         ];
     }
 
-    public function broadcastAs()
+    /**
+     * The event's broadcast name.
+     */
+    public function broadcastAs(): string
     {
-        return 'message.sent';
+        return 'new-message';
+    }
+
+    /**
+     * Get the data to broadcast.
+     *
+     * ✨ هنا نقوم بتطبيق منطق إخفاء هوية المرسل ✨
+     */
+    public function broadcastWith(): array
+    {
+        // أولاً، نقوم بتحميل بيانات المرسل
+        $this->message->load('sender:id,name,avatar_url');
+
+        // إذا كانت الرسالة مجهولة، نقوم بإزالة علاقة المرسل
+        if ($this->message->is_anonymous) {
+            $this->message->setRelation('sender', null);
+        }
+
+        // نقوم بإرجاع بيانات الرسالة كمصفوفة جاهزة للاستخدام في الواجهة الأمامية
+        return $this->message->toArray();
     }
 }

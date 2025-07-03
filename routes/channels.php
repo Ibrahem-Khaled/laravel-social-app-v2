@@ -19,11 +19,9 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 });
 
 
-Broadcast::presence('chat', function ($user) {
-    return [
-        'id' => $user->id,
-        'name' => $user->name,
-    ];
+Broadcast::channel('messages.{userId}', function ($user, $userId) {
+    // نسمح للمستخدم بالاستماع فقط إذا كان ID الخاص به يطابق ID القناة
+    return (int) $user->id === (int) $userId;
 });
 
 Broadcast::channel('notifications.{userId}', function ($user, $userId) {

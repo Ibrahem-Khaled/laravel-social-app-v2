@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Events\MessageSent;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
 use App\Models\Post;
@@ -55,6 +56,7 @@ class questionController extends Controller
             'is_anonymous' => $request->is_anonymous,
             'type_message' => 'anonymous',
         ]);
+        broadcast(new MessageSent($question));
 
         if ($receiver->expo_push_token) {
             Notification::send($receiver, new ExpoNotification([$receiver->expo_push_token], 'رسالة جديدة', $question->message));
