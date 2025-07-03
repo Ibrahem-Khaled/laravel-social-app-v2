@@ -15,7 +15,7 @@ class notificationController extends Controller
 
         $notifications = Notification::where('user_id', $user->id)
             ->latest()
-            ->with('related.user') // تحسين الاستعلام
+            ->with('related') // تحسين الاستعلام
             ->paginate(20); // استخدام paginate أفضل للأداء
 
         return NotificationResource::collection($notifications);
