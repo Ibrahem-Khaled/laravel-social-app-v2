@@ -24,3 +24,11 @@ Broadcast::presence('chat', function ($user) {
         'name' => $user->name,
     ];
 });
+
+Broadcast::channel('notifications.{userId}', function ($user, $userId) {
+    // هذا السطر هو قلب عملية المصادقة
+    // يقوم بالتأكد من أن المستخدم الذي يحاول الاستماع للقناة
+    // هو نفس المستخدم صاحب القناة
+    // مثلاً، المستخدم رقم 27 فقط هو من يمكنه الاستماع للقناة 'notifications.27'
+    return (int) $user->id === (int) $userId;
+});
