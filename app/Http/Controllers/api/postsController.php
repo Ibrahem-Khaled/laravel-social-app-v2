@@ -181,7 +181,7 @@ class postsController extends Controller
             $post->post
         );
 
-        return response()->json($post);
+        return response()->json($post->load('user', 'replies.user'));
     }
 
     public function deleteComment(PostComment $comment)
