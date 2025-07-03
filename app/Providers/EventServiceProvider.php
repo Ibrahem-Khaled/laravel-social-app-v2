@@ -6,9 +6,17 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use App\Observers\NotificationObserver;
+use App\Models\Notification;
 
 class EventServiceProvider extends ServiceProvider
 {
+
+
+    protected $observers = [
+        Notification::class => [NotificationObserver::class],
+    ];
+
     /**
      * The event to listener mappings for the application.
      *

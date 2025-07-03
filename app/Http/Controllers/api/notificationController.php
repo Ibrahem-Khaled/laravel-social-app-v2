@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\NotificationResource;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 
@@ -14,21 +15,10 @@ class notificationController extends Controller
 
         $notifications = Notification::where('user_id', $user->id)
             ->latest()
-            ->with('related') // لو محتاجين بيانات من related model
-            ->get()
-            ->map(function ($notification) {
-                return [
-                    'id' => $notification->id,
-                    'user_id ' => $notification->user_id,
-                    'user' => $notification->related?->user?->name ?? 'مستخدم',
-                    'image' => $notification->related?->user?->avatar_url,
-                    'action' => $notification->message,
-                    'is_read' => $notification->is_read,
-                    'time' => $notification->created_at->diffForHumans(),
-                ];
-            });
+            ->with('related.user') // تحسين الاستعلام
+            ->paginate(20); // استخدام paginate أفضل للأداء
 
-        return response()->json($notifications);
+        return NotificationResource::collection($notifications);
     }
 
     public function destroy(Notification $notification)
