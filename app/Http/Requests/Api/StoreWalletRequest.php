@@ -34,7 +34,7 @@ class StoreWalletRequest extends FormRequest
 
             // 'wallet_type' is required and must be one of the specified values.
             // You can add more types like 'paypal', 'payoneer', etc.
-            'wallet_type' => 'required|string|in:bank_account,e_wallet,crypto',
+            'wallet_type' => 'required|string',
 
             // 'wallet_details' is required and must be an array.
             'wallet_details' => 'required|array',

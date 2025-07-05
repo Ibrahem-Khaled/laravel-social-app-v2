@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('wallet_id')->constrained()->onDelete('cascade');
             $table->decimal('amount', 15, 2);
             $table->string('currency', 10)->default('EGP');
+            $table->enum('type', ['withdrawal', 'deposit'])->default('withdrawal'); // نوع الطلب (سحب أو إيداع)
             $table->enum('status', ['pending', 'approved', 'rejected', 'completed'])->default('pending');
             $table->text('rejection_reason')->nullable(); // في حال تم رفض الطلب
             $table->timestamp('processed_at')->nullable(); // تاريخ معالجة الطلب
