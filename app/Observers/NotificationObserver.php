@@ -13,7 +13,7 @@ class NotificationObserver
     public function created(Notification $notification): void
     {
         // تحميل العلاقة لضمان توفرها في الـ event
-        $notification->load('related.user');
+        $notification->load('related');
 
         // بث الحدث
         NotificationCreated::dispatch($notification);
