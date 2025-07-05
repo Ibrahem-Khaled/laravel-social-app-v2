@@ -98,6 +98,7 @@ Route::group([], function () {
     Route::get('/get/{user}/{type}', [followerController::class, 'getFollowersAndFollowing']);
     Route::post('/block', [followerController::class, 'addAndRemoveBlock']);
     Route::get('/blocked/users', [followerController::class, 'getBlockedUsers']);
+    Route::get('/suggestions/users', [followerController::class, 'suggestions']);
 
     //this call log routes
     Route::get('/call-logs', [CallLogController::class, 'index']);

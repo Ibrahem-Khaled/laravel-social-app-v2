@@ -102,4 +102,27 @@ class followerController extends Controller
             return response()->json(['error' => 'فشل جلب المستخدمين المحظورين', 'message' => $e->getMessage()], 500);
         }
     }
+
+
+    public function suggestions(Request $request)
+    {
+        $user = auth()->guard('api')->user();
+
+        // Get the IDs of users that the current user is already following.
+        // We assume you have a 'following' relationship defined in your User model.
+        $followingIds = $user->followings()->pluck('users.id')->all();
+
+        // Add the current user's ID to the array to exclude them from suggestions.
+        $excludeIds = array_merge($followingIds, [$user->id]);
+
+        // Fetch users to suggest.
+        // We get users who are not in the exclusion list,
+        // order them randomly, and take the first 10.
+        $suggestedUsers = User::whereNotIn('id', $excludeIds)
+            ->inRandomOrder()
+            ->limit(10)
+            ->get(['id', 'name', 'username']); // Select only needed fields
+
+        return response()->json($suggestedUsers);
+    }
 }
