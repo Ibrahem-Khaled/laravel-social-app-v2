@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('wallet_id')->constrained()->onDelete('cascade');
             $table->decimal('amount', 15, 2);
-            $table->string('currency', 10)->default('EGP');
+            $table->string('currency', 10)->default('USD'); // العملة الافتراضية هي الدولار الأمريكي
             $table->enum('type', ['withdrawal', 'deposit'])->default('withdrawal'); // نوع الطلب (سحب أو إيداع)
             $table->enum('status', ['pending', 'approved', 'rejected', 'completed'])->default('pending');
             $table->text('rejection_reason')->nullable(); // في حال تم رفض الطلب

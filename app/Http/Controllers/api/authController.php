@@ -157,6 +157,7 @@ class authController extends Controller
         // التحقق من صحة البيانات المدخلة
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'required|string|unique:users,phone,' . $user->id,
             'gender' => 'required|string|in:male,female',
@@ -180,17 +181,14 @@ class authController extends Controller
 
             // تخزين الصورة في مجلد "avatars" داخل القرص "public"
             $path = $avatar->storeAs('avatars', $filename, 'public');
-
-            // توليد رابط الصورة العام باستخدام asset() أو Storage::url()
-            $avatarUrl = asset('storage/' . $path);
-
             // تحديث رابط الصورة الخاصة بالمستخدم
-            $user->avatar = $avatarUrl;
+            $user->avatar = $path;
         }
 
         // تحديث باقي بيانات المستخدم
         $user->name = $request->input('name');
         $user->email = $request->input('email');
+        $user->username = $request->input('username');
         $user->phone = $request->input('phone');
         $user->gender = $request->input('gender');
         $user->bio = $request->input('bio');
