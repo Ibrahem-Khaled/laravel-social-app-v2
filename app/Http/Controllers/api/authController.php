@@ -29,8 +29,14 @@ class authController extends Controller
             return response()->json(['error' => 'بيانات الاعتماد غير صحيحة'], 401);
         }
 
-        // محاولة تسجيل الدخول والتحقق من صحة كلمة المرور
-        if (!$token = JWTAuth::attempt($credentials)) {
+        // // محاولة تسجيل الدخول والتحقق من صحة كلمة المرور
+        // if (!$token = JWTAuth::attempt($credentials)) {
+        //     return response()->json(['error' => 'بيانات الاعتماد غير صحيحة'], 401);
+        // }
+
+        // هذه الدالة تتحقق من صحة البيانات، تنشئ التوكن، وتسجل المستخدم في الطلب الحالي
+        if (!$token = auth('api')->attempt($credentials)) {
+            // هذا الخطأ يظهر الآن فقط إذا كانت كلمة المرور أو الإيميل غير صحيحين
             return response()->json(['error' => 'بيانات الاعتماد غير صحيحة'], 401);
         }
 
