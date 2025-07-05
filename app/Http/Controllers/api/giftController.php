@@ -122,6 +122,11 @@ class giftController extends Controller
 
         $receiver = User::findOrFail($post->user_id);
 
+        // -->> إضافة هذا الشرط هو الحل <<--
+        if ($user->id === $receiver->id) {
+            return response()->json(['message' => 'لا يمكنك إرسال هدية لنفسك.'], 422);
+        }
+
         if ($user->coins < $request->amount) {
             return response()->json(['message' => 'ليس لديك كافة النقاط'], 422);
         }
