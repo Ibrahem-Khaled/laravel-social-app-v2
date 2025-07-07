@@ -69,7 +69,15 @@ class AuthController extends Controller
         return redirect()->back()->with('success', 'تم تغيير كلمة المرور بنجاح.');
     }
 
-    public function login(Request $request)
+    public function login()
+    {
+        if (Auth::check()) {
+            return redirect()->route('home.dashboard')->with('success', 'تم تسجيل الدخول بنجاح.');
+        }
+        return view('Auth.login');
+    }
+
+    public function customLogin(Request $request)
     {
         // التحقق من صحة الإدخال (يبقى كما هو)
         $request->validate([
@@ -96,32 +104,6 @@ class AuthController extends Controller
             return redirect()->intended($defaultRoute)->with('success', 'تم تسجيل الدخول بنجاح.');
         }
 
-        return redirect()->back()->with('error', 'تفاصيل تسجيل الدخول غير صحيحة. يرجى المحاولة مرة أخرى.');
-    }
-
-    public function customLogin(Request $request)
-    {
-        // التحقق من صحة الإدخال
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|min:6',
-        ], [
-            'email.required' => 'البريد الإلكتروني مطلوب.',
-            'email.email' => 'يجب إدخال بريد إلكتروني صالح.',
-            'password.required' => 'كلمة المرور مطلوبة.',
-            'password.min' => 'يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل.',
-        ]);
-
-        $credentials = $request->only('email', 'password');
-        $remember = $request->has('remember');
-
-        if (auth()->attempt($credentials, $remember)) {
-            if (auth()->user()->role === 'admin') {
-                return redirect()->route('home.dashboard')->with('success', 'تم تسجيل الدخول بنجاح.');
-            } else {
-                return redirect()->route('home')->with('success', 'تم تسجيل الدخول بنجاح.');
-            }
-        }
         return redirect()->back()->with('error', 'تفاصيل تسجيل الدخول غير صحيحة. يرجى المحاولة مرة أخرى.');
     }
 
