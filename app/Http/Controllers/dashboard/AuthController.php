@@ -126,17 +126,17 @@ class AuthController extends Controller
             'password' => 'required|min:6',
         ]);
 
-        // تشفير كلمة المرور
+        // Hash the password
         $data['password'] = bcrypt($data['password']);
 
-        // إنشاء المستخدم
+        // Create the user
         $user = User::create($data);
 
-        // تسجيل الدخول
+        // Log the new user in
         Auth::login($user);
 
-        // إعادة التوجيه مع رسالة نجاح
-        return redirect()->back()->with('success', 'تم انشاء حسابك بنجاح');
+        // Redirect to the intended page, or to the 'home' route as a fallback
+        return redirect()->intended(route('home'))->with('success', 'تم إنشاء حسابك وتسجيل دخولك بنجاح');
     }
 
 
