@@ -69,12 +69,34 @@ class AuthController extends Controller
         return redirect()->back()->with('success', 'تم تغيير كلمة المرور بنجاح.');
     }
 
-    public function login()
+    public function login(Request $request)
     {
-        if (Auth::check()) {
-            return redirect()->route('home.dashboard')->with('success', 'تم تسجيل الدخول بنجاح.');
+        // التحقق من صحة الإدخال (يبقى كما هو)
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:6',
+        ], [
+            'email.required' => 'البريد الإلكتروني مطلوب.',
+            'email.email' => 'يجب إدخال بريد إلكتروني صالح.',
+            'password.required' => 'كلمة المرور مطلوبة.',
+            'password.min' => 'يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل.',
+        ]);
+
+        $credentials = $request->only('email', 'password');
+        $remember = $request->has('remember');
+
+        if (auth()->attempt($credentials, $remember)) {
+            // إعادة إنشاء الجلسة كإجراء أمني جيد
+            $request->session()->regenerate();
+
+            // تحديد المسار الافتراضي بناءً على دور المستخدم
+            $defaultRoute = auth()->user()->role === 'admin' ? route('home.dashboard') : route('home');
+
+            // إعادة التوجيه إلى الصفحة المقصودة، أو إلى المسار الافتراضي
+            return redirect()->intended($defaultRoute)->with('success', 'تم تسجيل الدخول بنجاح.');
         }
-        return view('Auth.login');
+
+        return redirect()->back()->with('error', 'تفاصيل تسجيل الدخول غير صحيحة. يرجى المحاولة مرة أخرى.');
     }
 
     public function customLogin(Request $request)
