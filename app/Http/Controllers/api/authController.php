@@ -163,7 +163,7 @@ class authController extends Controller
         // التحقق من صحة البيانات المدخلة
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'username' => 'nullable|string|max:255|unique:users,username,' . $user->id,
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'required|string|unique:users,phone,' . $user->id,
             'gender' => 'required|string|in:male,female',
@@ -194,7 +194,7 @@ class authController extends Controller
         // تحديث باقي بيانات المستخدم
         $user->name = $request->input('name');
         $user->email = $request->input('email');
-        $user->username = $request->input('username');
+        $user->username = $request->input('username') ?? $user->username; // إذا لم يتم توفير اسم مستخدم جديد، يبقى كما هو
         $user->phone = $request->input('phone');
         $user->gender = $request->input('gender');
         $user->bio = $request->input('bio');
