@@ -10,11 +10,14 @@ trait UserAccessors
     //this accessors methods
     public function getAvatarUrlAttribute()
     {
-        // إذا كانت قيمة avatar موجودة تُبنى باستخدام asset() مع مجلد storage
-        return $this->avatar ? asset(env('APP_URL') .'/storage/'. $this->avatar)
-            : ($this->gender == 'male' ? asset(env('APP_URL') . '/assets/img/avatar-male2.png')
-                : asset(env('APP_URL') . '/assets/img/avatar-female2.png')
-            );
+        if ($this->avatar) {
+            return asset(env('APP_URL') . '/storage/' . $this->avatar);
+        }
+        $defaultAvatar = $this->gender === 'male'
+            ? 'assets/img/avatar-male2.png'
+            : 'assets/img/avatar-female2.png';
+
+        return asset(env('APP_URL') . '/' . $defaultAvatar);
     }
     public function getUserFollowersCountAttribute()
     {

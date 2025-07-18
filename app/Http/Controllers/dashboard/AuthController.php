@@ -7,6 +7,8 @@ use App\Models\User;
 use Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -148,11 +150,36 @@ class AuthController extends Controller
     public function deleteAccount()
     {
         $user = Auth::user();
-        $user->delete();
-        Auth::logout();
-        return redirect()->route('login')->with('success', 'Account deleted successfully.');
-    }
+        try {
+            // تسجيل الخروج للمستخدم من الجلسة الحالية
+            Auth::logout();
 
+            // حذف حساب المستخدم من قاعدة البيانات
+            $user->delete();
+
+            // إبطال الجلسة الحالية ومسح بياناتها
+            $request->session()->invalidate();
+
+            // إعادة إنشاء توكن الجلسة للحماية
+            $request->session()->regenerateToken();
+
+            // إرجاع رد نجاح بصيغة JSON كما يتوقع الـ JavaScript
+            return redirect()->route('login')->with('success', 'تم حذف حسابك بنجاح.');
+        } catch (Throwable $e) {
+            // في حالة حدوث أي خطأ، قم بتسجيله
+            Log::error('فشل حذف الحساب للمستخدم ID ' . $user->id . ': ' . $e->getMessage());
+
+            // إرجاع رد خطأ بصيغة JSON
+            return response()->json([
+                'status' => 'error',
+                'message' => 'حدث خطأ غير متوقع أثناء محاولة حذف الحساب.'
+            ], 500); // Status 500 Internal Server Error
+        }
+    }
+    public function showDeleteForm()
+    {
+        return view('Auth.delete-account');
+    }
     public function forgetPassword()
     {
         return view('Auth.forgetPassword');

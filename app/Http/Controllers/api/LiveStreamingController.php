@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\LiveStreaming;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 class LiveStreamingController extends Controller
 {
     public function index()
@@ -106,89 +109,73 @@ class LiveStreamingController extends Controller
             'data'    => $liveStream,
         ]);
     }
-
-
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'agency_id'         => 'nullable|exists:agencies,id',
-            'title'             => 'required|string|max:255',
-            'description'       => 'nullable|string|max:1000',
-            'thumbnail'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'password'          => 'nullable|string|max:255',
-            'type'              => 'required|in:live,audio_room',
-            'scheduled_at'      => 'nullable|date',
-        ]);                                                       // قواعد التحقق من البيانات :contentReference[oaicite:1]{index=1}
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'خطأ في التحقق من البيانات',
-                'errors'  => $validator->errors(),
-            ], 422);
-        }
-
-        $data = $validator->validated();
-        $data['user_id'] = auth()->guard('api')->id();
-        $data['status']  = true;  // افتراضياً غير مُباشر
-
-        // تخزين الصورة إن وجدت
-        if ($request->hasFile('thumbnail')) {
-            $data['thumbnail'] = $request->file('thumbnail')
-                ->store('thumbnails', 'public');
-        }
-
-        $liveStream = LiveStreaming::create($data);
-
-        return response()->json([
-            'status'  => true,
-            'message' => 'تم إنشاء البث بنجاح',
-            'data'    => $liveStream,
-        ], 201);
-    }
-
-    public function update(Request $request, LiveStreaming $liveStream)
-    {
-        if (auth()->guard('api')->id() !== $liveStream->user_id) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'غير مصرح لك بتعديل هذا البث',
-            ], 403);
-        }
+        // الطريقة الأفضل لجلب المستخدم الحالي للـ API
+        $user = $request->user();
 
         $validator = Validator::make($request->all(), [
-            'agency_id'         => 'nullable|exists:agencies,id',
-            'title'             => 'required|string|max:255',
-            'description'       => 'nullable|string|max:1000',
-            'thumbnail'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'password'          => 'nullable|string|max:255',
-            'type'              => 'required|in:live,audio_room',
-            'status'            => 'required|boolean',
-            'scheduled_at'      => 'nullable|date',
+            'agency_id'    => 'nullable|exists:agencies,id',
+            'title'        => 'required|string|max:255',
+            'description'  => 'nullable|string|max:1000',
+            'thumbnail'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'password'     => 'nullable|string|max:255',
+            'type'         => 'required|in:live,audio_room',
+            'scheduled_at' => 'nullable|date|after_or_equal:now', // تحسين: التأكد أن الوقت مجدول في المستقبل
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'status'  => false,
-                'message' => 'خطأ في التحقق من البيانات',
+                'message' => 'خطأ في التحقق من البيانات.',
                 'errors'  => $validator->errors(),
             ], 422);
         }
 
-        $data = $validator->validated();
+        $validatedData = $validator->validated();
 
-        if ($request->hasFile('thumbnail')) {
-            $data['thumbnail'] = $request->file('thumbnail')
-                ->store('thumbnails', 'public');
+        // استخدام العمليات المجمعة (Transaction) لضمان تكامل البيانات
+        try {
+            $liveStream = DB::transaction(function () use ($request, $validatedData, $user) {
+                // 1. التعامل مع رفع الصورة
+                if ($request->hasFile('thumbnail')) {
+                    // حذف الصورة القديمة إذا كانت موجودة قبل رفع الجديدة
+                    if ($user->livestream && $user->livestream->thumbnail) {
+                        Storage::disk('public')->delete($user->livestream->thumbnail);
+                    }
+                    $validatedData['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
+                }
+
+                // 2. إضافة البيانات الافتراضية
+                $validatedData['status'] = true; // الحالة الافتراضية للبث هي "فعال"
+
+                // 3. ✨ التصحيح والمنطق الأساسي: تحديث البث الموجود أو إنشاء جديد
+                // هذه هي الطريقة الصحيحة لتطبيق علاقة hasOne
+                return $user->livestream()->updateOrCreate(
+                    [], // لا حاجة لتمرير شروط البحث، فالعلاقة تحددها تلقائياً
+                    $validatedData // البيانات التي سيتم تحديثها أو استخدامها للإنشاء
+                );
+            });
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'تم حفظ بيانات البث بنجاح.',
+                'data'    => $liveStream,
+            ], 201);
+        } catch (Throwable $e) {
+            // في حالة حدوث أي خطأ، تراجع عن كل شيء
+            // إذا تم رفع صورة جديدة أثناء الخطأ، قم بحذفها
+            if (!empty($validatedData['thumbnail'])) {
+                Storage::disk('public')->delete($validatedData['thumbnail']);
+            }
+
+            Log::error('Livestream store/update failed: ' . $e->getMessage()); // تسجيل الخطأ للمطورين
+
+            return response()->json([
+                'status'  => false,
+                'message' => 'حدث خطأ غير متوقع أثناء حفظ البث.',
+            ], 500);
         }
-
-        $liveStream->update($data);
-
-        return response()->json([
-            'status'  => true,
-            'message' => 'تم تحديث البث بنجاح',
-            'data'    => $liveStream,
-        ]);
     }
 
     public function destroy(LiveStreaming $liveStream)
