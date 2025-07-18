@@ -65,7 +65,7 @@ class postsController extends Controller
     public function create(Request $request)
     {
         // استخدام $request->user() هي الطريقة الأحدث والأفضل لجلب المستخدم في API
-        $user = $request->user();
+        $user = auth()->guard('api')->user();
 
         // --- ✨ التحسين الأساسي: التحقق من حد النشر اليومي ✨ ---
         $dailyPostLimit = 10;
