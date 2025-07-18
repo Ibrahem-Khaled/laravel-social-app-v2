@@ -60,32 +60,79 @@ class postsController extends Controller
     }
     public function create(Request $request)
     {
-        $user = auth()->guard('api')->user();
+        // استخدام $request->user() هي الطريقة الأحدث والأفضل لجلب المستخدم في API
+        $user = $request->user();
 
+        // --- ✨ التحسين الأساسي: التحقق من حد النشر اليومي ✨ ---
+        $dailyPostLimit = 10;
+        $postsTodayCount = $user->posts()
+            ->where('created_at', '>=', Carbon::now()->subDay())
+            ->count();
+
+        if ($postsTodayCount >= $dailyPostLimit) {
+            return response()->json([
+                'status' => false,
+                'message' => 'لقد وصلت إلى الحد الأقصى للنشر اليومي (10 منشورات). لحذف منشور قديم وإضافة منشور جديد، يرجى استخدام التطبيق.',
+            ], 429); // 429 Too Many Requests
+        }
+
+        // --- تحسين قواعد التحقق ---
         $validator = Validator::make($request->all(), [
-            'content' => 'nullable|string',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'images' => 'nullable|array',
+            'content'  => 'required_without:images|nullable|string|max:5000', // المحتوى مطلوب إذا لم توجد صور
+            'images'   => 'required_without:content|nullable|array|max:5', // الصور مطلوبة إذا لم يوجد محتوى، والحد الأقصى 5 صور
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // كل صورة يجب أن تكون من الأنواع المحددة
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'status' => false,
+                'message' => 'خطأ في التحقق من البيانات.',
+                'errors' => $validator->errors(),
+            ], 422);
         }
 
-        $data = $request->except('images');
-        // معالجة الصور
-        if ($request->hasFile('images')) {
-            $images = [];
-            foreach ($request->file('images') as $image) {
-                $path = $image->store('public/posts');
-                $images[] = str_replace('public/', '', $path);
-            }
-            $data['images'] = json_encode($images);
+        $validatedData = $validator->validated();
+
+        // --- استخدام Transactions لضمان سلامة البيانات ---
+        try {
+            $post = DB::transaction(function () use ($request, $validatedData, $user) {
+
+                $postData = ['content' => $validatedData['content'] ?? null];
+
+                // 1. معالجة وتخزين الصور إن وجدت
+                if ($request->hasFile('images')) {
+                    $imagePaths = [];
+                    foreach ($request->file('images') as $image) {
+                        // استخدام store يضمن اسم ملف فريد وآمن
+                        $path = $image->store('posts', 'public');
+                        $imagePaths[] = $path;
+                    }
+                    // تخزين مسارات الصور كـ JSON في قاعدة البيانات
+                    $postData['images'] = json_encode($imagePaths);
+                }
+
+                // 2. إنشاء المنشور وربطه بالمستخدم
+                return $user->posts()->create($postData);
+            });
+
+            // تحميل العلاقة مع المستخدم لإرجاع بياناته مع المنشور
+            $post->load('user');
+
+            return response()->json([
+                'status' => true,
+                'message' => 'تم نشر المنشور بنجاح.',
+                'data' => $post,
+            ], 201);
+        } catch (Throwable $e) {
+            // في حالة حدوث أي خطأ، قم بتسجيله للمطورين
+            Log::error('فشل إنشاء المنشور للمستخدم ID ' . $user->id . ': ' . $e->getMessage());
+
+            // إرجاع رد خطأ عام للمستخدم
+            return response()->json([
+                'status' => false,
+                'message' => 'حدث خطأ غير متوقع أثناء إنشاء المنشور.',
+            ], 500);
         }
-
-        $post = $user->posts()->create($data);
-
-        return response()->json($post);
     }
 
     public function update(Request $request, $post)

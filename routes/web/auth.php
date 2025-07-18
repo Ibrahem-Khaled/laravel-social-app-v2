@@ -15,7 +15,7 @@ Route::group(['prefix' => 'auth'], function () {
 
     Route::get('logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('deleteAccount', [AuthController::class, 'deleteAccount'])->name('profile.destroy');
-    Route::get('/profile/delete', [AuthController::class, 'showDeleteForm'])->name('profile.delete.form');
+    Route::get('/profile/delete', [AuthController::class, 'showDeleteForm'])->name('profile.delete.form')->middleware('auth');
 
     Route::get('profile', [AuthController::class, 'profile'])->name('profile')->middleware('auth');
     Route::get('profile-edit', [AuthController::class, 'profileUpdate'])->name('profile.edit')->middleware('auth');
