@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!--  مهم جداً: إضافة توكن الحماية الخاص بلارافيل -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" href="{{ asset('storage/' . $websiteData?->avatar) }}" type="image/x-icon">
     <title>تأكيد حذف الحساب - تواصل</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -40,8 +41,17 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
-            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.6; }
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 0.6;
+            }
         }
 
         .shake:hover {
@@ -49,17 +59,49 @@
         }
 
         @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+            0% {
+                transform: translate(1px, 1px) rotate(0deg);
+            }
+
+            10% {
+                transform: translate(-1px, -2px) rotate(-1deg);
+            }
+
+            20% {
+                transform: translate(-3px, 0px) rotate(1deg);
+            }
+
+            30% {
+                transform: translate(3px, 2px) rotate(0deg);
+            }
+
+            40% {
+                transform: translate(1px, -1px) rotate(1deg);
+            }
+
+            50% {
+                transform: translate(-1px, 2px) rotate(-1deg);
+            }
+
+            60% {
+                transform: translate(-3px, 1px) rotate(0deg);
+            }
+
+            70% {
+                transform: translate(3px, 1px) rotate(-1deg);
+            }
+
+            80% {
+                transform: translate(-1px, -1px) rotate(1deg);
+            }
+
+            90% {
+                transform: translate(1px, 2px) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(1px, -2px) rotate(-1deg);
+            }
         }
 
         .modal {
@@ -71,8 +113,15 @@
         }
 
         @keyframes pulse-red {
-            0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 107, 0.4); }
-            50% { box-shadow: 0 0 40px rgba(255, 107, 107, 0.8); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(255, 107, 107, 0.8);
+            }
         }
 
         .app-logo {
@@ -88,8 +137,15 @@
         }
 
         @keyframes typing {
-            0%, 100% { border-color: transparent; }
-            50% { border-color: #667eea; }
+
+            0%,
+            100% {
+                border-color: transparent;
+            }
+
+            50% {
+                border-color: #667eea;
+            }
         }
     </style>
 </head>
@@ -111,13 +167,12 @@
         <div class="glass-effect rounded-3xl p-6 mb-6 text-center shadow-2xl">
             <!-- App Logo -->
             <div class="flex items-center justify-center mb-4">
-                <div class="bg-gradient-to-br from-blue-500 to-purple-600 p-4 rounded-2xl shadow-lg transform hover:rotate-12 transition-transform duration-300">
-                    <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"></path>
-                    </svg>
+                <div
+                    class="bg-gradient-to-br from-blue-500 to-purple-600 p-4 rounded-2xl shadow-lg transform hover:rotate-12 transition-transform duration-300">
+                    <img src="{{ asset('storage/' . $websiteData?->avatar) }}" alt="App Logo" class="w-16 h-16">
                 </div>
                 <div class="mr-4">
-                    <h1 class="app-logo text-3xl font-black mb-1">تواصل</h1>
+                    <h1 class="app-logo text-3xl font-black mb-1">{{ $websiteData->name }}</h1>
                     <p class="text-gray-600 text-sm typing-effect">منصة التواصل الاجتماعي الذكية</p>
                 </div>
             </div>
@@ -141,7 +196,8 @@
             </div>
 
             <p class="text-gray-700 text-sm">
-                <span class="font-semibold">تواصل</span> - المكان الآمن للتواصل مع الأصدقاء والعائلة، مع تقنيات حماية متقدمة وتجربة مستخدم استثنائية.
+                <span class="font-semibold">{{ $websiteData->name }}</span> - المكان الآمن للتواصل مع الأصدقاء والعائلة،
+                مع تقنيات حماية متقدمة وتجربة مستخدم استثنائية.
             </p>
         </div>
 
@@ -161,7 +217,8 @@
                 </div>
             </div>
 
-            <h1 class="text-4xl md:text-5xl font-black bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent mb-6">
+            <h1
+                class="text-4xl md:text-5xl font-black bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent mb-6">
                 انتبه: أنت على وشك حذف حسابك!
             </h1>
 
@@ -223,7 +280,9 @@
                 class="w-full p-6 bg-gradient-to-r from-red-600 to-red-800 text-white text-xl font-black rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed disabled:scale-100 shake relative overflow-hidden"
                 disabled>
                 <span class="relative z-10">🗑️ امسح كل شيء واحذف الحساب للأبد</span>
-                <div class="absolute inset-0 bg-gradient-to-r from-red-700 to-red-900 transform scale-x-0 hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-red-700 to-red-900 transform scale-x-0 hover:scale-x-100 transition-transform duration-300 origin-left">
+                </div>
             </button>
         </div>
 
@@ -240,11 +299,14 @@
     <!-- Final confirmation modal -->
     <div id="finalConfirmationModal"
         class="modal fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
-        <div class="glass-effect rounded-3xl shadow-2xl p-8 max-w-md text-center transform scale-90 transition-all duration-300 border-4 border-red-500">
+        <div
+            class="glass-effect rounded-3xl shadow-2xl p-8 max-w-md text-center transform scale-90 transition-all duration-300 border-4 border-red-500">
 
             <div class="bg-red-100 rounded-full p-4 inline-block mb-6">
                 <svg class="w-12 h-12 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    <path fill-rule="evenodd"
+                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                        clip-rule="evenodd"></path>
                 </svg>
             </div>
 
@@ -296,7 +358,8 @@
                 confirmationInput.classList.add('border-red-500', 'bg-red-50');
                 confirmationInput.classList.remove('border-green-500', 'bg-green-50');
             } else {
-                confirmationInput.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50');
+                confirmationInput.classList.remove('border-green-500', 'bg-green-50', 'border-red-500',
+                'bg-red-50');
             }
         });
 
