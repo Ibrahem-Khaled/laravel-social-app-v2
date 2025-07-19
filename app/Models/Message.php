@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Message extends Model
 {
@@ -52,5 +53,11 @@ class Message extends Model
     public function replies()
     {
         return $this->hasMany(Message::class, 'parent_id');
+    }
+
+    // العلاقة مع المستخدمين الذين قاموا بحذف الرسالة
+    public function deletedByUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'message_user_deleted', 'message_id', 'user_id');
     }
 }

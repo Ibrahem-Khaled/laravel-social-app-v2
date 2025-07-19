@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\CallLog;
 use App\Models\Conversation;
 use App\Models\Gift;
@@ -123,5 +124,11 @@ trait UserRelationships
     public function withdrawalRequests()
     {
         return $this->hasMany(\App\Models\WithdrawalRequest::class);
+    }
+
+
+    public function deletedMessages(): BelongsToMany
+    {
+        return $this->belongsToMany(Message::class, 'message_user_deleted', 'user_id', 'message_id');
     }
 }

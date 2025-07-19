@@ -13,6 +13,8 @@ use App\Notifications\ExpoNotification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Builder; // تأكد من استيراد Builder
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
+
 
 class ChatController extends Controller
 {
@@ -253,15 +255,24 @@ class ChatController extends Controller
     {
         $currentUser = auth()->guard('api')->user();
 
-        Message::where('conversation_id', $conversationId)
-            ->where('receiver_id', $currentUser->id) // الرسائل التي استقبلها المستخدم الحالي فقط
-            ->where('is_read', false)                // التي لم يقرأها بعد
+        // هذا الجزء يبقى كما هو لتحديث حالة القراءة
+        Message::where('conversation_id', 'like', $conversationId)
+            ->where('receiver_id', $currentUser->id)
+            ->where('is_read', false)
             ->update(['is_read' => true]);
 
-
-        // جلب الرسائل العادية فقط
-        $messages = Message::where('conversation_id', $conversationId)
+        // --- ✨ التعديل هنا لجلب الرسائل بدون المحذوفة ✨ ---
+        $messages = Message::where('conversation_id', 'like', $conversationId)
             ->where('type_message', 'normal')
+
+            // -- الجزء المضاف --
+            // لا تجلب الرسائل التي لها علاقة بـ "المستخدمين الحاذفين"
+            // حيث يكون المستخدم الحالي واحدًا منهم
+            ->whereDoesntHave('deletedByUsers', function ($query) use ($currentUser) {
+                $query->where('user_id', $currentUser->id);
+            })
+            // -- نهاية الجزء المضاف --
+
             ->with([
                 'sender' => function ($q) {
                     $q->select('id', 'name');
@@ -270,7 +281,7 @@ class ChatController extends Controller
                     $q->select('id', 'name');
                 },
             ])
-            ->get();
+            ->paginate(30);
 
         return response()->json($messages, 200);
     }
@@ -294,7 +305,7 @@ class ChatController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        \DB::beginTransaction();
+        DB::beginTransaction();
         try {
             // معالجة ملف الوسائط إن وُجد وخزنه في القرص public
             $mediaPath = null;
@@ -325,10 +336,10 @@ class ChatController extends Controller
                 ); // :contentReference[oaicite:1]{index=1}
             }
 
-            \DB::commit();
+            DB::commit();
             return response()->json($message, 201);
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             return response()->json([
                 'message' => 'حدث خطأ أثناء إرسال الرسالة',
                 'error' => $e->getMessage()
@@ -341,10 +352,26 @@ class ChatController extends Controller
      */
     public function deleteConversationMessages($conversationId)
     {
-        $conversation = Conversation::findOrFail($conversationId);
-        $conversation->messages()->delete();
+        // جلب المستخدم الحالي المسجل
+        $user = auth()->guard('api')->user();
 
-        return response()->json(['message' => 'تم حذف الرسائل بنجاح'], 200);
+        // التأكد من وجود المحادثة لتجنب الأخطاء
+        $conversation = Conversation::findOrFail($conversationId);
+
+        // 1. جلب كل معرفات (IDs) الرسائل الموجودة في هذه المحادثة
+        $messageIds = $conversation->messages()->pluck('id')->all();
+
+        // 2. التحقق من وجود رسائل لحذفها
+        if (empty($messageIds)) {
+            return response()->json(['message' => 'لا توجد رسائل لحذفها في هذه المحادثة.'], 200);
+        }
+
+        // 3. ✨ الجزء الأساسي: ربط كل هذه الرسائل بالمستخدم الحالي كـ "محذوفة"
+        // نستخدم العلاقة التي أنشأناها في موديل User
+        // attach() ستقوم بإضافة كل الأزواج (user_id, message_id) إلى الجدول الوسيط
+        $user->deletedMessages()->syncWithoutDetaching($messageIds);
+
+        return response()->json(['message' => 'تم حذف جميع رسائل المحادثة لديك فقط.'], 200);
     }
 
     /**
@@ -360,17 +387,45 @@ class ChatController extends Controller
     /**
      * حذف رسالة معينة
      */
-    public function deleteMessage($messageId)
+    public function deleteMessage(Request $request, $messageId)
     {
+        $request->validate([
+            'scope' => 'nullable|string|in:me,all', // 'me' for me, 'all' for everyone
+        ]);
+
+        $user = $request->user(); // أو Auth::user()
         $message = Message::findOrFail($messageId);
 
-        // حذف ملف الوسائط من القرص إن وُجد
-        if ($message->media) {
-            Storage::disk('public')->delete($message->media);
+        // إذا لم يحدد المستخدم النطاق، يكون الافتراضي هو 'me'
+        $scope = $request->input('scope', 'me');
+
+        if ($scope === 'all') {
+            // --- منطق الحذف للجميع ---
+
+            // الشرط 1: فقط مُرسل الرسالة يمكنه حذفها للجميع
+            if ($message->sender_id !== $user->id) {
+                return response()->json(['message' => 'لا تملك الصلاحية لحذف هذه الرسالة للجميع.'], 403);
+            }
+
+            // الشرط 2 (اختياري): السماح بالحذف للجميع خلال فترة زمنية محددة (مثلاً: ساعة)
+            if (Carbon::now()->diffInMinutes($message->created_at) > 60) {
+                return response()->json(['message' => 'انتهت الفترة الزمنية المسموحة لحذف هذه الرسالة للجميع.'], 403);
+            }
+
+            // حذف ملف الوسائط من القرص إن وُجد
+            if ($message->media) {
+                Storage::disk('public')->delete($message->media);
+            }
+
+            // الحذف الفعلي للرسالة من قاعدة البيانات
+            $message->delete();
+
+            return response()->json(['message' => 'تم حذف الرسالة للجميع بنجاح.'], 200);
+        } else {
+
+            $user->deletedMessages()->attach($message->id);
+
+            return response()->json(['message' => 'تم حذف الرسالة لديك فقط.'], 200);
         }
-
-        $message->delete();
-
-        return response()->json(['message' => 'تم حذف الرسالة بنجاح'], 200);
     }
 }
