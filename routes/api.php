@@ -108,6 +108,7 @@ Route::group([], function () {
 
     //this live streaming routes
     Route::apiResource('live-streamings', LiveStreamingController::class);
+    Route::delete('/my-livestream', [LiveStreamingController::class, 'destroyMyLivestream']);
     Route::get('/live-streams/live', [LiveStreamingController::class, 'getLiveStreams']);
     Route::get('/live-streams/audio', [LiveStreamingController::class, 'getAudioRooms']);
     Route::get('/live-streams/following', [LiveStreamingController::class, 'getLiveStreamsByFollowing']);

@@ -179,29 +179,33 @@ class LiveStreamingController extends Controller
         }
     }
 
-    public function destroy(LiveStreaming $liveStream)
+    public function destroyMyLivestream()
     {
-        // 1. التحقق من صلاحية المستخدم (هذه الطريقة ممتازة)
-        if (auth()->guard('api')->user()->id !== $liveStream->user_id) {
+        // 1. جلب المستخدم المسجل دخوله
+        $user = auth()->guard('api')->user();
+
+        // 2. الوصول إلى البث المرتبط به عبر علاقة hasOne
+        $liveStream = $user->livestream;
+
+        // 3. التأكد من أن المستخدم لديه بث أصلاً
+        if (!$liveStream) {
             return response()->json([
                 'status'  => false,
-                'message' => 'غير مصرح لك بحذف هذا البث',
-            ], 403);
+                'message' => 'ليس لديك بث مباشر لحذفه',
+            ], 404); // 404 Not Found
         }
 
-        // 2. ✨ الإضافة: حذف الصورة المصغرة من مساحة التخزين أولاً
-        // نتأكد أن هناك صورة مسجلة قبل محاولة حذفها
+        // 4. تنفيذ الحذف
+        // ملاحظة: إذا كنت قد طبقت الـ Model Event، فلن تحتاج لسطر حذف الصورة هنا
         if ($liveStream->thumbnail) {
             Storage::disk('public')->delete($liveStream->thumbnail);
         }
-
-        // 3. حذف سجل البث من قاعدة البيانات
         $liveStream->delete();
 
-        // 4. إرجاع رسالة نجاح
+        // 5. إرجاع رسالة نجاح
         return response()->json([
             'status'  => true,
-            'message' => 'تم حذف البث بنجاح',
+            'message' => 'تم حذف البث الخاص بك بنجاح',
         ]);
     }
 }
