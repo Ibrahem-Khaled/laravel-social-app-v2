@@ -57,8 +57,8 @@ Route::group([], function () {
 
     //this posts routes
     Route::get('/posts', [postsController::class, 'index']);
-    Route::get('/posts/{post}', [postsController::class, 'getPost']);
     Route::get('/posts/follow', [postsController::class, 'getFollowPosts']);
+    Route::get('/posts/{post}', [postsController::class, 'getPost']);
     Route::post('/posts', [postsController::class, 'create']);
     Route::post('/posts/{post}', [postsController::class, 'update']);
     Route::delete('/posts/{post}', [postsController::class, 'delete']);
