@@ -182,7 +182,7 @@ class LiveStreamingController extends Controller
     public function destroy(LiveStreaming $liveStream)
     {
         // 1. التحقق من صلاحية المستخدم (هذه الطريقة ممتازة)
-        if (auth()->guard('api')->id() !== $liveStream->user_id) {
+        if (auth()->guard('api')->user()->id !== $liveStream->user_id) {
             return response()->json([
                 'status'  => false,
                 'message' => 'غير مصرح لك بحذف هذا البث',
