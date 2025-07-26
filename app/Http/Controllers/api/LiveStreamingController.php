@@ -112,7 +112,7 @@ class LiveStreamingController extends Controller
     public function store(Request $request)
     {
         // الطريقة الأفضل لجلب المستخدم الحالي للـ API
-        $user = $request->user();
+        $user = auth()->guard('api')->user();
 
         $validator = Validator::make($request->all(), [
             'agency_id'    => 'nullable|exists:agencies,id',
