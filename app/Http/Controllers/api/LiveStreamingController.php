@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+
 class LiveStreamingController extends Controller
 {
     public function index()
@@ -180,6 +181,7 @@ class LiveStreamingController extends Controller
 
     public function destroy(LiveStreaming $liveStream)
     {
+        // 1. التحقق من صلاحية المستخدم (هذه الطريقة ممتازة)
         if (auth()->guard('api')->id() !== $liveStream->user_id) {
             return response()->json([
                 'status'  => false,
@@ -187,8 +189,16 @@ class LiveStreamingController extends Controller
             ], 403);
         }
 
+        // 2. ✨ الإضافة: حذف الصورة المصغرة من مساحة التخزين أولاً
+        // نتأكد أن هناك صورة مسجلة قبل محاولة حذفها
+        if ($liveStream->thumbnail) {
+            Storage::disk('public')->delete($liveStream->thumbnail);
+        }
+
+        // 3. حذف سجل البث من قاعدة البيانات
         $liveStream->delete();
 
+        // 4. إرجاع رسالة نجاح
         return response()->json([
             'status'  => true,
             'message' => 'تم حذف البث بنجاح',
