@@ -41,10 +41,19 @@ Broadcast::channel('notifications.{userId}', function ($user, $userId) {
 });
 
 Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
-    // ابحث عن المحادثة المطلوبة
+
+    // ✨ أضف هذا السطر للتحقق من أن الدالة تُستدعى
+    Log::info("Authorizing channel for user: {$user->id} and conversation: {$conversationId}");
+
     $conversation = Conversation::find($conversationId);
 
-    // تحقق مما إذا كانت المحادثة موجودة وأن المستخدم الحالي هو بالفعل عضو فيها
-    // إذا كان الشرط صحيحًا، تُرجع true ويسمح بالاتصال. وإلا تُرجع false ويُرفض الاتصال.
-    return $conversation && $conversation->users->contains($user);
+    if ($conversation && $conversation->users->contains($user)) {
+        // ✨ أضف هذا السطر للتأكد من نجاح الشرط
+        Log::info("Authorization SUCCESSFUL for conversation: {$conversationId}");
+        return true;
+    }
+
+    // ✨ أضف هذا السطر للتأكد من فشل الشرط
+    Log::info("Authorization FAILED for conversation: {$conversationId}");
+    return false;
 });

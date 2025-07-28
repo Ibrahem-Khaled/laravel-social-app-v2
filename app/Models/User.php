@@ -37,6 +37,7 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
+        'avatar', // ✨ أضف هذا السطر لإخفاء المسار الأصلي
     ];
 
     protected $casts = [
