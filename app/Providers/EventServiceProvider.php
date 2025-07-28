@@ -9,12 +9,16 @@ use Illuminate\Support\Facades\Event;
 use App\Observers\NotificationObserver;
 use App\Models\Notification;
 
+use App\Models\Message; // <-- استيراد الموديل
+use App\Observers\MessageObserver; // <-- استيراد الأوبزرفر
+
 class EventServiceProvider extends ServiceProvider
 {
 
 
     protected $observers = [
         Notification::class => [NotificationObserver::class],
+        Message::class => [MessageObserver::class], // <-- ✨ أضف هذا السطر
     ];
 
     /**

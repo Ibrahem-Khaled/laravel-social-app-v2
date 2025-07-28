@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Log; //  ✨ أضف هذا السطر
+use App\Models\Conversation;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,4 +38,13 @@ Broadcast::channel('notifications.{userId}', function ($user, $userId) {
 
     // هذا هو الكود الأصلي للمصادقة
     return (int) $user->id === (int) $userId;
+});
+
+Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
+    // ابحث عن المحادثة المطلوبة
+    $conversation = Conversation::find($conversationId);
+
+    // تحقق مما إذا كانت المحادثة موجودة وأن المستخدم الحالي هو بالفعل عضو فيها
+    // إذا كان الشرط صحيحًا، تُرجع true ويسمح بالاتصال. وإلا تُرجع false ويُرفض الاتصال.
+    return $conversation && $conversation->users->contains($user);
 });
