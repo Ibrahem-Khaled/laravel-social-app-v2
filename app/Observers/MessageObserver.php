@@ -12,7 +12,7 @@ class MessageObserver
      */
      public function created(Message $message): void
     {
-        broadcast(new Chat('created', $message))->toOthers();
+        broadcast(new Chat('created', $message));
     }
 
     public function updated(Message $message): void
