@@ -41,6 +41,49 @@ Broadcast::channel('notifications.{userId}', function ($user, $userId) {
 });
 
 Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
-    $conversation = Conversation::find($conversationId);
-    return true;
+    try {
+        // الخطوة 1: التحقق من أن المستخدم مسجل دخوله
+        if (!$user) {
+            Log::warning('Channel Auth Failed: User is not authenticated.', [
+                'channel' => 'conversation.' . $conversationId,
+            ]);
+            return false;
+        }
+
+        // الخطوة 2: البحث عن المحادثة
+        $conversation = Conversation::find($conversationId);
+
+        // الخطوة 3: التحقق من وجود المحادثة
+        if (!$conversation) {
+            Log::warning('Channel Auth Failed: Conversation not found.', [
+                'user_id' => $user->id,
+                'conversation_id' => $conversationId,
+            ]);
+            return false;
+        }
+
+        // الخطوة 4: التحقق من أن المستخدم عضو في المحادثة
+        $isMember = $conversation->users()->where('user_id', $user->id)->exists();
+
+        // تسجيل النتيجة النهائية للمساعدة في التشخيص
+        Log::info('Channel Auth Result:', [
+            'user_id' => $user->id,
+            'conversation_id' => $conversationId,
+            'is_member' => $isMember,
+        ]);
+
+        return $isMember;
+
+    } catch (\Exception $e) {
+        // ✨ هذا هو الجزء الأهم: تسجيل أي خطأ فادح يحدث ✨
+        Log::error('EXCEPTION in Channel Authorization:', [
+            'channel' => 'conversation.' . $conversationId,
+            'user_id' => $user->id ?? 'GUEST',
+            'error_message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(), // يعطينا تفاصيل كاملة عن مكان الخطأ
+        ]);
+
+        // إرجاع false لمنع أي سلوك غير متوقع في الواجهة الأمامية
+        return false;
+    }
 });
