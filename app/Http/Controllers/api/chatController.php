@@ -393,7 +393,7 @@ class ChatController extends Controller
             'scope' => 'nullable|string|in:me,all', // 'me' for me, 'all' for everyone
         ]);
 
-        $user = $request->user(); // أو Auth::user()
+        $user = auth()->guard('api')->user();
         $message = Message::findOrFail($messageId);
 
         // إذا لم يحدد المستخدم النطاق، يكون الافتراضي هو 'me'

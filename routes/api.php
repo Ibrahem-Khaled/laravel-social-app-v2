@@ -88,9 +88,9 @@ Route::group([], function () {
     Route::post('conversations/{conversation}/leave', [ChatController::class, 'LeaveGroup']);
     Route::get('conversations/{conversationId}/messages', [ChatController::class, 'getMessages']);
     Route::post('messages', [ChatController::class, 'sendMessage']);
-    Route::delete('messages/{messageId}', [ChatController::class, 'deleteMessage']);
     Route::delete('conversations/{conversationId}/messages', [ChatController::class, 'deleteConversationMessages']);
     Route::delete('conversations/{conversationId}', [ChatController::class, 'deleteConversation']);
+    Route::delete('messages/{messageId}', [ChatController::class, 'deleteMessage']);
 
 
     //this block and follow routes
