@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Broadcast;
 use App\Models\Conversation;
-use Log;
+use Laravel\Reverb\Loggers\Log;
+
 /*
 |--------------------------------------------------------------------------
 | Broadcast Channels
