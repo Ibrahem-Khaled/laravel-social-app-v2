@@ -1,9 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
-use Illuminate\Support\Facades\Log; //  ✨ أضف هذا السطر
 use App\Models\Conversation;
-
+use Log;
 /*
 |--------------------------------------------------------------------------
 | Broadcast Channels
@@ -33,7 +32,6 @@ Broadcast::channel('conversation.{conversationId}', function ($user, $conversati
 
         // This returns true if the user is a member, and false otherwise
         return $conversation->users()->where('user_id', $user->id)->exists();
-
     } catch (\Exception $e) {
         // This will catch any other unexpected PHP errors
         Log::error('EXCEPTION in conversation channel auth:', [
@@ -69,4 +67,3 @@ Broadcast::channel('notifications.{userId}', function ($user, $userId) {
     // هذا هو الكود الأصلي للمصادقة
     return (int) $user->id === (int) $userId;
 });
-
