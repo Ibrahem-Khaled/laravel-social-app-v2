@@ -14,17 +14,19 @@ class MessageObserver
     public function created(Message $message): void
     {
         Log::info("MessageObserver 'created' method triggered for message ID: {$message->id}");
-        broadcast(new Chat('created', $message));
+        broadcast(new Chat('created', $message))->toOthers();
     }
 
     public function updated(Message $message): void
     {
-        broadcast(new Chat('updated', $message));
+        Log::info("MessageObserver 'updated' method triggered for message ID: {$message->id}");
+        broadcast(new Chat('updated', $message))->toOthers();
     }
 
     public function deleted(Message $message): void
     {
-        broadcast(new Chat('deleted', $message));
+        Log::info("MessageObserver 'deleted' method triggered for message ID: {$message->id}");
+        broadcast(new Chat('deleted', $message))->toOthers();
     }
 
     /**

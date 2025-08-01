@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('image')->nullable();
-            $table->text('is_animated')->nullable();
+            $table->string('animation_url')->nullable()->comment('URL for the animated version'); // <-- اسم أوضح
             $table->integer('price')->default(1);
             $table->boolean('is_active')->default(true);
             $table->timestamps();

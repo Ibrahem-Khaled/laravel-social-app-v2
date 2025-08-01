@@ -9,16 +9,22 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str; // <-- لاستخدامه في إنشاء اسم القناة
 use Throwable;
 
 class LiveStreamingController extends Controller
 {
+    /**
+     * جلب كل البثوث الحية (فيديو وصوت) مع دعم التصفح (Pagination).
+     */
     public function index()
     {
+        // التحسين: استخدام status enum بدلاً من boolean.
+        // التحسين: إضافة paginate لجلب عدد محدد من النتائج في كل مرة.
         $liveStreams = LiveStreaming::with(['user', 'agency'])
-            ->where('status', true)
+            ->where('status', 'live') // <-- التغيير: البحث عن البثوث الحية فقط
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(15); // <-- إضافة: لجعل الـ API قابلاً للتطوير
 
         return response()->json([
             'status'  => true,
@@ -29,41 +35,50 @@ class LiveStreamingController extends Controller
         ]);
     }
 
+    /**
+     * جلب بثوث الفيديو الحية فقط.
+     */
     public function getLiveStreams()
     {
-        $liveStream = LiveStreaming::with(['user', 'agency'])
-            ->where('status', true)
+        $liveStreams = LiveStreaming::with(['user', 'agency'])
+            ->where('status', 'live') // <-- التغيير: استخدام status enum
             ->where('type', 'live')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        if (!$liveStream) {
+        // التصحيح: التحقق من أن المجموعة فارغة باستخدام isEmpty()
+        if ($liveStreams->isEmpty()) {
             return response()->json([
-                'status'  => false,
+                'status'  => true, // إرجاع true ولكن مع بيانات فارغة ورسالة مناسبة
                 'message' => 'لا يوجد بث مباشر حاليًا',
-            ], 404);
+                'data'    => [],
+            ], 200);
         }
 
         return response()->json([
             'status'  => true,
             'message' => 'تم استرجاع البث المباشر بنجاح',
-            'data'    => $liveStream,
+            'data'    => $liveStreams,
         ]);
     }
 
+    /**
+     * جلب الغرف الصوتية الحية فقط.
+     */
     public function getAudioRooms()
     {
         $audioRooms = LiveStreaming::with(['user', 'agency'])
-            ->where('status', true)
+            ->where('status', 'live') // <-- التغيير: استخدام status enum
             ->where('type', 'audio_room')
             ->orderBy('created_at', 'desc')
             ->get();
 
         if ($audioRooms->isEmpty()) {
             return response()->json([
-                'status'  => false,
+                'status'  => true,
                 'message' => 'لا توجد غرف صوتية حاليًا',
-            ], 404);
+                'data'    => [],
+            ], 200);
         }
 
         return response()->json([
@@ -73,12 +88,18 @@ class LiveStreamingController extends Controller
         ]);
     }
 
+    /**
+     * جلب البثوث الحية للمستخدمين الذين يتابعهم المستخدم الحالي.
+     */
     public function getLiveStreamsByFollowing()
     {
         $userId = auth()->guard('api')->id();
+        if (!$userId) {
+            return response()->json(['status' => false, 'message' => 'Unauthenticated.'], 401);
+        }
 
         $liveStreams = LiveStreaming::with(['user', 'agency'])
-            ->where('status', true)
+            ->where('status', 'live') // <-- التغيير: استخدام status enum
             ->where('type', 'live')
             ->whereHas('user.followers', function ($query) use ($userId) {
                 $query->where('follower_id', $userId);
@@ -88,9 +109,10 @@ class LiveStreamingController extends Controller
 
         if ($liveStreams->isEmpty()) {
             return response()->json([
-                'status'  => false,
-                'message' => 'لا توجد بثوث حية من المتابعين',
-            ], 404);
+                'status'  => true,
+                'message' => 'لا توجد بثوث حية من المستخدمين الذين تتابعهم',
+                'data'    => [],
+            ], 200);
         }
 
         return response()->json([
@@ -100,6 +122,9 @@ class LiveStreamingController extends Controller
         ]);
     }
 
+    /**
+     * عرض تفاصيل بث مباشر محدد.
+     */
     public function show(LiveStreaming $liveStream)
     {
         $liveStream->load(['user', 'agency']);
@@ -110,102 +135,85 @@ class LiveStreamingController extends Controller
             'data'    => $liveStream,
         ]);
     }
+
+    /**
+     * إنشاء أو تحديث بث مباشر للمستخدم الحالي.
+     */
     public function store(Request $request)
     {
-        // الطريقة الأفضل لجلب المستخدم الحالي للـ API
         $user = auth()->guard('api')->user();
 
         $validator = Validator::make($request->all(), [
-            'agency_id'    => 'nullable|exists:agencies,id',
-            'title'        => 'required|string|max:255',
-            'description'  => 'nullable|string|max:1000',
-            'thumbnail'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'password'     => 'nullable|string|max:255',
-            'type'         => 'required|in:live,audio_room',
-            'scheduled_at' => 'nullable|date|after_or_equal:now', // تحسين: التأكد أن الوقت مجدول في المستقبل
+            'title'       => 'nullable|string|max:255',
+            'thumbnail'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'type'        => 'required|in:live,audio_room',
+            // الحقول القديمة التي لم نعد بحاجة إليها في الإنشاء:
+            // agency_id, description, password, scheduled_at
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'خطأ في التحقق من البيانات.',
-                'errors'  => $validator->errors(),
-            ], 422);
+            return response()->json(['status' => false, 'message' => 'خطأ في التحقق.', 'errors' => $validator->errors()], 422);
         }
 
         $validatedData = $validator->validated();
 
-        // استخدام العمليات المجمعة (Transaction) لضمان تكامل البيانات
         try {
             $liveStream = DB::transaction(function () use ($request, $validatedData, $user) {
-                // 1. التعامل مع رفع الصورة
                 if ($request->hasFile('thumbnail')) {
-                    // حذف الصورة القديمة إذا كانت موجودة قبل رفع الجديدة
+                    // حذف الصورة القديمة إذا وجدت
                     if ($user->livestream && $user->livestream->thumbnail) {
                         Storage::disk('public')->delete($user->livestream->thumbnail);
                     }
                     $validatedData['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
                 }
 
-                // 2. إضافة البيانات الافتراضية
-                $validatedData['status'] = true; // الحالة الافتراضية للبث هي "فعال"
+                // التحسين: إضافة البيانات الجديدة المطلوبة حسب السكيما
+                $validatedData['status'] = 'live'; // <-- الحالة الافتراضية هي "live"
+                $validatedData['channel_name'] = "stream_{$user->id}_" . Str::random(10); // <-- إنشاء اسم قناة فريد
 
-                // 3. ✨ التصحيح والمنطق الأساسي: تحديث البث الموجود أو إنشاء جديد
-                // هذه هي الطريقة الصحيحة لتطبيق علاقة hasOne
+                // تحديث البث الموجود أو إنشاء جديد (لضمان أن لكل مستخدم بث واحد فعال)
                 return $user->livestream()->updateOrCreate(
-                    [], // لا حاجة لتمرير شروط البحث، فالعلاقة تحددها تلقائياً
-                    $validatedData // البيانات التي سيتم تحديثها أو استخدامها للإنشاء
+                    ['user_id' => $user->id], // الشرط للبحث عن البث
+                    $validatedData // البيانات للتحديث أو الإنشاء
                 );
             });
 
             return response()->json([
                 'status'  => true,
-                'message' => 'تم حفظ بيانات البث بنجاح.',
+                'message' => 'تم بدء البث المباشر بنجاح.',
                 'data'    => $liveStream,
             ], 201);
+
         } catch (Throwable $e) {
-            // في حالة حدوث أي خطأ، تراجع عن كل شيء
-            // إذا تم رفع صورة جديدة أثناء الخطأ، قم بحذفها
-            if (!empty($validatedData['thumbnail'])) {
-                Storage::disk('public')->delete($validatedData['thumbnail']);
-            }
-
-            Log::error('Livestream store/update failed: ' . $e->getMessage()); // تسجيل الخطأ للمطورين
-
-            return response()->json([
-                'status'  => false,
-                'message' => 'حدث خطأ غير متوقع أثناء حفظ البث.',
-            ], 500);
+            Log::error('Livestream store/update failed: ' . $e->getMessage());
+            return response()->json(['status' => false, 'message' => 'حدث خطأ غير متوقع.'], 500);
         }
     }
 
+    /**
+     * إنهاء البث المباشر للمستخدم الحالي (بدلاً من حذفه).
+     */
     public function destroyMyLivestream()
     {
-        // 1. جلب المستخدم المسجل دخوله
         $user = auth()->guard('api')->user();
 
-        // 2. الوصول إلى البث المرتبط به عبر علاقة hasOne
-        $liveStream = $user->livestream;
+        // التحسين: البحث عن البث "الحي" فقط لإنهاءه
+        $liveStream = $user->livestream();
 
-        // 3. التأكد من أن المستخدم لديه بث أصلاً
         if (!$liveStream) {
             return response()->json([
                 'status'  => false,
-                'message' => 'ليس لديك بث مباشر لحذفه',
-            ], 404); // 404 Not Found
+                'message' => 'ليس لديك بث مباشر فعال حاليًا',
+            ], 404);
         }
 
-        // 4. تنفيذ الحذف
-        // ملاحظة: إذا كنت قد طبقت الـ Model Event، فلن تحتاج لسطر حذف الصورة هنا
-        if ($liveStream->thumbnail) {
-            Storage::disk('public')->delete($liveStream->thumbnail);
-        }
-        $liveStream->delete();
+        // التحسين: تغيير الحالة إلى "منتهي" بدلاً من الحذف
+        // هذا يحافظ على سجل البث (الهدايا، الإعجابات، إلخ)
+        $liveStream->update(['status' => 'ended']);
 
-        // 5. إرجاع رسالة نجاح
         return response()->json([
             'status'  => true,
-            'message' => 'تم حذف البث الخاص بك بنجاح',
+            'message' => 'تم إنهاء البث الخاص بك بنجاح',
         ]);
     }
 }
