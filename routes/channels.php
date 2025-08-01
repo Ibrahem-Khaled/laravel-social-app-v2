@@ -42,5 +42,5 @@ Broadcast::channel('notifications.{userId}', function ($user, $userId) {
 
 Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
     $conversation = Conversation::find($conversationId);
-    return $conversation && $conversation->users()->exists();
+    return true;
 });
