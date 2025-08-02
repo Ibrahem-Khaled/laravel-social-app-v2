@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Broadcast;
 use App\Models\Conversation;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,38 +15,50 @@ use App\Models\Conversation;
 |
 */
 
-Broadcast::channel('test-channel', function () {
+Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+});
+
+Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
+    // اسمح للجميع بالدخول مؤقتًا لأغراض الاختبار فقط
     return true;
 });
 
-// الأهم هو هذا الجزء
-// هذا الكود سيتم تنفيذه عند طلب رابط المصادقة
-// بغض النظر عن القناة المطلوبة
-echo json_encode(['status' => 'OK, I am here!']);
-exit();
+Broadcast::channel('messages.{userId}', function ($user, $userId) {
+    return (int) $user->id === (int) $userId;
+});
 
+Broadcast::channel('questions.{userId}', function ($user, $userId) {
+    return (int) $user->id === (int) $userId;
+});
 
-// Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
-//     // اسمح للجميع بالدخول مؤقتًا لأغراض الاختبار فقط
-//     return true;
-// });
+/**
+ * ======================================================================
+ * الكود التالي هو ما تم تعديله لتشخيص المشكلة
+ * ======================================================================
+ */
+Broadcast::channel('notifications.{userId}', function ($user, $userId) {
+    // --- بداية كود التشخيص ---
+    Log::info('--- Broadcasting Auth Check for notifications channel ---');
 
+    // هل المتغير $user يحتوي على بيانات المستخدم أم هو فارغ (null)؟
+    Log::info('User Object received: ' . json_encode($user));
 
+    // ما هو رقم المستخدم القادم من الطلب؟
+    Log::info('Requested User ID from channel name: ' . $userId);
 
-// Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-//     return (int) $user->id === (int) $id;
-// });
+    // الآن نقوم بالتحقق
+    if ($user) {
+        $is_authorized = (int) $user->id === (int) $userId;
+        Log::info('Result of comparison: ' . ($is_authorized ? 'Authorized (true)' : 'Not Authorized (false)'));
+    } else {
+        // إذا كان المستخدم null، فهذا يعني أنه غير مسجل دخوله
+        Log::info('User is null. Authorization failed.');
+        $is_authorized = false;
+    }
+    Log::info('--- End of Auth Check ---');
+    // --- نهاية كود التشخيص ---
 
-
-// Broadcast::channel('messages.{userId}', function ($user, $userId) {
-//     return (int) $user->id === (int) $userId;
-// });
-// Broadcast::channel('questions.{userId}', function ($user, $userId) {
-//     return (int) $user->id === (int) $userId;
-// });
-
-// Broadcast::channel('notifications.{userId}', function ($user, $userId) {
-
-//     // هذا هو الكود الأصلي للمصادقة
-//     return (int) $user->id === (int) $userId;
-// });
+    // إرجاع النتيجة النهائية
+    return $is_authorized;
+});
