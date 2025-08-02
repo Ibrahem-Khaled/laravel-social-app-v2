@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Broadcast;
 use App\Models\Conversation;
-use Laravel\Reverb\Loggers\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,36 +14,38 @@ use Laravel\Reverb\Loggers\Log;
 |
 */
 
-
-
-Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
-    // اسمح للجميع بالدخول مؤقتًا لأغراض الاختبار فقط
+Broadcast::channel('test-channel', function () {
     return true;
 });
 
+// الأهم هو هذا الجزء
+// هذا الكود سيتم تنفيذه عند طلب رابط المصادقة
+// بغض النظر عن القناة المطلوبة
+echo json_encode(['status' => 'OK, I am here!']);
+exit();
 
 
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
-});
+// Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
+//     // اسمح للجميع بالدخول مؤقتًا لأغراض الاختبار فقط
+//     return true;
+// });
 
 
-Broadcast::channel('messages.{userId}', function ($user, $userId) {
-    return (int) $user->id === (int) $userId;
-});
-Broadcast::channel('questions.{userId}', function ($user, $userId) {
-    return (int) $user->id === (int) $userId;
-});
 
-Broadcast::channel('notifications.{userId}', function ($user, $userId) {
+// Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
+//     return (int) $user->id === (int) $id;
+// });
 
-    // ✨ أضف هذا الكود للتسجيل والتشخيص
-    Log::info('Channel Authorization Attempt:', [
-        'authenticated_user_id' => $user->id ?? 'GUEST (Not Authenticated!)',
-        'requested_channel_for_userId' => $userId,
-        'is_authorized' => isset($user) ? ((int) $user->id === (int) $userId) : false,
-    ]);
 
-    // هذا هو الكود الأصلي للمصادقة
-    return (int) $user->id === (int) $userId;
-});
+// Broadcast::channel('messages.{userId}', function ($user, $userId) {
+//     return (int) $user->id === (int) $userId;
+// });
+// Broadcast::channel('questions.{userId}', function ($user, $userId) {
+//     return (int) $user->id === (int) $userId;
+// });
+
+// Broadcast::channel('notifications.{userId}', function ($user, $userId) {
+
+//     // هذا هو الكود الأصلي للمصادقة
+//     return (int) $user->id === (int) $userId;
+// });
