@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\dashboard\AgencyController;
-use App\Http\Controllers\Dashboard\AgencyUserController;
+// use App\Http\Controllers\dashboard\AgencyController;
+// use App\Http\Controllers\Dashboard\AgencyUserController;
 use App\Http\Controllers\dashboard\FamilyController;
 use App\Http\Controllers\dashboard\GiftController;
 use App\Http\Controllers\dashboard\homeController;
@@ -73,8 +73,8 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::resource('live-streamings', LiveStreamingController::class);
     Route::get('live-streamings/statistics', [LiveStreamingController::class, 'statistics'])->name('live-streamings.statistics');
 
-    Route::resource('agencies', AgencyController::class);
-    Route::resource('agency-users', AgencyUserController::class);
+    // Route::resource('agencies', AgencyController::class);
+    // Route::resource('agency-users', AgencyUserController::class);
 
     Route::resource('sell-coins', SellCoinController::class);
 
