@@ -16,6 +16,7 @@ use App\Http\Controllers\api\questionController;
 use App\Http\Controllers\api\ReelsController;
 use App\Http\Controllers\api\ReportController;
 use App\Http\Controllers\api\sellCoinsController;
+use App\Http\Controllers\BroadcastAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -153,4 +154,7 @@ Route::group([], function () {
             Route::get('/withdrawals', 'listWithdrawals');      // GET /api/v1/financial/withdrawals
             Route::post('/withdrawals', 'createWithdrawal');    // POST /api/v1/financial/withdrawals
         });
+
+
+    Route::post('/broadcasting/auth', [BroadcastAuthController::class, 'authenticate']);
 });
