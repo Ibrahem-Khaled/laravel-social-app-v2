@@ -16,36 +16,25 @@ use Illuminate\Support\Facades\Log; // <-- أضف هذا السطر
 */
 
 
-Broadcast::channel('test-channel', function () {
+Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+});
+
+
+Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
+    // اسمح للجميع بالدخول مؤقتًا لأغراض الاختبار فقط
     return true;
 });
 
-// الأهم هو هذا الجزء
-// هذا الكود سيتم تنفيذه عند طلب رابط المصادقة
-// بغض النظر عن القناة المطلوبة
-echo json_encode(['status' => auth()->guard('api')->check() ? 'authenticated' : 'unauthenticated']);
-exit();
+Broadcast::channel('messages.{userId}', function ($user, $userId) {
+    return (int) $user->id === (int) $userId;
+});
+Broadcast::channel('questions.{userId}', function ($user, $userId) {
+    return (int) $user->id === (int) $userId;
+});
 
+Broadcast::channel('notifications.{userId}', function ($user, $userId) {
 
-// Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-//     return (int) $user->id === (int) $id;
-// });
-
-
-// Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
-//     // اسمح للجميع بالدخول مؤقتًا لأغراض الاختبار فقط
-//     return true;
-// });
-
-// Broadcast::channel('messages.{userId}', function ($user, $userId) {
-//     return (int) $user->id === (int) $userId;
-// });
-// Broadcast::channel('questions.{userId}', function ($user, $userId) {
-//     return (int) $user->id === (int) $userId;
-// });
-
-// Broadcast::channel('notifications.{userId}', function ($user, $userId) {
-
-//     // هذا هو الكود الأصلي للمصادقة
-//     return (int) $user->id === (int) $userId;
-// });
+    // هذا هو الكود الأصلي للمصادقة
+    return (int) $user->id === (int) $userId;
+});
