@@ -17,6 +17,12 @@ use Illuminate\Support\Facades\Log; // <-- أضف هذا السطر
 
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
+    \Log::info('Broadcast Auth Attempt', [
+        'auth_user_id' => $user->id ?? null,
+        'channel_user_id' => $id
+    ]);
+
+
     return (int) $user->id === (int) $id;
 });
 
