@@ -92,10 +92,11 @@ class homeController extends Controller
             ->where(function ($query) use ($searchVariations) {
                 foreach ($searchVariations as $variation) {
                     $query->orWhere('name', 'LIKE', "%{$variation}%")
-                        ->orWhere('username', 'LIKE', "%{$variation}%");
+                        ->orWhere('username', 'LIKE', "%{$variation}%")
+                        ->orWhere('bio', 'LIKE', "%{$variation}%");
                 }
             })
-            ->where('id', '!=', auth()->guard('api')->user()->id)
+            ->where('id', '!=', auth()->guard('api')->user()->id ?? null)
             ->get();
 
         // البحث في الهاشتاجات
