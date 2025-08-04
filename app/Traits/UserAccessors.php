@@ -21,7 +21,7 @@ trait UserAccessors
         return asset(env('APP_URL') . '/' . $defaultAvatar);
     }
 
-    public function isOnline()
+    public function getIsOnlineAttribute()
     {
         return Cache::has('user-is-online-' . $this->id);
     }
