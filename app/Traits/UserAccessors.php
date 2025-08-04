@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Models\CallLog;
 use App\Models\Level;
+use Illuminate\Support\Facades\Cache;
 
 trait UserAccessors
 {
@@ -19,6 +20,13 @@ trait UserAccessors
 
         return asset(env('APP_URL') . '/' . $defaultAvatar);
     }
+
+    public function isOnline()
+    {
+        return Cache::has('user-is-online-' . $this->id);
+    }
+
+
     public function getUserFollowersCountAttribute()
     {
         return $this->followers()->count();

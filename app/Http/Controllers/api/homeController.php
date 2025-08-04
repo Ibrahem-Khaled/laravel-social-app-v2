@@ -12,6 +12,22 @@ use Illuminate\Http\Request;
 class homeController extends Controller
 {
 
+    private function getArabicSearchVariations(string $term): array
+    {
+        // إزالة التشكيل (الحركات) إن وجد
+        $term = preg_replace('/[ًٌٍَُِّْ]/u', '', $term);
+
+        // التعامل مع أشكال الألف
+        $term_alef = str_replace(['أ', 'إ', 'آ'], 'ا', $term);
+        // التعامل مع التاء المربوطة والهاء
+        $term_taa = str_replace('ة', 'ه', $term_alef);
+        // التعامل مع الألف المقصورة والياء
+        $term_yaa = str_replace('ى', 'ي', $term_taa);
+
+        // إرجاع مصفوفة فريدة من أشكال الكلمة المحتملة
+        return array_unique([$term, $term_alef, $term_taa, $term_yaa]);
+    }
+
     // جلب الاقتراحات الأولية
     public function getSuggestions()
     {
@@ -68,24 +84,37 @@ class homeController extends Controller
             ]);
         }
 
+        // الحصول على كل أشكال البحث الممكنة للكلمة العربية
+        $searchVariations = $this->getArabicSearchVariations($searchTerm);
+
         // البحث في المستخدمين
         $users = User::query()
-            ->where(function ($query) use ($searchTerm) {
-                $query->where('name', 'LIKE', "%{$searchTerm}%")
-                    ->orWhere('username', 'LIKE', "%{$searchTerm}%");
+            ->where(function ($query) use ($searchVariations) {
+                foreach ($searchVariations as $variation) {
+                    $query->orWhere('name', 'LIKE', "%{$variation}%")
+                        ->orWhere('username', 'LIKE', "%{$variation}%");
+                }
             })
             ->where('id', '!=', auth()->guard('api')->user()->id)
             ->get();
 
         // البحث في الهاشتاجات
         $hashtags = Hashtag::query()
-            ->where('name', 'LIKE', "%{$searchTerm}%")
+            ->where(function ($query) use ($searchVariations) {
+                foreach ($searchVariations as $variation) {
+                    $query->orWhere('name', 'LIKE', "%{$variation}%");
+                }
+            })
             ->withCount('posts')
             ->get();
 
         // البحث في المنشورات
         $posts = Post::query()
-            ->where('content', 'LIKE', "%{$searchTerm}%")
+            ->where(function ($query) use ($searchVariations) {
+                foreach ($searchVariations as $variation) {
+                    $query->orWhere('content', 'LIKE', "%{$variation}%");
+                }
+            })
             ->withCount('likes', 'comments')
             ->with('user', 'hashtags', 'likes', 'comments')
             ->get();
