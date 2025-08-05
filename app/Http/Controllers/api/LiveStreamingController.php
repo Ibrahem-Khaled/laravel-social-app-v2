@@ -144,11 +144,9 @@ class LiveStreamingController extends Controller
         $user = auth()->guard('api')->user();
 
         $validator = Validator::make($request->all(), [
-            'title'       => 'nullable|string|max:255',
-            'thumbnail'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'type'        => 'required|in:live,audio_room',
-            // الحقول القديمة التي لم نعد بحاجة إليها في الإنشاء:
-            // agency_id, description, password, scheduled_at
+            'title'     => 'nullable|string|max:255',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'type'      => 'required|in:live,audio_room',
         ]);
 
         if ($validator->fails()) {
@@ -159,34 +157,47 @@ class LiveStreamingController extends Controller
 
         try {
             $liveStream = DB::transaction(function () use ($request, $validatedData, $user) {
+
+                // التعامل مع الصورة المصغرة (Thumbnail)
                 if ($request->hasFile('thumbnail')) {
-                    // حذف الصورة القديمة إذا وجدت
-                    if ($user->livestream && $user->livestream->thumbnail) {
-                        Storage::disk('public')->delete($user->livestream->thumbnail);
+                    // نبحث عن البث الحالي للمستخدم لحذف الصورة القديمة إذا وجدت
+                    $currentStream = $user->livestream;
+                    if ($currentStream && $currentStream->thumbnail) {
+                        Storage::disk('public')->delete($currentStream->thumbnail);
                     }
                     $validatedData['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
                 }
 
-                // التحسين: إضافة البيانات الجديدة المطلوبة حسب السكيما
-                $validatedData['status'] = 'live'; // <-- الحالة الافتراضية هي "live"
-                $validatedData['channel_name'] = "stream_{$user->id}_" . Str::random(10); // <-- إنشاء اسم قناة فريد
+                // إعداد البيانات اللازمة للإنشاء أو التحديث
+                // بما أن status في السكيما هو ENUM، فإن القيمة 'live' صحيحة
+                $validatedData['status'] = 'live';
 
-                // تحديث البث الموجود أو إنشاء جديد (لضمان أن لكل مستخدم بث واحد فعال)
+                // إضافة قيمة افتراضية للعنوان إذا لم يتم إرساله
+                if (empty($validatedData['title'])) {
+                    $validatedData['title'] = "بث مباشر للمستخدم " . $user->name;
+                }
+
+                // تحديث البث الموجود أو إنشاء بث جديد للمستخدم
+                // عند استخدام علاقة (hasOne or hasMany) مثل livestream()
+                // يقوم لارافيل تلقائياً بملء user_id، لذلك لا حاجة لتمريره
+                // في الشرط الأول. نمرر مصفوفة فارغة للبحث، والبيانات للتحديث.
                 return $user->livestream()->updateOrCreate(
-                    ['user_id' => $user->id], // الشرط للبحث عن البث
+                    [], // الشرط للبحث (فارغ لأن العلاقة تهتم بـ user_id)
                     $validatedData // البيانات للتحديث أو الإنشاء
                 );
             });
+
+            // تم حذف channel_name من هنا لأنه أصبح جزءاً من validatedData
+            // ويتم التعامل معه داخل updateOrCreate
 
             return response()->json([
                 'status'  => true,
                 'message' => 'تم بدء البث المباشر بنجاح.',
                 'data'    => $liveStream,
             ], 201);
-
         } catch (Throwable $e) {
             Log::error('Livestream store/update failed: ' . $e->getMessage());
-            return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => false, 'message' => 'حدث خطأ غير متوقع: ' . $e->getMessage()], 500);
         }
     }
 
