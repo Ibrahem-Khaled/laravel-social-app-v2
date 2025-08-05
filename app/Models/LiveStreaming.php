@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str; // <-- لا تنسَ استدعاء هذه الكلاس
 
 class LiveStreaming extends Model
 {
@@ -22,9 +23,10 @@ class LiveStreaming extends Model
     protected static function boot()
     {
         parent::boot();
-
-        static::creating(function ($model) {
-            $model->live_streaming_id = rand(100000000000, 999999999999);
+        static::creating(function ($liveStreamModel) {
+            if (empty($liveStreamModel->channel_name)) {
+                $liveStreamModel->channel_name = "stream_" . $liveStreamModel->user_id . "_" . Str::random(10);
+            }
         });
     }
 
