@@ -186,7 +186,7 @@ class LiveStreamingController extends Controller
 
         } catch (Throwable $e) {
             Log::error('Livestream store/update failed: ' . $e->getMessage());
-            return response()->json(['status' => false, 'message' => 'حدث خطأ غير متوقع.'], 500);
+            return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
