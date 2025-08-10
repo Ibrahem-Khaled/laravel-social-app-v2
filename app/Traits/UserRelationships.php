@@ -65,8 +65,10 @@ trait UserRelationships
 
     public function gifts()
     {
-        return $this->belongsToMany(Gift::class, 'user_gifts')
-            ->withPivot('sender_id', 'quantity')
+        // الوسيط الثالث: هو اسم الحقل الخاص بالموديل الحالي (User) في الجدول الوسيط
+        // الوسيط الرابع: هو اسم الحقل الخاص بالموديل المرتبط (Gift) في الجدول الوسيط
+        return $this->belongsToMany(Gift::class, 'user_gifts', 'receiver_id', 'gift_id')
+            ->withPivot('sender_id', 'quantity', 'live_streaming_id', 'pk_battle_id') // أضف باقي الحقول
             ->withTimestamps();
     }
 

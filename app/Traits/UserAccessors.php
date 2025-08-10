@@ -72,6 +72,7 @@ trait UserAccessors
 
         return $authUser->blockedUsers()->where('blocked_user_id', $this->id)->exists();
     }
+
     public function allCallLogs()
     {
         return CallLog::with(['sender', 'recipient'])
