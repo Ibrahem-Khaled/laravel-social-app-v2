@@ -48,4 +48,9 @@ class LiveStreaming extends Model
     {
         return $this->thumbnail ? asset('storage/' . $this->thumbnail) : asset('assets/img/logo.png');
     }
+
+    public function getIsHostAttribute()
+    {
+        return $this->user_id === auth()->guard('api')->id();
+    }
 }
