@@ -103,6 +103,11 @@
             <span>الهدايات</span></a>
     </li>
     <li class="nav-item">
+        <a class="nav-link" href="{{ route('games.index') }}">
+            <i class="fas fa-fw fa-gamepad"></i>
+            <span>اللعبة</span></a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link" href="{{ route('messages.index') }}">
             <i class="fas fa-fw fa-envelope"></i>
             <span>الاسئلة</span></a>

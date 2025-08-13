@@ -3,6 +3,7 @@
 // use App\Http\Controllers\dashboard\AgencyController;
 // use App\Http\Controllers\Dashboard\AgencyUserController;
 use App\Http\Controllers\dashboard\FamilyController;
+use App\Http\Controllers\dashboard\GameController;
 use App\Http\Controllers\dashboard\GiftController;
 use App\Http\Controllers\dashboard\homeController;
 use App\Http\Controllers\dashboard\LevelController;
@@ -92,6 +93,9 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::resource('faqs', FAQController::class);
     Route::post('faqs.toggle-status', [FAQController::class, 'toggleStatus'])->name('faqs.toggle-status');
     Route::post('faqs.toggle-featured', [FAQController::class, 'toggleFeatured'])->name('faqs.toggle-featured');
+
+    //this routes to control from games
+    Route::resource('games', GameController::class);
 });
 
 
