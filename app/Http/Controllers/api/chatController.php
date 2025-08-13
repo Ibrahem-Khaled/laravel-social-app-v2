@@ -296,7 +296,7 @@ class ChatController extends Controller
         // التحقق من البيانات الواردة
         $validator = Validator::make($request->all(), [
             'conversation_id' => 'required|exists:conversations,id',
-            'message' => 'nullable|required_without:media|string|max:1000',
+            'message' => 'nullable|string|max:1000',
             'receiver_id' => 'nullable|exists:users,id',
             'media' => 'nullable|file|mimes:jpg,jpeg,png,mp4,mov,avi,mkv|max:20480',
         ]);
