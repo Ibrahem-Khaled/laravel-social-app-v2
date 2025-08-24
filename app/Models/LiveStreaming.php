@@ -15,6 +15,7 @@ class LiveStreaming extends Model
     protected $casts = [
         'scheduled_at' => 'datetime',
         'status' => 'boolean',
+        'likes' => 'integer',
     ];
     protected $hidden = [
         'password',

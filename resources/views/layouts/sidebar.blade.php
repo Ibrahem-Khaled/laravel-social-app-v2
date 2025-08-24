@@ -148,10 +148,10 @@
         <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">اللايفات:</h6>
-                <a class="collapse-item" href="{{ route('families.index') }}">
+                {{-- <a class="collapse-item" href="{{ route('families.index') }}">
                     <i class="fas fa-fw fa-users"></i>
                     <span>العائلات</span>
-                </a>
+                </a> --}}
                 <a class="collapse-item" href="{{ route('live-streamings.index') }}">
                     <i class="fas fa-fw fa-tv"></i>
                     <span>اللايفات الحية</span>

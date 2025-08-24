@@ -72,7 +72,8 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::resource('families', FamilyController::class);
     Route::resource('user-families', UserFamilyController::class)->only(['store', 'update', 'destroy']);
 
-    Route::resource('live-streamings', LiveStreamingController::class);
+    Route::resource('live-streamings', LiveStreamingController::class)->except(['show']);
+
     Route::get('live-streamings/statistics', [LiveStreamingController::class, 'statistics'])->name('live-streamings.statistics');
 
     // Route::resource('agencies', AgencyController::class);
@@ -100,8 +101,6 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
 
     //this routes to control from games
     Route::resource('games', GameController::class);
-
-
 });
 
 
