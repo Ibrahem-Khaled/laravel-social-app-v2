@@ -139,7 +139,7 @@ class Post extends Model
         // 3. Fallback to the website's default avatar
         $websiteData = Cache::remember('website_data', now()->addMinutes(60), function () {
             // Make sure you have a WebsiteData model or similar
-            return \App\Models\User::where('role', 'website')->first();
+            return \App\Models\User::where('role', 'website-data')->first();
         });
 
         if ($websiteData && $websiteData->avatar) {
