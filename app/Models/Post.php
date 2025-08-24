@@ -123,24 +123,30 @@ class Post extends Model
 
     public function getThumbnailUrlAttribute(): string
     {
-        // 1. البحث عن رابط يوتيوب في المحتوى
+        // 1. Check for a YouTube link in the content
         if ($this->content && preg_match('/(youtube\.com|youtu\.be)\/(watch\?v=|embed\/|v\/|)([\w-]{11})/', $this->content, $matches)) {
-            $youtubeId = $matches[3];
-            // إرجاع رابط الصورة المصغرة عالية الجودة من يوتيوب
-            return "https://img.youtube.com/vi/{$youtubeId}/hqdefault.jpg";
+            return "https://img.youtube.com/vi/{$matches[3]}/hqdefault.jpg";
         }
 
-        // 2. إذا لم يكن هناك يوتيوب، تحقق من وجود صور مرفقة بالمنشور
-        if (!empty($this->images) && isset($this->images[0])) {
-            return asset('storage/' . $this->images[0]);
+        // 2. Check for attached images (now safely)
+        $images = $this->images; // Access the casted attribute
+
+        // Check if $images is a valid, non-empty array and its first element is a string
+        if (is_array($images) && !empty($images) && is_string($images[0])) {
+            return asset('storage/' . $images[0]);
         }
 
-        // 3. إذا لم يوجد أي مما سبق، استخدم الصورة الافتراضية للموقع
-        // يتم جلب بيانات الموقع مرة واحدة وتخزينها مؤقتاً (caching) لتحسين الأداء
-        $websiteData = Cache::remember('website_data', 60, function () {
-            return \App\Models\User::where('role', 'website')->first(); // تأكد من أن هذا هو اسم النموذج الصحيح لبيانات موقعك
+        // 3. Fallback to the website's default avatar
+        $websiteData = Cache::remember('website_data', now()->addMinutes(60), function () {
+            // Make sure you have a WebsiteData model or similar
+            return \App\Models\User::where('role', 'website')->first();
         });
 
-        return $websiteData ? asset('storage/' . $websiteData->avatar) : asset('images/default-post.png'); // fallback إضافي
+        if ($websiteData && $websiteData->avatar) {
+            return asset('storage/' . $websiteData->avatar);
+        }
+
+        // Final fallback image if nothing else is found
+        return asset('images/default-post-placeholder.png');
     }
 }
