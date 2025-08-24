@@ -80,7 +80,7 @@
                                 <input type="checkbox" name="message_ids[]" value="{{ $message->id }}">
                             </td>
                             <td>{{ $message->is_anonymous ? 'مجهول' : $message->sender->name }}</td>
-                            <td>{{ $message->receiver->name }}</td>
+                            <td>{{ $message?->receiver?->name }}</td>
                             <td>{{ $message->message }}</td>
                             <td>
                                 @if ($message->is_read)
