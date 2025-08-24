@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Post extends Model
 {
@@ -115,5 +116,31 @@ class Post extends Model
         })->unique(); // ضمان عدم التكرار
 
         $this->hashtags()->sync($hashtagIds);
+    }
+
+
+
+
+    public function getThumbnailUrlAttribute(): string
+    {
+        // 1. البحث عن رابط يوتيوب في المحتوى
+        if ($this->content && preg_match('/(youtube\.com|youtu\.be)\/(watch\?v=|embed\/|v\/|)([\w-]{11})/', $this->content, $matches)) {
+            $youtubeId = $matches[3];
+            // إرجاع رابط الصورة المصغرة عالية الجودة من يوتيوب
+            return "https://img.youtube.com/vi/{$youtubeId}/hqdefault.jpg";
+        }
+
+        // 2. إذا لم يكن هناك يوتيوب، تحقق من وجود صور مرفقة بالمنشور
+        if (!empty($this->images) && isset($this->images[0])) {
+            return asset('storage/' . $this->images[0]);
+        }
+
+        // 3. إذا لم يوجد أي مما سبق، استخدم الصورة الافتراضية للموقع
+        // يتم جلب بيانات الموقع مرة واحدة وتخزينها مؤقتاً (caching) لتحسين الأداء
+        $websiteData = Cache::remember('website_data', 60, function () {
+            return \App\Models\User::where('role', 'website')->first(); // تأكد من أن هذا هو اسم النموذج الصحيح لبيانات موقعك
+        });
+
+        return $websiteData ? asset('storage/' . $websiteData->avatar) : asset('images/default-post.png'); // fallback إضافي
     }
 }

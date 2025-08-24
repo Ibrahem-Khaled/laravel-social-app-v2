@@ -323,145 +323,158 @@
         </div>
     </section>
 
-    <!-- Shipping Agent Section -->
-    <section class="py-24 relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                <div class="order-2 lg:order-1">
-                    <div class="glass rounded-3xl p-8 card-3d hover-lift">
-                        <h2 class="text-4xl md:text-5xl font-bold mb-6">
-                            كن <span
-                                class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-purple-400">وكيل
-                                شحن</span> معنا
-                        </h2>
-                        <p class="text-gray-300 text-lg mb-8 leading-relaxed">
-                            انضم إلى شبكة وكلاء الشحن لدينا وكن حلقة الوصل بين العملاء والبائعين. نوفر لك الأدوات
-                            والموارد اللازمة لإدارة عمليات الشحن بسهولة.
-                        </p>
+    @if ($featureSections->isNotEmpty())
+        @foreach ($featureSections as $section)
+            {{-- نستخدم slug السكشن كـ id لسهولة الوصول إليه عبر الروابط --}}
+            <section id="{{ $section->slug }}" class="py-24 relative">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
-                        <ul class="space-y-4 mb-10">
-                            <li class="flex items-start group">
-                                <div
-                                    class="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary-500 to-purple-600 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
-                                    <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7" />
+                        {{-- عمود النص --}}
+                        {{-- إذا كان التكرار زوجيًا (السكشن الثاني، الرابع...)، النص يظهر أولاً --}}
+                        <div class="@if ($loop->even) order-2 lg:order-1 @endif">
+                            <div class="glass rounded-3xl p-8 card-3d hover-lift">
+                                <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                                    {{ $section->title_before_highlight }}
+                                    <span
+                                        class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-purple-400">
+                                        {{ $section->highlighted_title }}
+                                    </span>
+                                    {{ $section->title_after_highlight }}
+                                </h2>
+                                <p class="text-gray-300 text-lg mb-8 leading-relaxed">
+                                    {{ $section->description }}
+                                </p>
+
+                                <ul class="space-y-4 mb-10">
+                                    @foreach ($section->items as $item)
+                                        <li class="flex items-start group">
+                                            <div
+                                                class="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary-500 to-purple-600 rounded-full flex items-center justify-center ml-4 group-hover:scale-110 transition-transform">
+                                                <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                            <span class="text-gray-300 text-lg">{{ $item->text }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+
+                                <a href="{{ url($section->button_url) }}"
+                                    class="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-xl overflow-hidden">
+                                    <span class="relative z-10">{{ $section->button_text }}</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-6 w-6 mr-3 group-hover:translate-x-1 transition-transform"
+                                        viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                                            clip-rule="evenodd" />
                                     </svg>
-                                </div>
-                                <span class="text-gray-300 text-lg">عمولات تنافسية على كل شحنة</span>
-                            </li>
-                            <li class="flex items-start group">
-                                <div
-                                    class="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary-500 to-purple-600 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
-                                    <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </div>
-                                <span class="text-gray-300 text-lg">منصة متكاملة لمتابعة الشحنات</span>
-                            </li>
-                            <li class="flex items-start group">
-                                <div
-                                    class="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary-500 to-purple-600 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
-                                    <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </div>
-                                <span class="text-gray-300 text-lg">دعم فني متواصل</span>
-                            </li>
-                        </ul>
-
-                        <a href="{{ route('shippingAgent') }}"
-                            class="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-xl overflow-hidden">
-                            <span class="relative z-10">سجل كوكيل شحن</span>
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                class="h-6 w-6 mr-3 group-hover:translate-x-1 transition-transform"
-                                viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="order-1 lg:order-2 relative">
-                    <div class="relative floating">
-                        <div class="neon-border rounded-3xl overflow-hidden shadow-2xl">
-                            <img src="{{ asset('assets/img/agent.jpg') }}" alt="Shipping Agent"
-                                class="w-full h-auto">
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Demo Section -->
-    <section id="demo" class="py-24 relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                <div class="glass rounded-3xl p-10 card-3d">
-                    <h2 class="text-4xl md:text-5xl font-bold mb-6">
-                        جرب <span
-                            class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-purple-400">التطبيق</span>
-                        الآن
-                    </h2>
-                    <p class="text-gray-300 text-lg mb-10 leading-relaxed">
-                        شاهد عرضًا توضيحيًا سريعًا لتجربة واجهة التطبيق وميزاته قبل الاشتراك.
-                    </p>
-
-                    <ul class="space-y-6 mb-10">
-                        @foreach ($demoFeatures as $feature)
-                            <li class="flex items-start group">
-                                <div
-                                    class="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary-500 to-purple-600 rounded-full flex items-center justify-center ml-4 group-hover:scale-110 transition-transform">
-                                    <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </div>
-                                <span class="text-gray-300 text-lg">{{ $feature }}</span>
-                            </li>
-                        @endforeach
-                    </ul>
-
-                    <a href="{{ route('register') }}"
-                        class="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-xl overflow-hidden">
-                        <span class="relative z-10">ابدأ تجربتك المجانية</span>
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-6 w-6 mr-3 group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20"
-                            fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <div class="absolute inset-0 shimmer opacity-0 group-hover:opacity-100"></div>
-                    </a>
-                </div>
-
-                <div class="relative">
-                    <div class="relative rounded-3xl overflow-hidden shadow-2xl neon-border">
-                        <div class="glass h-12 flex items-center px-6">
-                            <div class="flex space-x-3 space-x-reverse">
-                                <div class="w-4 h-4 rounded-full bg-red-500 glow"></div>
-                                <div class="w-4 h-4 rounded-full bg-yellow-500 glow"></div>
-                                <div class="w-4 h-4 rounded-full bg-green-500 glow"></div>
+                                </a>
                             </div>
                         </div>
-                        <img src="{{ asset('assets/img/demo.png') }}" alt="Demo Image" class="w-full">
-                    </div>
 
+                        {{-- عمود الصورة --}}
+                        {{-- إذا كان التكرار فرديًا (السكشن الأول، الثالث...)، الصورة تظهر أولاً --}}
+                        <div class="@if ($loop->even) order-1 lg:order-2 @endif relative">
+                            <div class="relative floating">
+                                <div class="neon-border rounded-3xl overflow-hidden shadow-2xl">
+                                    <img src="{{ asset('storage/' . $section->image_path) }}"
+                                        alt="{{ $section->image_alt }}" class="w-full h-auto">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
+            </section>
+        @endforeach
+    @endif
+
+    <!-- Latest Posts Section -->
+    <section class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                    آخر <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-purple-400">المنشورات</span>
+                </h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                    اكتشف آخر الأخبار والمواضيع التي تمت مشاركتها في مجتمعنا.
+                </p>
+            </div>
+
+            @if ($latestPosts->isNotEmpty())
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @foreach ($latestPosts as $post)
+                        <div class="glass rounded-2xl overflow-hidden hover-lift card-3d group">
+                            <div class="relative overflow-hidden">
+                                {{-- هنا نستخدم الدالة الذكية التي أنشأناها في النموذج --}}
+                                <img src="{{ $post->thumbnail_url }}" alt="{{ Str::limit($post->content, 50) }}"
+                                    loading="lazy"
+                                    class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110">
+
+                                {{-- يمكنك إضافة شارة مميزة حسب نوع المنشور --}}
+                                <div
+                                    class="absolute top-4 left-4 bg-primary-500 text-white px-3 py-1 rounded-full text-sm font-bold glow">
+                                    {{ ucfirst($post->type) }}
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center mb-4">
+                                    {{-- هنا نستخدم الدالة الذكية من نموذج المستخدم --}}
+                                    <img class="w-12 h-12 rounded-full ml-4 ring-2 ring-primary-500/50"
+                                        src="{{ $post->user?->avatar_url }}" alt="{{ $post->user?->name }}">
+                                    <div>
+                                        <h4 class="font-bold text-lg">{{ $post->user?->name ?? 'مستخدم محذوف' }}</h4>
+                                        <p class="text-primary-400 text-sm">{{ $post->created_at->diffForHumans() }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <p class="text-gray-400 text-sm mb-6 leading-relaxed h-20 overflow-hidden">
+                                    {{ Str::limit($post->content, 120) }}
+                                </p>
+
+                                <a href="#" {{-- استبدل # برابط المنشور الفعلي --}}
+                                    class="inline-flex items-center text-primary-500 hover:text-primary-400 transition-all group-hover:translate-x-1 font-medium">
+                                    اقرأ المزيد
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center text-gray-400">
+                    <p>لا توجد منشورات لعرضها حالياً.</p>
+                </div>
+            @endif
+
+            <div class="mt-16 text-center">
+                <a href="#" {{-- استبدل # برابط صفحة كل المنشورات --}}
+                    class="group inline-flex items-center px-8 py-4 glass rounded-full font-bold text-lg hover:bg-white/10 transition-all transform hover:scale-105 shadow-xl">
+                    عرض جميع المنشورات
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6 mr-3 group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </a>
             </div>
         </div>
     </section>
+
+
 
     <!-- Latest Lives Section -->
     <section class="py-24 relative">

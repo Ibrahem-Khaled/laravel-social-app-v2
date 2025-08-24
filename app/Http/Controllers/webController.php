@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\FAQ;
+use App\Models\FeatureSection;
 use App\Models\LiveStreaming;
+use App\Models\Post;
 use App\Models\SellCoins;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -17,12 +19,21 @@ class webController extends Controller
         $latestLives = LiveStreaming::latest()->with('user')->take(8)->get();
         $coins = SellCoins::where('platform', 'web')->get();
         $faqs = FAQ::all();
+        $featureSections = FeatureSection::with('items')->latest()->get();
+        $latestPosts = Post::with('user')
+            ->where('status', 'active')
+            ->latest() // للترتيب حسب الأحدث
+            ->take(3)  // لجلب 3 فقط
+            ->get();
+
 
         return view('home', [
             'users' => $users,
             'latestLives' => $latestLives,
             'coins' => $coins,
             'faqs' => $faqs,
+            'featureSections' => $featureSections,
+            'latestPosts' => $latestPosts,
             'heroImage' => 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
             'testimonials' => [
                 [
