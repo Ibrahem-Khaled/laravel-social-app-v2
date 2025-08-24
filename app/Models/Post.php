@@ -147,6 +147,6 @@ class Post extends Model
         }
 
         // Final fallback image if nothing else is found
-        return asset('images/default-post-placeholder.png');
+        return asset('storage/' . $websiteData->avatar);
     }
 }
