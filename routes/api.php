@@ -1,9 +1,11 @@
 <?php
 
 use App\Events\MessageSent;
+use App\Http\Controllers\api\AttachmentApiController;
 use App\Http\Controllers\api\authController;
 use App\Http\Controllers\api\CallLogController;
 use App\Http\Controllers\api\chatController;
+use App\Http\Controllers\api\ContactMessageApiController;
 use App\Http\Controllers\api\FinancialController;
 use App\Http\Controllers\api\followerController;
 use App\Http\Controllers\api\giftController;
@@ -153,4 +155,19 @@ Route::group([], function () {
             Route::get('/withdrawals', 'listWithdrawals');      // GET /api/v1/financial/withdrawals
             Route::post('/withdrawals', 'createWithdrawal');    // POST /api/v1/financial/withdrawals
         });
+
+
+    Route::post('/contact/messages', [ContactMessageApiController::class, 'store'])
+        ->name('api.contact.store');
+    // قائمة / عرض / تحديث / حذف
+    Route::get('/contact/messages', [ContactMessageApiController::class, 'index'])->name('api.contact.index');
+    Route::get('/contact/messages/{message}', [ContactMessageApiController::class, 'show'])->name('api.contact.show');
+    // تحديث حقول إدارة فقط (حالة/أولوية/تصنيف/تعيين)
+    Route::patch('/contact/messages/{message}', [ContactMessageApiController::class, 'update'])->name('api.contact.update');
+    Route::delete('/contact/messages/{message}', [ContactMessageApiController::class, 'destroy'])->name('api.contact.destroy');
+    // مرفقات على رسالة
+    Route::post('/contact/messages/{message}/attachments', [AttachmentApiController::class, 'storeForMessage'])
+        ->name('api.attachments.storeForMessage');
+    Route::delete('/attachments/{attachment}', [AttachmentApiController::class, 'destroy'])->name('api.attachments.destroy');
+    Route::get('/attachments/{attachment}/download', [AttachmentApiController::class, 'download'])->name('api.attachments.download');
 });

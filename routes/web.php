@@ -2,6 +2,8 @@
 
 // use App\Http\Controllers\dashboard\AgencyController;
 // use App\Http\Controllers\Dashboard\AgencyUserController;
+
+use App\Http\Controllers\dashboard\ContactMessageController;
 use App\Http\Controllers\dashboard\FamilyController;
 use App\Http\Controllers\dashboard\FeatureSectionController;
 use App\Http\Controllers\dashboard\GameController;
@@ -95,6 +97,14 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::resource('faqs', FAQController::class);
     Route::post('faqs.toggle-status', [FAQController::class, 'toggleStatus'])->name('faqs.toggle-status');
     Route::post('faqs.toggle-featured', [FAQController::class, 'toggleFeatured'])->name('faqs.toggle-featured');
+
+    Route::get('/contacts', [ContactMessageController::class, 'index'])->name('contacts.index');
+    Route::post('/contacts', [ContactMessageController::class, 'store'])->name('contacts.store');
+    Route::put('/contacts/{contact_message}', [ContactMessageController::class, 'update'])->name('contacts.update');
+    Route::delete('/contacts/{contact_message}', [ContactMessageController::class, 'destroy'])->name('contacts.destroy');
+    // مرفقات
+    Route::delete('/attachments/{attachment}', [ContactMessageController::class, 'destroyAttachment'])->name('attachments.destroy');
+    Route::get('/attachments/{attachment}/download', [ContactMessageController::class, 'downloadAttachment'])->name('attachments.download');
 
     Route::resource('feature-sections', FeatureSectionController::class)->except(['show']);
 

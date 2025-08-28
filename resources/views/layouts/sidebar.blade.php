@@ -79,24 +79,24 @@
                     <i class="fas fa-fw fa-question-circle"></i>
                     <span>الأسئلة الشائعة</span>
                 </a>
-                <a class="collapse-item" href="#">
+                <a class="collapse-item" href="{{ route('contacts.index') }}">
                     <i class="fas fa-fw fa-envelope"></i>
                     <span>اتصل بنا</span>
                 </a>
                 <div class="collapse-divider"></div>
                 <h6 class="collapse-header">إعدادات الموقع:</h6>
-                <a class="collapse-item" href="#">
+                {{-- <a class="collapse-item" href="#">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>الإعدادات العامة</span>
-                </a>
+                </a> --}}
                 <a class="collapse-item" href="{{ route('feature-sections.index') }}">
                     <i class="fas fa-fw fa-sliders-h"></i>
                     <span>الخصائص العامة</span>
                 </a>
-                <a class="collapse-item" href="#">
+                {{-- <a class="collapse-item" href="#">
                     <i class="fas fa-fw fa-sliders-h"></i>
                     <span>إعدادات SEO</span>
-                </a>
+                </a> --}}
             </div>
         </div>
     </li>
