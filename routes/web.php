@@ -15,6 +15,7 @@ use App\Http\Controllers\dashboard\MessageController;
 use App\Http\Controllers\dashboard\NotificationController;
 use App\Http\Controllers\dashboard\PostController;
 use App\Http\Controllers\dashboard\SellCoinController;
+use App\Http\Controllers\dashboard\SettingController;
 use App\Http\Controllers\dashboard\UserController;
 use App\Http\Controllers\dashboard\UserFamilyController;
 use App\Http\Controllers\dashboard\VerificationController;
@@ -98,6 +99,9 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::post('faqs.toggle-status', [FAQController::class, 'toggleStatus'])->name('faqs.toggle-status');
     Route::post('faqs.toggle-featured', [FAQController::class, 'toggleFeatured'])->name('faqs.toggle-featured');
 
+    Route::get('settings', [SettingController::class, 'index'])->name('dashboard.settings.index');
+    Route::post('settings', [SettingController::class, 'update'])->name('dashboard.settings.update');
+
     Route::get('/contacts', [ContactMessageController::class, 'index'])->name('contacts.index');
     Route::post('/contacts', [ContactMessageController::class, 'store'])->name('contacts.store');
     Route::put('/contacts/{contact_message}', [ContactMessageController::class, 'update'])->name('contacts.update');
@@ -107,6 +111,8 @@ Route::group(['middleware' => ['auth', 'role:admin'], 'prefix' => 'admin'], func
     Route::get('/attachments/{attachment}/download', [ContactMessageController::class, 'downloadAttachment'])->name('attachments.download');
 
     Route::resource('feature-sections', FeatureSectionController::class)->except(['show']);
+    //end routes to control from website data
+
 
 
     //this routes to control from games

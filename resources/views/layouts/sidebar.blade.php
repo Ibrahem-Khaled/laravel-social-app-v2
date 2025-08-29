@@ -93,6 +93,11 @@
                     <i class="fas fa-fw fa-sliders-h"></i>
                     <span>الخصائص العامة</span>
                 </a>
+                <a class="collapse-item" href="{{ route('dashboard.settings.index') }}">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>إعدادات الموقع</span>
+                </a>
+
                 {{-- <a class="collapse-item" href="#">
                     <i class="fas fa-fw fa-sliders-h"></i>
                     <span>إعدادات SEO</span>

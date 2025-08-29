@@ -7,6 +7,7 @@ use App\Models\FeatureSection;
 use App\Models\LiveStreaming;
 use App\Models\Post;
 use App\Models\SellCoins;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -20,6 +21,7 @@ class webController extends Controller
         $coins = SellCoins::where('platform', 'web')->get();
         $faqs = FAQ::all();
         $featureSections = FeatureSection::with('items')->latest()->get();
+        $settings = Setting::all()->keyBy('key');
         $latestPosts = Post::with('user')
             ->where('status', 'active')
             ->latest() // للترتيب حسب الأحدث
@@ -34,6 +36,7 @@ class webController extends Controller
             'faqs' => $faqs,
             'featureSections' => $featureSections,
             'latestPosts' => $latestPosts,
+            'settings' => $settings,
             'heroImage' => 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
             'testimonials' => [
                 [
@@ -44,13 +47,6 @@ class webController extends Controller
                     'rating' => 5
                 ],
                 // المزيد من التوصيات...
-            ],
-            'demoFeatures' => [
-                'جودة صوت عالية الدقة',
-                'غرف صوتية متعددة',
-                'بث مباشر للفعاليات',
-                'تسجيل المحادثات',
-                'واجهة سهلة الاستخدام'
             ],
         ]);
     }

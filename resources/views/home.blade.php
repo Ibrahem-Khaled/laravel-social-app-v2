@@ -323,6 +323,46 @@
         </div>
     </section>
 
+    <section id="demo" class="py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-white">
+                    شاهد <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-purple-400">التطبيق</span>
+                    في حركة
+                </h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    خذ جولة سريعة في تطبيقنا وشاهد كيف يمكنك التواصل مع الآخرين بسهولة ومتعة.
+                </p>
+            </div>
+
+            <div class="relative max-w-4xl mx-auto" style="padding-bottom: 56.25%; /* 16:9 Aspect Ratio */">
+                @if (!empty($settings['promotional_video_url']->value))
+                    <iframe
+                        class="absolute top-0 left-0 w-full h-full rounded-2xl shadow-2xl border-2 border-primary-500/20 hover-lift"
+                        src="{{ str_replace('watch?v=', 'embed/', $settings['promotional_video_url']->value) }}"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                    </iframe>
+                @else
+                    <div
+                        class="absolute top-0 left-0 w-full h-full bg-gray-800 rounded-2xl flex items-center justify-center">
+                        <div class="text-center text-gray-500">
+                            <svg class="w-16 h-16 mx-auto mb-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                                    d="M15 10l4.55a2.5 2.5 0 010 4.09l-4.55 2.43M15 10v10a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v4z" />
+                            </svg>
+                            <p>الفيديو الترويجي غير متاح حالياً.</p>
+                            <p class="text-sm">يرجى إضافة رابط الفيديو من لوحة التحكم.</p>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </section>
+
     @if ($featureSections->isNotEmpty())
         @foreach ($featureSections as $section)
             {{-- نستخدم slug السكشن كـ id لسهولة الوصول إليه عبر الروابط --}}
